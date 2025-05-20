@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { SectorEconomico } from '../../../../domain/sector-economico.model';
-import { SectorEconomicoService } from '../../../../services/data-container.service';
+import { LocalSectorEconomicoService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-sector-economico-create',
@@ -43,7 +43,7 @@ import { SectorEconomicoService } from '../../../../services/data-container.serv
   ],
   templateUrl: './sector-economico-create.component.html',
   styleUrl: './sector-economico-create.component.scss',
-  providers: [SectorEconomicoService, MessageService]
+  providers: [LocalSectorEconomicoService, MessageService]
 })
 
 export class SectorEconomicoCreateComponent {
@@ -59,7 +59,7 @@ export class SectorEconomicoCreateComponent {
   submitted: boolean = false;
 
   constructor(
-    private sectorEconomicoService: SectorEconomicoService,
+    private sectorEconomicoService: LocalSectorEconomicoService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

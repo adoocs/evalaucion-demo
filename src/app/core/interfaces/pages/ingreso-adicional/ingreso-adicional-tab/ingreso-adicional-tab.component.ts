@@ -24,7 +24,7 @@ import { IngresoAdicional } from '../../../../domain/ingreso-adicional.model';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
-import { AportanteService, IngresoAdicionalService } from '../../../../services/data-container.service';
+import { LocalAportanteService, LocalIngresoAdicionalService } from '../../../../services/local-data-container.service';
 import { DetalleEconomico } from '../../../../domain/detalle-economico.model';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 
@@ -59,7 +59,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
   ],
   templateUrl: './ingreso-adicional-tab.component.html',
   styleUrl: './ingreso-adicional-tab.component.scss',
-  providers: [IngresoAdicionalService, MessageService, AportanteService, MessageToastService],
+  providers: [LocalIngresoAdicionalService, MessageService, LocalAportanteService, MessageToastService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestroy {
@@ -143,8 +143,8 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
   isConyugeChecked: boolean = false;
 
   constructor(
-    private ingresoAdicionalService: IngresoAdicionalService,
-    private aportanteService: AportanteService,
+    private ingresoAdicionalService: LocalIngresoAdicionalService,
+    private aportanteService: LocalAportanteService,
     private fb: FormBuilder,
     private messageToastService: MessageToastService,
     private cdr: ChangeDetectorRef

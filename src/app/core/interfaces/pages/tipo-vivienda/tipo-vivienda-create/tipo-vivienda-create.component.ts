@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { TipoVivienda } from '../../../../domain/tipo-vivienda.model';
-import { TipoViviendaService } from '../../../../services/data-container.service';
+import { LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-tipo-vivienda-create',
@@ -43,7 +43,7 @@ import { TipoViviendaService } from '../../../../services/data-container.service
   ],
   templateUrl: './tipo-vivienda-create.component.html',
   styleUrl: './tipo-vivienda-create.component.scss',
-  providers: [TipoViviendaService, MessageService]
+  providers: [LocalTipoViviendaService, MessageService]
 })
 
 export class TipoViviendaCreateComponent {
@@ -58,7 +58,7 @@ export class TipoViviendaCreateComponent {
   submitted: boolean = false;
 
   constructor(
-    private tipoViviendaService: TipoViviendaService,
+    private tipoViviendaService: LocalTipoViviendaService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

@@ -17,7 +17,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
 import { ActividadEconomica } from '../../../../domain/actividad-economica.model';
 import { ActividadEconomicaCreateComponent } from '../actividad-economica-create/actividad-economica-create.component';
 import { SectorEconomico } from '../../../../domain/sector-economico.model';
-import { ActividadEconomicaService, SectorEconomicoService } from '../../../../services/data-container.service';
+import { LocalActividadEconomicaService, LocalSectorEconomicoService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -49,7 +49,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     ActividadEconomicaCreateComponent
   ],
-  providers: [MessageService, MessageToastService, ActividadEconomicaService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalActividadEconomicaService, ConfirmationService],
   templateUrl: './actividad-economica-list.component.html',
   styleUrl: './actividad-economica-list.component.scss'
 })
@@ -74,8 +74,8 @@ export class ActividadEconomicaListComponent implements OnInit {
   loading: boolean = true;
 
   constructor(
-    private actividadEconomicaService: ActividadEconomicaService,
-    private sectoreconomicoService: SectorEconomicoService,
+    private actividadEconomicaService: LocalActividadEconomicaService,
+    private sectoreconomicoService: LocalSectorEconomicoService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }

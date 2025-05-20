@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { Aportante } from '../../../../domain/aportante.model';
 import { AportanteCreateComponent } from '../aportante-create/aportante-create.component';
-import { AportanteService } from '../../../../services/aportante.service';
+import { LocalAportanteService } from '../../../../services/local-data-container.service';
 
 
 interface Column {
@@ -49,7 +49,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     AportanteCreateComponent
   ],
-  providers: [MessageService, MessageToastService, AportanteService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalAportanteService, ConfirmationService],
   templateUrl: './aportante-list.component.html',
   styleUrl: './aportante-list.component.scss'
 })
@@ -69,7 +69,7 @@ export class AportanteListComponent implements OnInit {
   editabled: boolean = false;
 
   constructor(
-    private AportanteService: AportanteService,
+    private AportanteService: LocalAportanteService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }
@@ -83,9 +83,8 @@ export class AportanteListComponent implements OnInit {
   }
 
   loadDataTable() {
-    this.AportanteService.getAll().subscribe((data) => {
-      this.aportantes.set(data);
-    });
+    this.AportanteService.loadInitialData();
+    this.aportantes.set(this.AportanteService.data());
 
     this.cols = [
       { field: 'descripcion', header: 'descripcion', customExportHeader: 'Aportante Descripción' },
@@ -117,7 +116,7 @@ export class AportanteListComponent implements OnInit {
   submit() {
 
   }
-  
+
   deleteSelectedAportantes() {
     this.confirmationService.confirm({
       message: '¿Deseas eliminar los tipos de aportante seleccionados?',

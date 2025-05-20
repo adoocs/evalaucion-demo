@@ -26,7 +26,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { GastosOperativos } from '../../../../domain/gastos-operativos.model';
 import { IngresoDependiente } from '../../../../domain/ingreso-dependiente.model';
 import { RegistroVentas } from '../../../../domain/registro-ventas.model';
-import { NegocioService, TiempoService, ActividadEconomicaService, IngresoDependienteService, RegistroVentasService, GastosOperativosService, SectorEconomicoService, DenominacionService } from '../../../../services/data-container.service';
+import { LocalNegocioService, LocalTiempoService, LocalActividadEconomicaService, LocalIngresoDependienteService, LocalRegistroVentasService, LocalGastosOperativosService, LocalSectorEconomicoService, LocalDenominacionService } from '../../../../services/local-data-container.service';
 import { DetalleEconomico } from '../../../../domain/detalle-economico.model';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 
@@ -61,7 +61,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
   ],
   templateUrl: './negocio-tab.component.html',
   styleUrl: './negocio-tab.component.scss',
-  providers: [NegocioService, TiempoService, ConfirmationService, ActividadEconomicaService, IngresoDependienteService, RegistroVentasService, GastosOperativosService, MessageToastService],
+  providers: [LocalNegocioService, LocalTiempoService, ConfirmationService, LocalActividadEconomicaService, LocalIngresoDependienteService, LocalRegistroVentasService, LocalGastosOperativosService, MessageToastService],
 })
 export class NegocioTabComponent implements OnInit, OnChanges {
 
@@ -109,11 +109,11 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   errorVentasBajas: string = '';
 
   constructor(
-    private negocioService: NegocioService,
-    private tiempoService: TiempoService,
-    private sectorEconomicoService: SectorEconomicoService,
-    private actividadEconomica: ActividadEconomicaService,
-    private denominacionService: DenominacionService,
+    private negocioService: LocalNegocioService,
+    private tiempoService: LocalTiempoService,
+    private sectorEconomicoService: LocalSectorEconomicoService,
+    private actividadEconomica: LocalActividadEconomicaService,
+    private denominacionService: LocalDenominacionService,
     private fb: FormBuilder,
     private confirmationService: ConfirmationService,
     private messageToastService: MessageToastService
@@ -412,8 +412,8 @@ export class NegocioTabComponent implements OnInit, OnChanges {
           importe: this.ingreso_importe.value,
           actividad: this.ingreso_actividad.value,
           tiempo_valor: this.ingreso_tiempo_valor.value,
-          tiempo: this.ingreso_tiempo.value.code === 'MES' ? 
-            this.tiemposList().find(item => item.id === 1) 
+          tiempo: this.ingreso_tiempo.value.code === 'MES' ?
+            this.tiemposList().find(item => item.id === 1)
             : this.tiemposList().find(item => item.id === 2),
         }
       };
@@ -679,8 +679,8 @@ export class NegocioTabComponent implements OnInit, OnChanges {
           importe: this.ingreso_importe.value,
           actividad: this.ingreso_actividad.value,
           tiempo_valor: this.ingreso_tiempo_valor.value,
-          tiempo: this.ingreso_tiempo.value.code === 'MES' ? 
-            this.tiemposList().find(item => item.id === 1) 
+          tiempo: this.ingreso_tiempo.value.code === 'MES' ?
+            this.tiemposList().find(item => item.id === 1)
             : this.tiemposList().find(item => item.id === 2)
         }
       };

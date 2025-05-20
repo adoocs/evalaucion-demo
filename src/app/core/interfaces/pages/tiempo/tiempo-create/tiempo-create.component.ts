@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { Tiempo } from '../../../../domain/tiempo.model';
-import { TiempoService } from '../../../../services/data-container.service';
+import { LocalTiempoService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-tiempo-create',
@@ -43,7 +43,7 @@ import { TiempoService } from '../../../../services/data-container.service';
   ],
   templateUrl: './tiempo-create.component.html',
   styleUrl: './tiempo-create.component.scss',
-  providers: [TiempoService, MessageService]
+  providers: [LocalTiempoService, MessageService]
 })
 
 export class TiempoCreateComponent {
@@ -59,7 +59,7 @@ export class TiempoCreateComponent {
   submitted: boolean = false;
 
   constructor(
-    private TiempoService: TiempoService,
+    private TiempoService: LocalTiempoService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

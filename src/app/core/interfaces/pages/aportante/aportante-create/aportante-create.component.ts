@@ -17,7 +17,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { Message } from 'primeng/message';
 import { Aportante } from '../../../../domain/aportante.model';
-import { AportanteService } from '../../../../services/data-container.service';
+import { LocalAportanteService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-aportante-create',
@@ -43,7 +43,7 @@ import { AportanteService } from '../../../../services/data-container.service';
   ],
   templateUrl: './aportante-create.component.html',
   styleUrl: './aportante-create.component.scss',
-  providers: [AportanteService, MessageService]
+  providers: [LocalAportanteService, MessageService]
 })
 
 export class AportanteCreateComponent {
@@ -60,7 +60,7 @@ export class AportanteCreateComponent {
   submitted: boolean = false;
 
   constructor(
-    private AportanteService: AportanteService,
+    private AportanteService: LocalAportanteService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

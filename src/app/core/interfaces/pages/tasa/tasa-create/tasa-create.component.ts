@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { Tasa } from '../../../../domain/tasa.model';
-import { TasaService } from '../../../../services/data-container.service';
+import { LocalTasaService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-tasa-create',
@@ -43,7 +43,7 @@ import { TasaService } from '../../../../services/data-container.service';
   ],
   templateUrl: './tasa-create.component.html',
   styleUrl: './tasa-create.component.scss',
-  providers: [TasaService, MessageService]
+  providers: [LocalTasaService, MessageService]
 })
 
 export class TasaCreateComponent {
@@ -59,7 +59,7 @@ export class TasaCreateComponent {
   submitted: boolean = false;
 
   constructor(
-    private TasaService: TasaService,
+    private TasaService: LocalTasaService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

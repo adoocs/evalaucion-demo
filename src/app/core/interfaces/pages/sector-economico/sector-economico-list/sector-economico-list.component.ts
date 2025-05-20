@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { SectorEconomico } from '../../../../domain/sector-economico.model';
 import { SectorEconomicoCreateComponent } from '../sector-economico-create/sector-economico-create.component';
-import { SectorEconomicoService } from '../../../../services/data-container.service';
+import { LocalSectorEconomicoService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -48,7 +48,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     SectorEconomicoCreateComponent
   ],
-  providers: [MessageService, MessageToastService, SectorEconomicoService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalSectorEconomicoService, ConfirmationService],
   templateUrl: './sector-economico-list.component.html',
   styleUrl: './sector-economico-list.component.scss'
 })
@@ -68,7 +68,7 @@ export class SectorEconomicoListComponent implements OnInit {
   editabled: boolean = false;
 
   constructor(
-    private sectorEconomicoService: SectorEconomicoService,
+    private sectorEconomicoService: LocalSectorEconomicoService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }
@@ -113,7 +113,7 @@ export class SectorEconomicoListComponent implements OnInit {
   submit() {
 
   }
-  
+
   deleteSelectedsectorEconomicos() {
     this.confirmationService.confirm({
       message: '¿Deseas eliminar los tipos de sector economico seleccionados?',

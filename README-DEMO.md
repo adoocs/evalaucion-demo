@@ -88,7 +88,17 @@ Puedes editar las solicitudes existentes y los cambios se reflejarán inmediatam
 
 - La versión demo utiliza datos en memoria, mientras que la versión de producción se conecta a una API real
 - Los datos en la versión demo se pierden al refrescar la página
-- Algunas validaciones complejas pueden estar simplificadas
+- Todas las validaciones y reglas de negocio están implementadas localmente
+- No se realizan llamadas al backend, todo se procesa en el navegador
+
+## Solución de problemas
+
+Si encuentras algún error o advertencia en la consola, no te preocupes. La versión demo está diseñada para funcionar sin conexión a backend, por lo que algunos errores de conexión son esperados y no afectan la funcionalidad principal.
+
+Si la aplicación no carga correctamente:
+1. Limpia la caché del navegador
+2. Reinicia la aplicación con `npm start`
+3. Asegúrate de que no haya otros servicios usando el puerto 4200
 
 ## Notas técnicas
 

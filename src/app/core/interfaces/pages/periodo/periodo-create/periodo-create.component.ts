@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { Periodo } from '../../../../domain/periodo.model';
-import { PeriodoService } from '../../../../services/data-container.service';
+import { LocalPeriodoService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-periodo-create',
@@ -43,7 +43,7 @@ import { PeriodoService } from '../../../../services/data-container.service';
   ],
   templateUrl: './periodo-create.component.html',
   styleUrl: './periodo-create.component.scss',
-  providers: [PeriodoService, MessageService]
+  providers: [LocalPeriodoService, MessageService]
 })
 
 export class PeriodoCreateComponent {
@@ -59,7 +59,7 @@ export class PeriodoCreateComponent {
   submitted: boolean = false;
 
   constructor(
-    private PeriodoService: PeriodoService,
+    private PeriodoService: LocalPeriodoService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

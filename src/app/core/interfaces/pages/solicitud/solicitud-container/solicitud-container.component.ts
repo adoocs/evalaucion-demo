@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
-import { SolicitudService } from '../../../../services/data-container.service';
+import { LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { Solicitud } from '../../../../domain/solicitud.model';
 
 @Component({
@@ -51,7 +51,7 @@ export class SolicitudContainerComponent implements OnInit {
   loading: boolean = true;
 
   constructor(
-    private solicitudService: SolicitudService,
+    private solicitudService: LocalSolicitudService,
     private messageService: MessageToastService
   ) {}
 

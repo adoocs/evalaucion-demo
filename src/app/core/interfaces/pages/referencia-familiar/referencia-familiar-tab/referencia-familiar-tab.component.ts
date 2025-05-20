@@ -23,7 +23,7 @@ import { ReferenciaFamiliar } from '../../../../domain/referencia-familiar.model
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { FamiliaMiembros } from '../../../../domain/familia-miembros.model';
-import { ReferenciaFamiliarService, FamiliaMiembrosService } from '../../../../services/data-container.service';
+import { LocalReferenciaFamiliarService, LocalFamiliaMiembrosService } from '../../../../services/local-data-container.service';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 
 @Component({
@@ -56,7 +56,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
   ],
   templateUrl: './referencia-familiar-tab.component.html',
   styleUrl: './referencia-familiar-tab.component.scss',
-  providers: [ReferenciaFamiliarService, MessageService, FamiliaMiembrosService]
+  providers: [LocalReferenciaFamiliarService, MessageService, LocalFamiliaMiembrosService]
 })
 export class ReferenciaFamiliarTabComponent implements OnChanges {
 
@@ -84,8 +84,8 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
   // Output para comunicar el estado de validación al componente padre
   @Output() validationChange = new EventEmitter<boolean>();
   constructor(
-    private referenciaFamiliarService: ReferenciaFamiliarService,
-    private familiaMiembrosService: FamiliaMiembrosService,
+    private referenciaFamiliarService: LocalReferenciaFamiliarService,
+    private familiaMiembrosService: LocalFamiliaMiembrosService,
     private messageService: MessageToastService,
     private fb: FormBuilder
   ) {

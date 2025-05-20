@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { TipoVivienda } from '../../../../domain/tipo-vivienda.model';
 import { TipoViviendaCreateComponent } from '../tipo-vivienda-create/tipo-vivienda-create.component';
-import { TipoViviendaService } from '../../../../services/data-container.service';
+import { LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -48,7 +48,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     TipoViviendaCreateComponent
   ],
-  providers: [MessageService, MessageToastService, TipoViviendaService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalTipoViviendaService, ConfirmationService],
   templateUrl: './tipo-vivienda-list.component.html',
   styleUrl: './tipo-vivienda-list.component.scss'
 })
@@ -68,7 +68,7 @@ export class TipoViviendaListComponent implements OnInit {
   editabled: boolean = false;
 
   constructor(
-    private tipoViviendaService: TipoViviendaService,
+    private tipoViviendaService: LocalTipoViviendaService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }
@@ -113,7 +113,7 @@ export class TipoViviendaListComponent implements OnInit {
   submit() {
 
   }
-  
+
   deleteSelectedTipoViviendas() {
     this.confirmationService.confirm({
       message: '¿Deseas eliminar los tipos de tipo Vivienda seleccionados?',

@@ -24,7 +24,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { Tasa } from '../../../../domain/tasa.model';
 import { Periodo } from '../../../../domain/periodo.model';
 import { CreditoAnterior } from '../../../../domain/credito-anterior.model';
-import { CreditoAnteriorService, TasaService, PeriodoService } from '../../../../services/data-container.service';
+import { LocalCreditoAnteriorService, LocalTasaService, LocalPeriodoService } from '../../../../services/local-data-container.service';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -59,7 +59,7 @@ import { TooltipModule } from 'primeng/tooltip';
   ],
   templateUrl: './credito-anterior-tab.component.html',
   styleUrl: './credito-anterior-tab.component.scss',
-  providers: [CreditoAnteriorService, TasaService, MessageService, PeriodoService, MessageToastService]
+  providers: [LocalCreditoAnteriorService, LocalTasaService, MessageService, LocalPeriodoService, MessageToastService]
 })
 export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
 
@@ -88,9 +88,9 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
   }
 
   constructor(
-    private creditoAnteriorService: CreditoAnteriorService,
-    private tasaService: TasaService,
-    private periodoService: PeriodoService,
+    private creditoAnteriorService: LocalCreditoAnteriorService,
+    private tasaService: LocalTasaService,
+    private periodoService: LocalPeriodoService,
     private messageService: MessageToastService,
     private fb: FormBuilder
   ) {

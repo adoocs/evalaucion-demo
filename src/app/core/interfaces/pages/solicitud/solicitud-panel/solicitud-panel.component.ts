@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal, ViewChild } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -17,14 +17,14 @@ import { SolicitudTabComponent } from '../solicitud-tab/solicitud-tab.component'
 import { FichaTrabajo } from '../../../../domain/ficha-trabajo.model';
 import { Solicitud } from '../../../../domain/solicitud.model';
 import { Cliente } from '../../../../domain/cliente.model';
-import { SolicitudService, TipoViviendaService } from '../../../../services/data-container.service';
+import { LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 import { PuntajeSentinelTabComponent } from "../../puntaje-sentinel/puntaje-sentinel-tab/puntaje-sentinel-tab.component";
 import { ResumenTabComponent } from "../../resumen/resumen-tab/resumen-tab.component";
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
-import { FichaService } from '../../../../services/ficha.service';
-import { ValidationService } from '../../../../services/validation.service';
+import { LocalFichaService } from '../../../../services/local-ficha.service';
+import { LocalValidationService } from '../../../../services/local-validation.service';
 import { TaskToastService, Task } from '../../../../../shared/utils/task-toast.service';
 
 type TabConfig = {
@@ -45,16 +45,16 @@ type TabConfig = {
     ReactiveFormsModule,
     IconFieldModule,
     ToastModule,
+    SolicitudTabComponent,
     ClienteTabComponent,
     AvalTabComponent,
     ConyugeTabComponent,
     CreditoAnteriorTabComponent,
     NegocioTabComponent,
     IngresoAdicionalTabComponent,
+    PuntajeSentinelTabComponent,
     GastoFinancieroTabComponent,
     ReferenciaFamiliarTabComponent,
-    SolicitudTabComponent,
-    PuntajeSentinelTabComponent,
     ResumenTabComponent
   ],
   templateUrl: './solicitud-panel.component.html',
@@ -124,13 +124,11 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   tareasPendientes: Task[] = [];
 
   constructor(
-    // Mantenemos las referencias a los servicios pero los comentamos para evitar advertencias
-    // private solicitudService: SolicitudService,
-    // private fichaTrabajoService: FichaService,
     private messageService: MessageToastService,
-    private validationService: ValidationService,
-    private tipoViviendaService: TipoViviendaService,
-    private taskToastService: TaskToastService
+    private validationService: LocalValidationService,
+    private tipoViviendaService: LocalTipoViviendaService,
+    private taskToastService: TaskToastService,
+    private fichaTrabajoService: LocalFichaService
   ) { }
 
   ngOnInit(): void {
@@ -1376,23 +1374,19 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
 
     this.displayJson = true;
 
-    // Versión demo: Simular la creación de la ficha de trabajo sin conectarse al backend
+    // Usar el servicio local para crear la ficha de trabajo
     console.log('Ficha de Trabajo (DEMO):', this.fichaTrabajo);
-    this.messageService.successMessageToast('Éxito', 'Ficha de trabajo guardada correctamente (Versión Demo)');
 
-    // Comentamos la llamada al servicio real para evitar errores de conexión
-    /*
     this.fichaTrabajoService.createFichaTrabajo(this.fichaTrabajo).subscribe({
       next: (response) => {
         console.log('Ficha de Trabajo creada:', response);
-        this.messageService.successMessageToast('Éxito', 'Ficha de trabajo guardada correctamente');
+        this.messageService.successMessageToast('Éxito', 'Ficha de trabajo guardada correctamente (Versión Demo)');
       },
       error: (error) => {
         console.error('Error al crear ficha de trabajo:', error);
         this.messageService.errorMessageToast('Error', 'No se pudo guardar la ficha de trabajo');
       }
     });
-    */
   }
 
   createSolicitud(): void {

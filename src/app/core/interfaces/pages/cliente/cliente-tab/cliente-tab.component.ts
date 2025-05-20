@@ -22,8 +22,7 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { Cliente } from '../../../../domain/cliente.model';
 import { InputMaskModule } from 'primeng/inputmask';
 import { TipoVivienda } from '../../../../domain/tipo-vivienda.model';
-import { ClienteService, TipoViviendaService } from '../../../../services/data-container.service';
-import { ValidationService } from '../../../../services/validation.service';
+import { LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
 
@@ -55,7 +54,7 @@ import { LoadPersonService } from '../../../../../shared/utils/load-person.servi
   ],
   templateUrl: './cliente-tab.component.html',
   styleUrl: './cliente-tab.component.scss',
-  providers: [ClienteService, TipoViviendaService, MessageService]
+  providers: [MessageService]
 })
 export class ClienteTabComponent implements OnInit {
 
@@ -81,11 +80,9 @@ export class ClienteTabComponent implements OnInit {
 
   tipoViviendaList = computed(() => this.tipoViviendaService.data());
   constructor(
-    private clienteService: ClienteService,
     private loadPersonService: LoadPersonService,
-    protected tipoViviendaService: TipoViviendaService,
-    private fb: FormBuilder,
-    private validationService: ValidationService
+    protected tipoViviendaService: LocalTipoViviendaService,
+    private fb: FormBuilder
   ) {
     const today = new Date();
     this.max18Date = new Date(today.getFullYear() - 18, today.getMonth(), today.getDay());
@@ -480,7 +477,7 @@ export class ClienteTabComponent implements OnInit {
     }
 
     // 2. Verificar si el cliente tiene casa propia
-    const tipoViviendaPropia = tiposVivienda.find(tv =>
+    const tipoViviendaPropia = tiposVivienda.find((tv: TipoVivienda) =>
       tv.descripcion.toLowerCase().includes('propia')
     );
 

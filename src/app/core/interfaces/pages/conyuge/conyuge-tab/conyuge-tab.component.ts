@@ -23,7 +23,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 
 import { Conyuge } from '../../../../domain/conyuge.model';
-import { ConyugeService, TipoViviendaService } from '../../../../services/data-container.service';
+import { LocalConyugeService, LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
 
@@ -58,7 +58,7 @@ import { LoadPersonService } from '../../../../../shared/utils/load-person.servi
   ],
   templateUrl: './conyuge-tab.component.html',
   styleUrl: './conyuge-tab.component.scss',
-  providers: [ConyugeService, TipoViviendaService, MessageService]
+  providers: [LocalConyugeService, LocalTipoViviendaService, MessageService]
 })
 export class ConyugeTabComponent implements OnChanges {
 
@@ -86,8 +86,8 @@ export class ConyugeTabComponent implements OnChanges {
   motivoTemp: string = '';
 
   constructor(
-    private conyugeService: ConyugeService,
-    private tipoViviendaService: TipoViviendaService,
+    private conyugeService: LocalConyugeService,
+    private tipoViviendaService: LocalTipoViviendaService,
     private fb: FormBuilder,
     private messageService: MessageService,
     private loadPersonService: LoadPersonService

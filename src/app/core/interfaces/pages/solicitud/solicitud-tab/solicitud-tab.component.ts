@@ -21,7 +21,7 @@ import { PanelModule } from 'primeng/panel';
 import { ChartModule } from 'primeng/chart';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { Solicitud } from '../../../../domain/solicitud.model';
-import { SolicitudService, PeriodoService } from '../../../../services/data-container.service';
+import { LocalSolicitudService, LocalPeriodoService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-solicitud-tab',
@@ -52,7 +52,7 @@ import { SolicitudService, PeriodoService } from '../../../../services/data-cont
   ],
   templateUrl: './solicitud-tab.component.html',
   styleUrl: './solicitud-tab.component.scss',
-  providers: [SolicitudService, PeriodoService, MessageService]
+  providers: [LocalSolicitudService, LocalPeriodoService, MessageService]
 })
 export class SolicitudTabComponent implements   OnInit, OnChanges {
 
@@ -70,8 +70,8 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   submitted: boolean = false;
 
   constructor(
-    private solicitudService: SolicitudService,
-    private periodoService: PeriodoService,
+    private solicitudService: LocalSolicitudService,
+    private periodoService: LocalPeriodoService,
     private fb: FormBuilder
   ) {
     this.initiateForm();

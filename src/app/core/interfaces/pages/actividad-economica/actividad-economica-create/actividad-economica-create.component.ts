@@ -20,7 +20,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { PanelModule } from 'primeng/panel';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { ActividadEconomica } from '../../../../domain/actividad-economica.model';
-import { ActividadEconomicaService, SectorEconomicoService } from '../../../../services/data-container.service';
+import { LocalActividadEconomicaService, LocalSectorEconomicoService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-actividad-economica-create',
@@ -49,7 +49,7 @@ import { ActividadEconomicaService, SectorEconomicoService } from '../../../../s
   ],
   templateUrl: './actividad-economica-create.component.html',
   styleUrl: './actividad-economica-create.component.scss',
-  providers: [ActividadEconomicaService, SectorEconomicoService, MessageService]
+  providers: [LocalActividadEconomicaService, LocalSectorEconomicoService, MessageService]
 })
 export class ActividadEconomicaCreateComponent implements OnChanges {
 
@@ -67,8 +67,8 @@ export class ActividadEconomicaCreateComponent implements OnChanges {
   displayAffiliation: boolean = false;
 
   constructor(
-    private actividadEconomicaService: ActividadEconomicaService,
-    private sectorEconomicoService: SectorEconomicoService,
+    private actividadEconomicaService: LocalActividadEconomicaService,
+    private sectorEconomicoService: LocalSectorEconomicoService,
     private fb: FormBuilder
   ) {
     this.initiateForm();
@@ -85,7 +85,7 @@ export class ActividadEconomicaCreateComponent implements OnChanges {
     if (this.actividadEconomica) {
       this.actividadEconomicaForm.patchValue({
         id: this.actividadEconomica.id,
-        descripcion: this.actividadEconomica.descripcion,        
+        descripcion: this.actividadEconomica.descripcion,
         sector_economico: this.actividadEconomica.sector_economico?.descripcion
       });
     }
@@ -94,7 +94,7 @@ export class ActividadEconomicaCreateComponent implements OnChanges {
   initiateForm() {
     this.actividadEconomicaForm = this.fb.group({
       id: [[this.actividadEconomica.id], [Validators.required, Validators.minLength(1)]],
-      descripcion: [[this.actividadEconomica.descripcion], [Validators.required, Validators.minLength(1)]],      
+      descripcion: [[this.actividadEconomica.descripcion], [Validators.required, Validators.minLength(1)]],
       sector_economico: [[this.actividadEconomica.sector_economico?.descripcion], [Validators.required]],
     });
     this.actividadEconomicaForm.reset();

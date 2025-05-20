@@ -17,7 +17,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
 import { GastoFinanciero } from '../../../../domain/gasto-financiero.model';
 import { PanelModule } from 'primeng/panel';
 import { CheckboxModule } from 'primeng/checkbox';
-import { GastoFinancieroService, PeriodoService } from '../../../../services/data-container.service';
+import { LocalGastoFinancieroService, LocalPeriodoService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -51,7 +51,7 @@ interface ExportColumn {
     PanelModule,
     CheckboxModule
   ],
-  providers: [MessageService, MessageToastService, GastoFinancieroService, ConfirmationService, PeriodoService],
+  providers: [MessageService, MessageToastService, LocalGastoFinancieroService, ConfirmationService, LocalPeriodoService],
   templateUrl: './gasto-financiero-tab.component.html',
   styleUrl: './gasto-financiero-tab.component.scss'
 })
@@ -92,9 +92,9 @@ export class GastoFinancieroTabComponent implements OnInit {
   gastoFinancieroForm: FormGroup;
 
   constructor(
-    private gastoFinancieroService: GastoFinancieroService,
+    private gastoFinancieroService: LocalGastoFinancieroService,
     private messageService: MessageToastService,
-    private periodoService: PeriodoService,
+    private periodoService: LocalPeriodoService,
     private confirmationService: ConfirmationService,
     private fb: FormBuilder
   ) {

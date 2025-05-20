@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { Periodo } from '../../../../domain/periodo.model';
 import { PeriodoCreateComponent } from '../periodo-create/periodo-create.component';
-import { PeriodoService } from '../../../../services/data-container.service';
+import { LocalPeriodoService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -48,7 +48,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     PeriodoCreateComponent
   ],
-  providers: [MessageService, MessageToastService, PeriodoService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalPeriodoService, ConfirmationService],
   templateUrl: './periodo-list.component.html',
   styleUrl: './periodo-list.component.scss'
 })
@@ -68,7 +68,7 @@ export class PeriodoListComponent implements OnInit {
   editabled: boolean = false;
 
   constructor(
-    private periodoService: PeriodoService,
+    private periodoService: LocalPeriodoService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }
@@ -114,7 +114,7 @@ export class PeriodoListComponent implements OnInit {
   submit() {
 
   }
-  
+
   deleteSelectedPeriodos() {
     this.confirmationService.confirm({
       message: '¿Deseas eliminar los tipos de periodo seleccionados?',

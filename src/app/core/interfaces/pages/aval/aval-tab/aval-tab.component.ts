@@ -22,7 +22,7 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { Aval } from '../../../../domain/aval.model';
-import { AvalService, TipoViviendaService } from '../../../../services/data-container.service';
+import { LocalAvalService, LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
 
@@ -57,7 +57,7 @@ import { LoadPersonService } from '../../../../../shared/utils/load-person.servi
   ],
   templateUrl: './aval-tab.component.html',
   styleUrl: './aval-tab.component.scss',
-  providers: [AvalService, TipoViviendaService, MessageService]
+  providers: [LocalAvalService, LocalTipoViviendaService, MessageService]
 })
 export class AvalTabComponent implements OnInit {
 
@@ -79,8 +79,8 @@ export class AvalTabComponent implements OnInit {
   motivoTemp: string = '';
 
   constructor(
-    private avalService: AvalService,
-    private tipoViviendaService: TipoViviendaService,
+    private avalService: LocalAvalService,
+    private tipoViviendaService: LocalTipoViviendaService,
     private fb: FormBuilder,
     private messageService: MessageService,
     private loadPersonService: LoadPersonService

@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { Tiempo } from '../../../../domain/tiempo.model';
 import { TiempoCreateComponent } from '../tiempo-create/tiempo-create.component';
-import { TiempoService } from '../../../../services/data-container.service';
+import { LocalTiempoService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -48,7 +48,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     TiempoCreateComponent
   ],
-  providers: [MessageService, MessageToastService, TiempoService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalTiempoService, ConfirmationService],
   templateUrl: './tiempo-list.component.html',
   styleUrl: './tiempo-list.component.scss'
 })
@@ -69,7 +69,7 @@ export class TiempoListComponent implements OnInit {
   editabled: boolean = false;
 
   constructor(
-    private tiempoService: TiempoService,
+    private tiempoService: LocalTiempoService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }

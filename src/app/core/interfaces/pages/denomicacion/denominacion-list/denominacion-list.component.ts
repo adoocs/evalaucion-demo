@@ -18,7 +18,7 @@ import { Denominacion } from '../../../../domain/denominacion.model';
 import { DenominacionCreateComponent } from '../denominacion-create/denominacion-create.component';
 
 import { SectorEconomico } from '../../../../domain/sector-economico.model';
-import { DenominacionService, SectorEconomicoService } from '../../../../services/data-container.service';
+import { LocalDenominacionService, LocalSectorEconomicoService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -50,7 +50,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     DenominacionCreateComponent
   ],
-  providers: [MessageService, MessageToastService, DenominacionService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalDenominacionService, ConfirmationService],
   templateUrl: './denominacion-list.component.html',
   styleUrl: './denominacion-list.component.scss'
 })
@@ -75,8 +75,8 @@ export class DenominacionListComponent implements OnInit {
   loading: boolean = true;
 
   constructor(
-    private denominacionService: DenominacionService,
-    private sectoreconomicoService: SectorEconomicoService,
+    private denominacionService: LocalDenominacionService,
+    private sectoreconomicoService: LocalSectorEconomicoService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }

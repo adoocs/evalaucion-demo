@@ -19,7 +19,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { PanelModule } from 'primeng/panel';
 import { Denominacion } from '../../../../domain/denominacion.model';
 import { KeyFilterModule } from 'primeng/keyfilter';
-import { DenominacionService, SectorEconomicoService } from '../../../../services/data-container.service';
+import { LocalDenominacionService, LocalSectorEconomicoService } from '../../../../services/local-data-container.service';
 
 @Component({
   selector: 'app-denominacion-create',
@@ -47,7 +47,7 @@ import { DenominacionService, SectorEconomicoService } from '../../../../service
   ],
   templateUrl: './denominacion-create.component.html',
   styleUrl: './denominacion-create.component.scss',
-  providers: [DenominacionService, SectorEconomicoService, MessageService]
+  providers: [LocalDenominacionService, LocalSectorEconomicoService, MessageService]
 })
 export class DenominacionCreateComponent implements OnChanges {
 
@@ -65,8 +65,8 @@ export class DenominacionCreateComponent implements OnChanges {
   displayAffiliation: boolean = false;
 
   constructor(
-    private denominacionService: DenominacionService,
-    private sectorEconomicoService: SectorEconomicoService,
+    private denominacionService: LocalDenominacionService,
+    private sectorEconomicoService: LocalSectorEconomicoService,
     private fb: FormBuilder
   ) {
     this.initiateForm();
@@ -82,7 +82,7 @@ export class DenominacionCreateComponent implements OnChanges {
     if (this.denominacion) {
       this.denominacionForm.patchValue({
         id: this.denominacion.id,
-        descripcion: this.denominacion.descripcion,        
+        descripcion: this.denominacion.descripcion,
         sector_economico: this.denominacion.sector_economico?.descripcion
       });
     }
@@ -91,7 +91,7 @@ export class DenominacionCreateComponent implements OnChanges {
   initiateForm() {
     this.denominacionForm = this.fb.group({
       id: [[this.denominacion.id], [Validators.required, Validators.minLength(1)]],
-      descripcion: [[this.denominacion.descripcion], [Validators.required, Validators.minLength(1)]],      
+      descripcion: [[this.denominacion.descripcion], [Validators.required, Validators.minLength(1)]],
       sector_economico: [[this.denominacion.sector_economico?.descripcion], [Validators.required]],
     });
     this.denominacionForm.reset();
@@ -179,5 +179,5 @@ export class DenominacionCreateComponent implements OnChanges {
         event.preventDefault();
     }
   }
-  
+
 }

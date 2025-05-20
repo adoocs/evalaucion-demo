@@ -16,7 +16,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { Tasa } from '../../../../domain/tasa.model';
 import { TasaCreateComponent } from '../tasa-create/tasa-create.component';
-import { TasaService } from '../../../../services/data-container.service';
+import { LocalTasaService } from '../../../../services/local-data-container.service';
 
 interface Column {
   mw?: number
@@ -48,7 +48,7 @@ interface ExportColumn {
     ConfirmDialogModule,
     TasaCreateComponent
   ],
-  providers: [MessageService, MessageToastService, TasaService, ConfirmationService],
+  providers: [MessageService, MessageToastService, LocalTasaService, ConfirmationService],
   templateUrl: './tasa-list.component.html',
   styleUrl: './tasa-list.component.scss'
 })
@@ -68,7 +68,7 @@ export class TasaListComponent implements OnInit {
   editabled: boolean = false;
 
   constructor(
-    private tasaService: TasaService,
+    private tasaService: LocalTasaService,
     private messageService: MessageToastService,
     private confirmationService: ConfirmationService
   ) { }
@@ -114,7 +114,7 @@ export class TasaListComponent implements OnInit {
   submit() {
 
   }
-  
+
   deleteSelectedTasas() {
     this.confirmationService.confirm({
       message: '¿Deseas eliminar los tipos de tasa seleccionados?',
