@@ -24,7 +24,6 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { TipoVivienda } from '../../../../domain/tipo-vivienda.model';
 import { LocalTipoViviendaService, LocalClienteService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
-import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
 import { LocalLoadPersonService } from '../../../../../shared/utils/local-load-person.service';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 
@@ -482,7 +481,7 @@ export class ClienteTabComponent implements OnInit {
 
     // 2. Verificar si el cliente tiene casa propia
     const tipoViviendaPropia = tiposVivienda.find((tv: TipoVivienda) =>
-      tv.descripcion.toLowerCase().includes('propia')
+      tv.descripcion.toLowerCase() === 'propia'
     );
 
     const tieneViviendaPropia = tipoViviendaPropia &&
