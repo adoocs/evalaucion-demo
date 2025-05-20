@@ -1,6 +1,7 @@
 <p-toast />
 <p-toolbar styleClass="mb-6">
     <ng-template pTemplate="start">
+        <h5 class="m-0 mr-4">Lista de Solicitudes</h5>
         <p-button label="Nueva Solicitud" icon="pi pi-plus" severity="secondary" class="mr-2" (click)="openNew()" />
     </ng-template>
 
@@ -26,7 +27,7 @@
 >
     <ng-template pTemplate="caption">
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Administrar Solicitudes</h5>
+            <h5 class="m-0">Solicitudes Registradas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" placeholder="Buscar..." />
@@ -60,7 +61,7 @@
             </td>
             <td>
                 <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editSolicitud(solicitud)" />
-                <p-button icon="pi pi-eye" severity="info" [rounded]="true" [outlined]="true" (click)="editSolicitud(solicitud)" />
+                <p-button icon="pi pi-eye" severity="info" [rounded]="true" [outlined]="true" (click)="viewSolicitud(solicitud)" />
             </td>
         </tr>
     </ng-template>
@@ -82,6 +83,10 @@
     [closable]="true"
     (onHide)="hideDialog()"
 >
-    <app-solicitud-panel *ngIf="displaySolicitudDialog" />
+    <app-solicitud-panel
+        *ngIf="displaySolicitudDialog && selectedSolicitud"
+        [solicitud]="selectedSolicitud!"
+        (switchMessage)="handleSwitchMessage($event)"
+    />
 </p-dialog>
 <p-confirmdialog [style]="{ width: '450px' }" />

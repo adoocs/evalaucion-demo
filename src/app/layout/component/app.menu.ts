@@ -26,7 +26,8 @@ export class AppMenu {
             {
                 label: 'Solicitudes',
                 items: [
-                    { label: 'Nueva Solicitud', icon: 'pi pi-file-edit', routerLink: ['/solicitudes'] },
+                    { label: 'Ver Solicitudes', icon: 'pi pi-list', routerLink: ['/solicitudes'] },
+                    { label: 'Nueva Solicitud', icon: 'pi pi-file-edit', routerLink: ['/solicitudes/crear'] },
                 ]
             },
             {
@@ -46,7 +47,7 @@ export class AppMenu {
                     }
                 ]
             },
-            
+
         ];
     }
 }

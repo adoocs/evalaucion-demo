@@ -89,7 +89,7 @@ export class AvalTabComponent implements OnInit {
   }
   ngOnInit(): void {
     this.tipoViviendaService.loadInitialData();
-    this.setupAutoApiCall()
+    // this.setupAutoApiCall()
 
   }
 

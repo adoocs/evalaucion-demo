@@ -396,10 +396,10 @@ export class GastoFinancieroTabComponent implements OnInit {
         isValid = false;
         errorMessages.push('El monto de la cuota no puede ser mayor al saldo del crédito');
       }
-      if (!this.validarMontoCredito(gastoFinanciero)) {
-        isValid = false;
-        errorMessages.push('El monto del crédito no puede ser menor al saldo del crédito');
-      }
+      // if (!this.validarMontoCredito(gastoFinanciero)) {
+      //   isValid = false;
+      //   errorMessages.push('El monto del crédito no puede ser menor al saldo del crédito');
+      // }
     }
     if (!isValid && markAsTouched) {
       if (camposIncompletos) {

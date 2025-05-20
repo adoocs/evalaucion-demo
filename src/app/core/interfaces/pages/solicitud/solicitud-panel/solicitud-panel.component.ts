@@ -17,7 +17,7 @@ import { SolicitudTabComponent } from '../solicitud-tab/solicitud-tab.component'
 import { FichaTrabajo } from '../../../../domain/ficha-trabajo.model';
 import { Solicitud } from '../../../../domain/solicitud.model';
 import { Cliente } from '../../../../domain/cliente.model';
-import { LocalTipoViviendaService } from '../../../../services/local-data-container.service';
+import { LocalTipoViviendaService, LocalClienteService } from '../../../../services/local-data-container.service';
 import { PuntajeSentinelTabComponent } from "../../puntaje-sentinel/puntaje-sentinel-tab/puntaje-sentinel-tab.component";
 import { ResumenTabComponent } from "../../resumen/resumen-tab/resumen-tab.component";
 import { MessageService } from 'primeng/api';
@@ -26,6 +26,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
 import { LocalFichaService } from '../../../../services/local-ficha.service';
 import { LocalValidationService } from '../../../../services/local-validation.service';
 import { TaskToastService, Task } from '../../../../../shared/utils/task-toast.service';
+import { LocalLoadPersonService } from '../../../../../shared/utils/local-load-person.service';
 
 type TabConfig = {
   label: string;
@@ -128,11 +129,14 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     private validationService: LocalValidationService,
     private tipoViviendaService: LocalTipoViviendaService,
     private taskToastService: TaskToastService,
-    private fichaTrabajoService: LocalFichaService
+    private fichaTrabajoService: LocalFichaService,
+    private clienteService: LocalClienteService,
+    private loadPersonService: LocalLoadPersonService
   ) { }
 
   ngOnInit(): void {
     this.tipoViviendaService.loadInitialData();
+    this.clienteService.loadInitialData();
 
     // Mostrar mensaje de bienvenida a la versión demo
     setTimeout(() => {
@@ -141,6 +145,73 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         'Esta es una versión demo con datos locales. Puedes probar todas las funcionalidades sin conexión a base de datos.'
       );
     }, 1000);
+
+    // Si tenemos una solicitud existente, cargar los datos
+    if (this.solicitud && this.solicitud.id) {
+      console.log('Cargando solicitud existente:', this.solicitud);
+      // Aquí se cargarían los datos de la ficha de trabajo asociada a la solicitud
+    }
+  }
+
+  /**
+   * Verifica si un cliente existe por DNI
+   * @param dni El DNI a verificar
+   * @returns Promise con el cliente si existe, null si no existe
+   */
+  verificarClientePorDNI(dni: string): Promise<Cliente | null> {
+    return new Promise((resolve) => {
+      // Primero verificamos si el cliente existe en la base de datos local
+      const clienteExistente = this.clienteService.data().find(cliente => cliente.dni === dni);
+
+      if (clienteExistente) {
+        console.log('Cliente encontrado en la base de datos local:', clienteExistente);
+        this.messageService.infoMessageToast('Cliente encontrado', 'Se ha encontrado un cliente con el DNI ' + dni);
+        resolve(clienteExistente);
+        return;
+      }
+
+      // Si no existe en la base de datos local, consultamos el servicio de carga de personas
+      this.loadPersonService.consultarDni(dni).subscribe({
+        next: (response: any) => {
+          if (response && response.success && response.persona) {
+            console.log('Cliente encontrado en el servicio de carga de personas:', response);
+            this.messageService.infoMessageToast('Cliente encontrado', 'Se ha encontrado un cliente con el DNI ' + dni);
+
+            // Mapear la respuesta a un objeto Cliente
+            const clienteMapeado = this.loadPersonService.mapApiToCliente(response);
+
+            // Crear un nuevo cliente con los datos obtenidos
+            const nuevoCliente: Cliente = {
+              id: this.clienteService.data().length + 1,
+              apellidos: clienteMapeado.apellidos || '',
+              nombres: clienteMapeado.nombres || '',
+              dni: dni,
+              fecha_born: clienteMapeado.fecha_born || '',
+              estado_civil: 'Soltero',
+              edad: clienteMapeado.edad || 0,
+              genero: clienteMapeado.genero || 'M',
+              direccion: '',
+              celular: 0,
+              n_referencial: 0,
+              grado_instruccion: 'Secundaria',
+              email: '',
+              tipo_vivienda: this.tipoViviendaService.data()[0]
+            };
+
+            resolve(nuevoCliente);
+          } else {
+            console.log('Cliente no encontrado en el servicio de carga de personas');
+            this.messageService.warnMessageToast('Cliente no encontrado', 'No se ha encontrado un cliente con el DNI ' + dni);
+            resolve(null);
+          }
+        },
+        error: (error: any) => {
+          console.error('Error al consultar el servicio de carga de personas:', error);
+          this.messageService.errorMessageToast('Error', 'No se pudo consultar el servicio de carga de personas');
+          resolve(null);
+        }
+      });
+    });
   }
 
   // Suscripciones para poder limpiarlas en ngOnDestroy
@@ -1390,18 +1461,42 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   }
 
   createSolicitud(): void {
-    // Versión demo: Simular la creación de la solicitud sin conectarse al backend
+    // Obtener todos los datos de la ficha de trabajo
+    this.fichaTrabajo = this.getAllData();
+
+    // Actualizar la solicitud con los datos de la ficha de trabajo
+    if (this.fichaTrabajo.cliente) {
+      this.solicitud.cliente = this.fichaTrabajo.cliente.apellidos + ' ' + this.fichaTrabajo.cliente.nombres;
+    }
+
+    if (this.fichaTrabajo.aval) {
+      this.solicitud.aval = this.fichaTrabajo.aval.apellidos + ' ' + this.fichaTrabajo.aval.nombres;
+    }
+
+    if (this.fichaTrabajo.conyuge) {
+      this.solicitud.conyugue = this.fichaTrabajo.conyuge.apellidos + ' ' + this.fichaTrabajo.conyuge.nombres;
+    }
+
+    // Asignar otros campos de la solicitud
+    this.solicitud.credito_anterior = this.fichaTrabajo.credito_anterior || undefined;
+    this.solicitud.gasto_financiero = this.fichaTrabajo.gasto_financieros?.[0] || undefined;
+    this.solicitud.referencia_familiar = this.fichaTrabajo.referencia_familiar || undefined;
+    this.solicitud.ingreso_adicional = this.fichaTrabajo.ingreso_adicional || undefined;
+    this.solicitud.negocio = this.fichaTrabajo.detalleEconomico?.negocio || undefined;
+
+    // Asignar fecha actual si no tiene
+    if (!this.solicitud.fecha) {
+      this.solicitud.fecha = new Date().toISOString().split('T')[0];
+    }
+
+    // Generar número de crédito si no tiene
+    if (!this.solicitud.n_credito) {
+      this.solicitud.n_credito = Math.floor(10000 + Math.random() * 90000);
+    }
+
     console.log('Creando solicitud (DEMO):', this.solicitud);
     this.messageService.successMessageToast('Éxito', 'Solicitud creada correctamente (Versión Demo)');
     this.switchMessageHandler('create');
-
-    // Comentamos la llamada al servicio real para evitar errores de conexión
-    /*
-    this.solicitudService.create(this.solicitud).subscribe({
-      next: () => this.switchMessageHandler('create'),
-      error: () => this.switchMessageHandler('error')
-    });
-    */
   }
 
   editSolicitud(): void {

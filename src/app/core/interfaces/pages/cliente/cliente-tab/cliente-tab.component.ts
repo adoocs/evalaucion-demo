@@ -22,9 +22,11 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { Cliente } from '../../../../domain/cliente.model';
 import { InputMaskModule } from 'primeng/inputmask';
 import { TipoVivienda } from '../../../../domain/tipo-vivienda.model';
-import { LocalTipoViviendaService } from '../../../../services/local-data-container.service';
+import { LocalTipoViviendaService, LocalClienteService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
+import { LocalLoadPersonService } from '../../../../../shared/utils/local-load-person.service';
+import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 
 @Component({
   selector: 'app-cliente-tab',
@@ -80,8 +82,10 @@ export class ClienteTabComponent implements OnInit {
 
   tipoViviendaList = computed(() => this.tipoViviendaService.data());
   constructor(
-    private loadPersonService: LoadPersonService,
+    private localLoadPersonService: LocalLoadPersonService,
     protected tipoViviendaService: LocalTipoViviendaService,
+    private clienteService: LocalClienteService,
+    private messageToastService: MessageToastService,
     private fb: FormBuilder
   ) {
     const today = new Date();
@@ -90,7 +94,7 @@ export class ClienteTabComponent implements OnInit {
   }
   ngOnInit(): void {
     this.tipoViviendaService.loadInitialData();
-    this.setupAutoApiCall();
+    //this.setupAutoApiCall();
 
     // Suscribirse a cambios en los campos relevantes
     this.setupFormListeners();
@@ -550,12 +554,25 @@ export class ClienteTabComponent implements OnInit {
     // Versión demo: Usar el servicio local para consultar DNI
     console.log('Consultando DNI (DEMO):', dni);
 
-    this.loadPersonService.consultarDni(dni).subscribe({
-      next: (response) => {
+    // Primero verificamos si el cliente existe en la base de datos local
+    const clienteExistente = this.clienteService.data().find(cliente => cliente.dni === dni);
+
+    if (clienteExistente) {
+      console.log('Cliente encontrado en la base de datos local:', clienteExistente);
+      this.messageToastService.infoMessageToast('Cliente encontrado', 'Se ha encontrado un cliente con el DNI ' + dni);
+
+      // Actualizar el formulario con los datos del cliente existente
+      this.updateFormValues(clienteExistente);
+      return;
+    }
+
+    // Si no existe en la base de datos local, consultamos el servicio de carga de personas
+    this.localLoadPersonService.consultarDni(dni).subscribe({
+      next: (response: any) => {
         console.log('Respuesta de consulta DNI (DEMO):', response);
 
-        if (response.success) {
-          const client = this.loadPersonService.mapApiToCliente(response);
+        if (response && response.success && response.persona) {
+          const client = this.localLoadPersonService.mapApiToCliente(response);
           console.log('Cliente mapeado (DEMO):', client);
 
           this.clienteForm.patchValue({
@@ -566,14 +583,28 @@ export class ClienteTabComponent implements OnInit {
             genero: this.generoList.find(g => g.code === client.genero) || this.generoList[0],
             direccion: client.direccion || 'Dirección de ejemplo'
           });
+
+          this.messageToastService.infoMessageToast('Cliente encontrado', 'Se ha encontrado un cliente con el DNI ' + dni);
         } else {
           console.log('No se encontró información para el DNI (DEMO)');
+          this.messageToastService.warnMessageToast('Cliente no encontrado', 'No se ha encontrado un cliente con el DNI ' + dni);
           this.clienteForm.reset();
+
+          // Mantener el DNI en el formulario
+          this.clienteForm.patchValue({
+            dni: dni
+          });
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al consultar DNI (DEMO):', error);
+        this.messageToastService.errorMessageToast('Error', 'No se pudo consultar el servicio de carga de personas');
         this.clienteForm.reset();
+
+        // Mantener el DNI en el formulario
+        this.clienteForm.patchValue({
+          dni: dni
+        });
       }
     });
   }

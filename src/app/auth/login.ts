@@ -126,19 +126,21 @@ export class Login {
 
         // Mostrar información de depuración en la consola
         console.log('Intentando iniciar sesión con:', credentials);
+        this.router.navigateByUrl('/solicitudes');
+        this.loading = false;
 
-        this.authService.login(credentials).subscribe({
-            next: (response) => {
-              console.log('Login exitoso:', response);
-              this.router.navigateByUrl('/solicitudes');
-              this.loading = false;
-            },
-            error: (error) => {
-                console.error('Error en login:', error);
-                this.loading = false;
-                this.messageService.add({ severity: 'error', summary: 'Bad credentials', detail: 'Credenciales incorrectas' });
-            }
-        })
+        // this.authService.login(credentials).subscribe({
+        //     next: (response) => {
+        //       console.log('Login exitoso:', response);
+        //       this.router.navigateByUrl('/solicitudes');
+        //       this.loading = false;
+        //     },
+        //     error: (error) => {
+        //         console.error('Error en login:', error);
+        //         this.loading = false;
+        //         this.messageService.add({ severity: 'error', summary: 'Bad credentials', detail: 'Credenciales incorrectas' });
+        //     }
+        // })
     }
 
     get email() {

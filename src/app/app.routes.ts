@@ -9,6 +9,7 @@ import { SectorEconomicoListComponent } from './core/interfaces/pages/sector-eco
 import { ActividadEconomicaListComponent } from './core/interfaces/pages/actividad-economica/actividad-economica-list/actividad-economica-list.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { SolicitudContainerComponent } from './core/interfaces/pages/solicitud/solicitud-container/solicitud-container.component';
+import { SolicitudCrearComponent } from './core/interfaces/pages/solicitud/solicitud-crear/solicitud-crear.component';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,7 @@ export const routes: Routes = [
       { path: 'tiempos', component: TiempoListComponent },
       { path: 'periodos', component: PeriodoListComponent },
       { path: 'solicitudes', component: SolicitudContainerComponent },
+      { path: 'solicitudes/crear', component: SolicitudCrearComponent },
       { path: 'account', loadChildren: () => import('./auth/account/account.routes') } ,
     ]
   },

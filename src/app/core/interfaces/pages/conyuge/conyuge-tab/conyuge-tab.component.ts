@@ -93,7 +93,7 @@ export class ConyugeTabComponent implements OnChanges {
     private loadPersonService: LoadPersonService
   ) {
     this.initiateForm();
-    this.setupAutoApiCall()
+    // this.setupAutoApiCall()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
