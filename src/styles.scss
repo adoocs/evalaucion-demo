@@ -1,0 +1,13 @@
+/* You can add global styles to this file, and also import other style files */
+@use './tailwind.css';
+@use './assets/layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@use './assets/demo/demo.scss';
+
+.p-message.p-message-error.p-message-sm {
+  margin-top: 0.25rem;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}

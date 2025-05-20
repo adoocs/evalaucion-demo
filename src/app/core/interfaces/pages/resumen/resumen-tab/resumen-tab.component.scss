@@ -1,0 +1,24 @@
+:host ::ng-deep {
+  .p-panel {
+    .p-panel-header {
+      background-color: #f8f9fa;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .p-panel-content {
+      border-radius: 0 0 6px 6px;
+    }
+  }
+
+  .p-tag {
+    font-weight: 600;
+  }
+
+  .text-500 {
+    color: #6c757d;
+  }
+
+  .text-900 {
+    color: #212529;
+  }
+}

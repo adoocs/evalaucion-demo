@@ -1,0 +1,47 @@
+<div class="card">
+  <p-panel styleClass="mb-4">
+    <span class="p-text-secondary block mb-8">Actualizar tu información</span>
+
+    <div class="flex items-center gap-4 mb-4">
+      <label for="username" class="font-semibold w-1/5 text-center">Nombre de usuario :</label>
+      <input pInputText id="username" class="p-inputtext p-component p-inputtext-fluid flex-1" />
+    </div>
+
+    <div class="flex items-center gap-4 mb-8">
+      <label for="email" class="font-semibold w-1/5 text-center">Dirección email :</label>
+      <input pInputText id="email" class="p-inputtext p-component p-inputtext-fluid flex-1" />
+    </div>
+
+    <div class="flex items-center gap-4 mb-8">
+      <label for="description" class="font-semibold w-1/5 text-center">Descripción :</label>
+      <textarea id="description" rows="5" cols="30" pTextarea [autoResize]="true"
+        class="p-inputtext p-component p-inputtext-fluid flex-1"></textarea>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="false" />
+      <p-button label="Save" (click)="false" />
+    </div>
+  </p-panel>
+
+  <p-panel>
+    <span class="p-text-secondary block mb-8">Actualizar contraseña.</span>
+
+    <div class="flex items-center gap-4 mb-4">
+      <label for="currentPassword" class="font-semibold w-1/5 text-center">Contraseña actual :</label>
+      <input pPassword id="currentPassword" formControlName="profile.password"
+        class="p-inputtext p-component p-inputtext-fluid flex-1" />
+    </div>
+
+    <div class="flex items-center gap-4 mb-8">
+      <label for="newPassword" class="font-semibold w-1/5 text-center">Nueva contraseña :</label>
+      <input pPassword id="newPassword" formControlName="profile.newPassword"
+        class="p-inputtext p-component p-inputtext-fluid flex-1" />
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="false" />
+      <p-button label="Save" (click)="false" />
+    </div>
+  </p-panel>
+</div>

@@ -1,0 +1,100 @@
+<!-- Mensaje de éxito cuando el formulario está completo o está omitido -->
+<div *ngIf="isFormComplete()" class="p-4 bg-green-50 border-l-4 border-green-300 text-green-600 mb-4">
+  <div class="flex items-center">
+    <i class="pi pi-check-circle mr-2 text-green-500"></i>
+    <p><strong>¡Correcto!</strong>
+      <span *ngIf="!puntajeForm.get('omitido')?.value">La información de Puntaje Sentinel ha sido completada correctamente.</span>
+      <span *ngIf="puntajeForm.get('omitido')?.value">El formulario de Puntaje Sentinel ha sido omitido.</span>
+    </p>
+  </div>
+</div>
+
+<p-panel header="Dato de Experian" styleClass="w-full" [ngClass]="{'opacity-50': puntajeForm.get('omitido')?.value}">
+  <div class="flex flex-row flex-wrap p-6 align-items-start">
+
+    <div class="flex flex-column mr-8" style="flex: 0 0 340px;">
+      <form [formGroup]="puntajeForm" class="w-full">
+        <div class="field w-full mb-4">
+          <p-floatlabel>
+            <input pInputText id="puntaje" formControlName="puntaje" (input)="validatePuntajeInput($event)"
+              class="w-full" [ngClass]="getInputColorClass()" [disabled]="puntajeForm.get('omitido')?.value"
+              [attr.disabled]="puntajeForm.get('omitido')?.value ? '' : null" />
+            <label for="puntaje">Puntaje Experian</label>
+          </p-floatlabel>
+
+          <!-- Mensajes de error de validación -->
+          <div *ngIf="puntajeForm.get('puntaje')?.invalid && (puntajeForm.get('puntaje')?.touched || puntajeForm.get('puntaje')?.dirty) && !puntajeForm.get('omitido')?.value">
+            <small class="text-red-500 block mt-1" *ngIf="puntajeForm.get('puntaje')?.errors?.['required']">
+              El puntaje es requerido
+            </small>
+            <small class="text-red-500 block mt-1" *ngIf="puntajeForm.get('puntaje')?.errors?.['min']">
+              El puntaje debe ser mayor o igual a 1
+            </small>
+            <small class="text-red-500 block mt-1" *ngIf="puntajeForm.get('puntaje')?.errors?.['max']">
+              El puntaje debe ser menor o igual a 999
+            </small>
+          </div>
+        </div>
+
+        <div *ngIf="puntajeSentinel > 0" class="w-full mt-4">
+          <div class="text-center text-sm text-gray-600 mb-2">Puntaje actual</div>
+          <div class="text-center font-bold p-3 border-round-lg" [ngClass]="getInputColorClass()">
+            {{ puntajeSentinel }} - {{ columnaSeleccionada >= 0 ? rangos[columnaSeleccionada].nombre : 'Fuera de rango' }}
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="flex-1 min-w-0 pl-8 border-left-2 border-gray-200" style="flex-grow: 1;">
+      <p-table [value]="[{}]" styleClass="p-datatable-sm" [tableStyle]="{'min-width': '100%'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th *ngFor="let rango of rangos; let i = index" [ngClass]="rango.colorClass"
+              class="text-center border-1 border-gray-300 p-4">
+              <div class="font-medium">{{ rango.nombre }}</div>
+              <div class="text-sm font-normal mt-2">
+                {{ rango.minimo }} - {{ rango.maximo }}
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body">
+          <tr>
+            <td *ngFor="let rango of rangos; let i = index" [ngClass]="getColorClass(i)"
+              class="text-center border-1 border-gray-300 p-4 h-6rem">
+              <i *ngIf="columnaSeleccionada === i" class="pi pi-check-circle text-3xl"></i>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </div>
+</p-panel>
+<div class="mb-4"></div>
+<!-- Panel de omisión -->
+<p-panel>
+  <ng-template pTemplate="header">
+    <div class="flex justify-between items-center w-full">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold">PUNTAJE EXPERIAN:</span>
+        <!-- Botones para omitir/habilitar que siempre están habilitados -->
+        <div>
+          <button type="button"
+            class="p-button p-button-sm p-button-rounded p-button-text"
+            [ngClass]="{'p-button-danger': !puntajeForm.get('omitido')?.value, 'p-button-success': puntajeForm.get('omitido')?.value}"
+            (click)="toggleOmitirPuntajeSentinel()">
+            <i class="pi" [ngClass]="{'pi-times-circle': !puntajeForm.get('omitido')?.value, 'pi-check-circle': puntajeForm.get('omitido')?.value}"></i>
+            <span class="ml-1 text-xs">{{ puntajeForm.get('omitido')?.value ? 'Habilitar' : 'Omitir' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <form [formGroup]="puntajeForm" class="w-full">
+    <div *ngIf="puntajeForm.get('omitido')?.value" class="mt-2">
+      <small class="text-gray-600">Al marcar esta opción, se omitirá el formulario de Puntaje Sentinel y podrá continuar
+        con el proceso.</small>
+    </div>
+  </form>
+</p-panel>

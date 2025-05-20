@@ -1,0 +1,40 @@
+<p-dialog [(visible)]="display" [style]="{ width: '300px' }" (visibleChange)="hideDialog($event)" header="Detalle Item"
+    [modal]="true">
+    <form [formGroup]="familiaForm" class="card flex flex-col justify-center">
+        <div class="mb-8">
+            <p-floatlabel variant="on">
+                <p-select formControlName="descripcion" inputId="descripcion" [options]="descripcionList" optionLabel="name"
+                  styleClass="w-full" />
+                <label for="descripcion">Descripción</label>
+              </p-floatlabel>
+        </div>
+        <div class="mb-8">
+            <p-floatlabel variant="on">
+                <p-inputnumber inputId="integeronly" formControlName="n_hijos" mode="decimal" [showButtons]="true"
+                    inputId="minmax-buttons" [min]="0" [max]="100" />
+                <span *ngIf="submitted && n_hijos.invalid" class="text-xs text-red-500 ml-2">
+                    Ingrese un número válido.
+                </span>
+                <label>n_hijos </label>
+            </p-floatlabel>
+        </div>
+        <div class="mb-6 flex items-center gap-2">
+            <p-checkbox name="condicion" formControlName="condicion" binary="true"></p-checkbox>
+            <label for="condicion">Inicial</label>
+            <span *ngIf="condicion.value" class="text-xs text-gray-500 ml-2">
+                Estudia nivel inicial.
+            </span>
+        </div>
+        <div class="mb-6 flex items-center gap-2">
+            <p-checkbox name="condicion" formControlName="condicion" binary="true"></p-checkbox>
+            <label for="condicion">No vive el domicilio</label>
+            <span *ngIf="condicion.value" class="text-xs text-gray-500 ml-2">
+                Pero incurre en gastos.
+            </span>
+        </div>
+    </form>
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="cancel()" />
+        <p-button label="Save" icon="pi pi-check" (click)="submit()" />
+    </ng-template>
+</p-dialog>

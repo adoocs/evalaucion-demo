@@ -1,0 +1,331 @@
+<p-toast></p-toast>
+<div class="card flex flex-col gap-6 p-6">
+
+  <p-confirmDialog [style]="{width: '450px'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+  <div class="mb-2">
+    <h2 class="text-xl font-bold mb-2">Actividad Económica</h2>
+    <p class="text-gray-600 mb-2">Seleccione el tipo de actividad económica del cliente:</p>
+
+    <div class="flex gap-8">
+      <div class="flex items-center p-3 rounded-lg transition-colors"
+           [ngClass]="{'bg-blue-50 border border-blue-200': tipoActividadSeleccionada === 'negocio'}">
+        <p-radioButton name="tipoActividad" [value]="'negocio'" [(ngModel)]="tipoActividadSeleccionada"
+          [ngModelOptions]="{standalone: true}" inputId="negocio" (onChange)="cambiarTipoActividad('negocio')"></p-radioButton>
+        <label for="negocio" class="ml-2 cursor-pointer font-medium text-lg" (click)="cambiarTipoActividad('negocio')">
+          <i class="pi pi-briefcase mr-2 text-blue-600"></i>
+          Negocio
+        </label>
+      </div>
+
+      <div class="flex items-center p-3 rounded-lg transition-colors"
+           [ngClass]="{'bg-blue-50 border border-blue-200': tipoActividadSeleccionada === 'dependiente'}">
+        <p-radioButton name="tipoActividad" [value]="'dependiente'" [(ngModel)]="tipoActividadSeleccionada"
+          [ngModelOptions]="{standalone: true}" inputId="dependiente" (onChange)="cambiarTipoActividad('dependiente')"></p-radioButton>
+        <label for="dependiente" class="ml-2 cursor-pointer font-medium text-lg" (click)="cambiarTipoActividad('dependiente')">
+          <i class="pi pi-user mr-2 text-blue-600"></i>
+          Ingreso Dependiente
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <p-panel *ngIf="negocioForm" [formGroup]="negocioForm" [toggleable]="true"
+    [collapsed]="tipoActividadSeleccionada !== 'negocio'"
+    [ngClass]="{'opacity-50': tipoActividadSeleccionada !== 'negocio',
+               'border-red-500 shadow-md': tipoActividadSeleccionada === 'negocio' && submitted && negocioForm.invalid}">
+    <ng-template #header>
+      <div class="flex items-center gap-2">
+        <span class="font-bold">Datos del Negocio</span>
+        <p-button icon="pi pi-info-circle" severity="secondary" rounded text pTooltip="RECUERDA: Complete este formulario solo si el cliente tiene un negocio propio"
+          tooltipPosition="top" />
+      </div>
+    </ng-template>
+    <div class="flex flex-col gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="mb-6">
+          <p-floatlabel variant="on">
+            <p-select formControlName="sector" inputId="sector" [options]="sectoresList()"
+              (onChange)="sectorEconomicoOnChage($event)" optionLabel="descripcion" styleClass="w-full" />
+            <label for="sector">Sector económico</label>
+          </p-floatlabel>
+          <p-message severity="error" variant="simple" size="small" *ngIf="sector.touched && sector.invalid"
+            [text]="'Campo es requerido.'"></p-message>
+        </div>
+        <div class="mb-6">
+          <p-select [options]="actividadEconomicasList" formControlName="actividad_economica"
+            optionLabel="actividad_economica" [filter]="true" filterBy="nombre" [showClear]="true"
+            placeholder="Seleccione una actividad económica" class="w-full"
+            pTooltip="RECUERDA: Esta deberá ser su actividad principal" tooltipPosition="top">
+            <ng-template #selectedItem let-selectedOption>
+              <div class="flex items-center gap-2">
+                <div>{{ selectedOption.descripcion }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-actividad #item>
+              <div class="flex items-center gap-2">
+                <div>{{ actividad.descripcion }}</div>
+              </div>
+            </ng-template>
+          </p-select>
+          <p-message severity="error" variant="simple" size="small"
+            *ngIf="actividad_economica.touched && actividad_economica.invalid"
+            [text]="'Campo es requerido.'"></p-message>
+        </div>
+        <div class="mb-8 w-full">
+          <p-floatlabel variant="on">
+            <input pInputText id="direccion" formControlName="direccion" autocomplete="off" required autofocus
+              class="w-full" />
+            <label for="direccion">Dirección</label>
+          </p-floatlabel>
+          <p-message severity="error" variant="simple" size="small" *ngIf="direccion.touched && direccion.invalid"
+            [text]="'Dirección es requerido.'"></p-message>
+        </div>
+        <div class="mb-8 flex gap-6 w-full">
+          <div class="flex flex-col w-1/3">
+            <label for="tiempo_valor" class="font-semibold">Tiempo en el negocio</label>
+          </div>
+          <div class="flex flex-col w-1/3">
+            <div class="relative">
+              <p-floatlabel variant="on">
+                <input pInputText id="tiempo_valor" pKeyFilter="int" formControlName="tiempo_valor" autocomplete="off"
+                  required class="w-full" />
+                <label for="tiempo_valor">Valor</label>
+              </p-floatlabel>
+              <i *ngIf="tiempo_valor.value <= 6 && tiempo_valor.value > 0 && tiempo.value?.code === 'MES'"
+                class="pi pi-exclamation-triangle text-yellow-500 absolute right-3 top-3"
+                pTooltip="Tiene menos de 6 meses de experiencia" tooltipPosition="top"></i>
+            </div>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="tiempo_valor.touched && tiempo_valor.invalid" [text]="'Tiempo valor es requerido.'"></p-message>
+          </div>
+
+          <div class="flex flex-col w-1/3">
+            <p-floatlabel variant="on">
+              <p-select formControlName="tiempo" inputId="tiempo" [options]="tiempoList" optionLabel="name"
+                styleClass="w-full" />
+              <label for="tiempo">Tiempo</label>
+            </p-floatlabel>
+            <p-message severity="error" variant="simple" size="small" *ngIf="tiempo.touched && tiempo.invalid"
+              [text]="'Tiempo es requerido.'"></p-message>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-6 w-full">
+      <div formGroupName="registro_ventas" class="md:w-1/3 registro-ventas-section">
+        <p-panel class="mb-0" [ngClass]="{'border-red-500 shadow-md': errorRegistroVentas}">
+          <ng-template pTemplate="header">
+            <div class="flex justify-between items-center w-full">
+              <span class="font-semibold">Registro de Ventas</span>
+            </div>
+          </ng-template>
+          <div class="mb-6 mt-4">
+            <p-floatlabel variant="on">
+              <p-select formControlName="ventas_frecuencia" inputId="frecuencia" [options]="frecuenciaList"
+                optionLabel="name" styleClass="w-full" />
+              <label for="frecuencia">Frecuencia</label>
+            </p-floatlabel>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_frecuencia.touched && ventas_frecuencia.invalid" [text]="'Campo requerido.'"></p-message>
+          </div>
+          <div class="mb-6">
+            <p-floatlabel variant="on">
+              <input pInputText pKeyFilter="money" formControlName="ventas_normales" autocomplete="off"
+                class="w-full" (input)="validarVentasEnTiempoReal()" />
+              <label for="ventas_normales">Ventas Normales</label>
+            </p-floatlabel>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_normales.touched && ventas_normales.invalid" [text]="'Campo requerido.'"></p-message>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_normales.touched && errorVentasNormales" [text]="errorVentasNormales"></p-message>
+          </div>
+          <div class="mb-6">
+            <p-floatlabel variant="on">
+              <input pInputText pKeyFilter="money" formControlName="ventas_altas" autocomplete="off" required
+                class="w-full" (input)="validarVentasEnTiempoReal()" />
+              <label for="ventas_altas">Ventas Altas</label>
+            </p-floatlabel>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_altas.touched && ventas_altas.invalid" [text]="'Campo requerido.'"></p-message>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_altas.touched && errorVentasAltas" [text]="errorVentasAltas"></p-message>
+          </div>
+          <div class="mb-6">
+            <p-floatlabel variant="on">
+              <input pInputText pKeyFilter="money" formControlName="ventas_bajas" autocomplete="off" class="w-full"
+                (input)="validarVentasEnTiempoReal()" />
+              <label for="ventas_bajas">Ventas Bajas</label>
+            </p-floatlabel>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_bajas.touched && ventas_bajas.invalid" [text]="'Campo requerido.'"></p-message>
+            <p-message severity="error" variant="simple" size="small"
+              *ngIf="ventas_bajas.touched && errorVentasBajas" [text]="errorVentasBajas"></p-message>
+          </div>
+
+          <div *ngIf="errorRegistroVentas" class="mt-2 text-red-500">
+            <p>{{ errorRegistroVentas }}</p>
+          </div>
+        </p-panel>
+      </div>
+
+      <div class="md:w-2/3 gastos-operativos-section">
+        <p-panel class="mb-0">
+          <ng-template pTemplate="header">
+            <div class="flex justify-between items-center w-full">
+              <span class="font-semibold">Gastos Operativos</span>
+            </div>
+          </ng-template>
+          <div class="card">
+            <p-table [value]="gastosOperativosList" dataKey="id" [tableStyle]="{ 'min-width': '50rem' }">
+              <ng-template #header>
+                <tr>
+                  <th style="width:35%">Denominación</th>
+                  <th style="width:15%">Importe</th>
+                  <th style="width:10%">Cantidad</th>
+                  <th style="width:25%">Detalle</th>
+                  <th style="width:15%">Total</th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-gasto let-editing="editing">
+                <tr>
+                  <td>
+                    {{gasto.denominacion?.descripcion}}
+                  </td>
+                  <td [pEditableColumn]="gasto.importe" pEditableColumnField="importe">
+                    <p-cellEditor>
+                      <ng-template #input>
+                        <input pInputText type="number" [(ngModel)]="gasto.importe"
+                          [ngModelOptions]="{ standalone: true }" />
+                      </ng-template>
+                      <ng-template #output>
+                        <span *ngIf="gasto.importe === 0" class="placeholder-text">0</span>
+                        <span *ngIf="gasto.importe !== 0">{{ gasto.importe }}</span>
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td [pEditableColumn]="gasto.cantidad" pEditableColumnField="cantidad">
+                    <p-cellEditor>
+                      <ng-template #input>
+                        <input pInputText type="number" [(ngModel)]="gasto.cantidad"
+                          [ngModelOptions]="{ standalone: true }" />
+                      </ng-template>
+                      <ng-template #output>
+                        <span *ngIf="gasto.cantidad === 0" class="placeholder-text">0</span>
+                        <span *ngIf="gasto.cantidad !== 0">{{ gasto.cantidad }}</span>
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td [pEditableColumn]="gasto.detalle" pEditableColumnField="detalle">
+                    <p-cellEditor>
+                      <ng-template #input>
+                        <input pInputText type="text" [(ngModel)]="gasto.detalle"
+                          [ngModelOptions]="{ standalone: true }" />
+                      </ng-template>
+                      <ng-template #output>
+                        <span *ngIf="!gasto.detalle" class="placeholder-text">Ingrese un detalle</span>
+                        <span *ngIf="gasto.detalle">{{ gasto.detalle }}</span>
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td>
+                    {{ (gasto.cantidad || 0) * (gasto.importe || 0) | currency: 'S/.' }}
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template #footer>
+                <tr>
+                  <td colspan="4" style="text-align: right;">Total Gastos</td>
+                  <td [ngClass]="{'text-red-500 font-bold': calcularTotalGastos() === 0}">
+                    {{ calcularTotalGastos() | currency: 'S/.' }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+
+            <div *ngIf="tipoActividadSeleccionada === 'negocio' && submitted && calcularTotalGastos() === 0"
+                 class="mt-2 text-red-500">
+              <p>Debe ingresar al menos un gasto operativo con importe y cantidad mayor a 0.</p>
+            </div>
+          </div>
+
+        </p-panel>
+      </div>
+    </div>
+  </p-panel>
+
+  <p-panel [toggleable]="true"
+    [collapsed]="tipoActividadSeleccionada !== 'dependiente'"
+    [ngClass]="{'opacity-50': tipoActividadSeleccionada !== 'dependiente',
+               'border-red-500 shadow-md': tipoActividadSeleccionada === 'dependiente' && submitted && ingresoDependienteForm.invalid}">
+    <ng-template #header>
+      <div class="flex items-center gap-2">
+        <span class="font-bold">Datos de Ingreso Dependiente</span>
+        <p-button icon="pi pi-info-circle" severity="secondary" rounded text
+          pTooltip="RECUERDA:
+      - LLENAR SIEMPRE Y CUANDO EL CLIENTE CUENTE CON BOLETAS, CONTRATO, ETC
+      - RECUERDE QUE SI EL CLIENTE CUENTA CON UNA ACTIVIDAD PARALELA, SE DEBE CONSIDERAR SOLO EN 'INGRESOS ADICIONALES'" tooltipPosition="top" />
+      </div>
+    </ng-template>
+    <div *ngIf="ingresoDependienteForm" [formGroup]="ingresoDependienteForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="mb-6">
+        <p-floatlabel variant="on">
+          <p-select formControlName="ingreso_frecuencia" inputId="in_frecuencia" [options]="frecuenciaListDependiente"
+            optionLabel="name" styleClass="w-full" />
+          <label for="in_frecuencia">Frecuencia</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small"
+          *ngIf="ingreso_frecuencia.touched && ingreso_frecuencia.invalid"
+          [text]="'Frecuencia es requerida.'"></p-message>
+      </div>
+      <div class="mb-6">
+        <p-floatlabel variant="on">
+          <input pInputText pKeyFilter="money" formControlName="ingreso_importe" autocomplete="off" class="w-full" />
+          <label for="importe">Importe</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small"
+          *ngIf="ingreso_importe.touched && ingreso_importe.invalid" [text]="'Importe es requerido.'"></p-message>
+      </div>
+      <div class="mb-6">
+        <p-floatlabel variant="on">
+          <input pInputText formControlName="ingreso_actividad" autocomplete="off" class="w-full" (keypress)="alpha($event)"
+            pTooltip="RECUERDA: INGRESE LA ACTIVIDAD ESPECIFICA QUE DESEMPEÑA EN SU LOCAL DE TRABAJO"
+            tooltipPosition="top" />
+          <label for="actividad">Actividad</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small"
+          *ngIf="ingreso_actividad.touched && ingreso_actividad.invalid" [text]="'Actividad es requerida.'"></p-message>
+      </div>
+      <div class="mb-8 flex gap-6 w-full">
+        <div class="flex flex-col w-1/3">
+          <label for="id" class="font-semibold">Tiempo de experiencia</label>
+        </div>
+        <div class="flex flex-col w-1/3">
+          <div class="relative">
+            <p-floatlabel variant="on">
+              <input pInputText id="tiempo_v" pKeyFilter="int" formControlName="ingreso_tiempo_valor" autocomplete="off"
+                required class="w-full" />
+              <label for="tiempo_v">Valor</label>
+            </p-floatlabel>
+            <i *ngIf="ingreso_tiempo_valor.value <= 6 && ingreso_tiempo_valor.value > 0 && ingreso_tiempo.value?.code === 'MES'"
+              class="pi pi-exclamation-triangle text-yellow-500 absolute right-3 top-3"
+              pTooltip="Tiene menos de 6 meses de experiencia" tooltipPosition="top"></i>
+          </div>
+          <p-message severity="error" variant="simple" size="small"
+            *ngIf="ingreso_tiempo_valor.touched && ingreso_tiempo_valor.invalid"
+            [text]="'Valor requerido.'"></p-message>
+        </div>
+        <div class="flex flex-col w-1/3">
+          <p-floatlabel variant="on">
+            <p-select formControlName="ingreso_tiempo" inputId="tiempo" [options]="tiempoListDependiente"
+              optionLabel="name" styleClass="w-full" />
+            <label for="tiempo">Tiempo</label>
+          </p-floatlabel>
+          <p-message severity="error" variant="simple" size="small"
+            *ngIf="ingreso_tiempo.touched && ingreso_tiempo.invalid" [text]="'Tiempo es requerido.'"></p-message>
+        </div>
+      </div>
+    </div>
+  </p-panel>
+</div>

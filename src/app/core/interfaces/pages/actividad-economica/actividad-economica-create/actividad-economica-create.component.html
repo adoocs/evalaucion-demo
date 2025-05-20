@@ -1,0 +1,34 @@
+<p-dialog [(visible)]="display" [style]="{ width: '700px' }" (visibleChange)="hideDialog($event)" header="{{title}}"
+    [modal]="true">
+    <div class="card flex flex-col gap-6">
+        <form [formGroup]="actividadEconomicaForm" class="flex flex-col">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="mb-8">
+                    <p-floatlabel variant="on">
+                        <input pInputText id="descripcion" formControlName="descripcion" autocomplete="off" required
+                            autofocus (keypress)="alpha($event)"/>
+                        <label for="descripcion">Descripción</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="descripcion.touched && descripcion.invalid"
+                        [text]="'Descripción es requerida'">
+                    </p-message>
+                </div>
+                <div class="mb-8">
+                    <p-floatlabel variant="on">
+                        <p-select formControlName="sector_economico" inputId="sector_economico"
+                            [options]="sectorEconomicosList" placeholder="Seleccione un sector" 
+                            optionLabel="name" styleClass="w-full" />
+                        <label for="sector_economico">Sector Económico</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="sector_economico.touched && sector_economico.invalid"
+                        [text]="'Sector es requerido'">
+                    </p-message>
+                </div>
+            </div>
+        </form>
+    </div>
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="cancel()" />
+        <p-button label="Save" icon="pi pi-check" (click)="submit()" />
+    </ng-template>
+</p-dialog>

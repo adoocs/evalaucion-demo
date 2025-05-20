@@ -1,0 +1,39 @@
+<p-dialog [(visible)]="display" [style]="{ width: '700px' }" (visibleChange)="hideDialog($event)" header="{{title}}"
+    [modal]="true">
+    <div class="card flex flex-col gap-6">
+        <form [formGroup]="denominacionForm" class="flex flex-col">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                <div class="mb-8">
+                    <p-floatlabel variant="on">
+                        <input pInputText id="id" formControlName="id" autocomplete="off" required autofocus />
+                        <small class="text-red-500" *ngIf="submitted && id.invalid">Código es requerido.</small>
+                        <label for="id">Código</label>
+                    </p-floatlabel>
+                </div>
+                <div class="mb-8">
+                    <p-floatlabel variant="on">
+                        <input pInputText id="descripcion" formControlName="descripcion" autocomplete="off" (keypress)="alpha($event)" required
+                            autofocus />
+                        <small class="text-red-500" *ngIf="submitted && descripcion.invalid">descripcion es
+                            requerido.</small>
+                        <label for="descripcion">descripcion</label>
+                    </p-floatlabel>
+                </div>
+                <div class="mb-8">
+                    <p-floatlabel variant="on">
+                        <p-select formControlName="sector_economico" inputId="sector_economico"
+                            [options]="sectorEconomicosList()" placeholder="Seleccione un sector económico" placeholder=""
+                            optionLabel="name" styleClass="w-full" />
+                        <label for="sector_economico">Sector Económico</label>
+                        <small class="text-red-500" *ngIf="submitted && sector_economico.invalid">Seleccionar una sector
+                            económico.</small>
+                    </p-floatlabel>
+                </div>
+            </div>
+        </form>
+    </div>
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="cancel()" />
+        <p-button label="Save" icon="pi pi-check" (click)="submit()" />
+    </ng-template>
+</p-dialog>

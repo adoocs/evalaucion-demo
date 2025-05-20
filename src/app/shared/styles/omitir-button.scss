@@ -1,0 +1,24 @@
+/* Estilos para asegurar que los botones de omitir/desomitir siempre estén habilitados */
+:host ::ng-deep {
+  /* Asegurarse de que los botones de omitir/desomitir no hereden la opacidad del panel */
+  .p-panel-header button.p-button {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Estilos para el botón de omitir (rojo) */
+  .p-button-danger {
+    color: #f44336 !important;
+  }
+
+  /* Estilos para el botón de desomitir (verde) */
+  .p-button-success {
+    color: #4caf50 !important;
+  }
+
+  /* Asegurarse de que los iconos y texto de los botones sean visibles */
+  .p-panel-header button.p-button i,
+  .p-panel-header button.p-button span {
+    opacity: 1 !important;
+  }
+}

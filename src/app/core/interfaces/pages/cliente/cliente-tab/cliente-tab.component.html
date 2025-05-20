@@ -1,0 +1,163 @@
+<div class="card flex flex-col gap-6">
+    <p-panel header="Datos del Cliente" class="mb-0">
+        <!-- Alerta cuando se requiere AVAL -->
+        <div *ngIf="requiresAval" class="p-4 mb-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+            <div class="flex items-center">
+                <i class="pi pi-exclamation-triangle mr-2 text-yellow-500"></i>
+                <p><strong>Atención:</strong> {{ avalReason }}</p>
+            </div>
+        </div>
+        <form [formGroup]="clienteForm" class="flex flex-col">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-4">
+                <div>
+                    <p-floatlabel variant="on" class="relative w-full max-w-lg">
+                        <input pInputText id="dni" pKeyFilter="int" formControlName="dni" maxlength="8" minlength="8" autocomplete="off" required
+                            class="w-full pr-10" (input)="onDniInput()" (blur)="onDniBlur()" />
+                        <label for="dni">DNI</label>
+                        <button *ngIf="showClearIcon" type="button"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            (click)="clearDni()">
+                            <i class="pi pi-times"></i>
+                        </button>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="dni.touched && dni.invalid"
+                        [text]="'DNI es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText (keypress)="alpha($event)" id="apellidos" formControlName="apellidos" autocomplete="off" required
+                            class="w-full max-w-lg" />
+                        <label for="apellidos">Apellidos</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="apellidos.touched && apellidos.invalid"
+                        [text]="'Apellidos es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText (keypress)="alpha($event)" id="nombres" formControlName="nombres" autocomplete="off" required
+                            class="w-full max-w-lg" />
+                        <label for="nombres">Nombres</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="nombres.touched && nombres.invalid"
+                        [text]="'Nombres es requerido.'">
+                    </p-message>
+                </div>
+
+                <div >
+                    <p-floatlabel variant="on">
+                        <p-datepicker formControlName="fecha_born" inputId="fecha_born" (onSelect)="onDateSelect($event)" (onBlur)="checkIfRequiresAval()" [maxDate]="max18Date" showIcon
+                            iconDisplay="input" utc="false" dateFormat="dd/mm/yy" styleClass="w-full max-w-lg" />
+                        <label for="fecha_born">Fecha de nacimiento</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="fecha_born.touched && fecha_born.invalid"
+                        [text]="'Fecha de nacimiento es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText id="edad" pKeyFilter="int" formControlName="edad" autocomplete="off" required
+                            class="w-full max-w-lg" />
+                        <label for="edad">Edad</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="edad.touched && edad.invalid"
+                        [text]="'Edad es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <p-select formControlName="estado_civil" inputId="estado_civil" [options]="estadoCivilList"
+                            optionLabel="name" styleClass="w-full max-w-xl" (onChange)="onEstadoCivilChange($event)" />
+                        <label for="estado_civil">Estado civil</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="estado_civil.touched && estado_civil.invalid"
+                        [text]="'Seleccionar un estado civil.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <p-select formControlName="genero" inputId="genero" [options]="generoList" optionLabel="name"
+                            styleClass="w-full max-w-xl" />
+                        <label for="genero">Género</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="genero.touched && genero.invalid"
+                        [text]="'Seleccionar un género.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText id="direccion" formControlName="direccion" autocomplete="off" required
+                            class="w-full max-w-lg" />
+                        <label for="direccion">Dirección</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="direccion.touched && direccion.invalid"
+                        [text]="'Dirección es requerida.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText id="celular" pKeyFilter="int" maxlength="9" minlength="9" formControlName="celular" autocomplete="off"
+                            required class="w-full max-w-lg" />
+                        <label for="celular">Celular</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="celular.touched && celular.invalid"
+                        [text]="'Celular es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText id="n_referencial" pKeyFilter="int" maxlength="9" minlength="9" formControlName="n_referencial"
+                            autocomplete="off" class="w-full max-w-lg" />
+                        <label for="n_referencial">Telf. referencial (opcional)</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="n_referencial.touched && n_referencial.invalid"
+                        [text]="'Si ingresa un teléfono referencial, debe tener 9 dígitos.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <p-select formControlName="grado_instruccion" inputId="grado_instruccion"
+                            [options]="gradoInstruccionList" optionLabel="name" styleClass="w-full max-w-xl" />
+                        <label for="grado_instruccion">Grado de instrucción</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="grado_instruccion.touched && grado_instruccion.invalid"
+                        [text]="'Seleccionar un grado de instruccion.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <input pInputText id="email" formControlName="email" autocomplete="off"
+                            class="w-full max-w-lg" />
+                        <label for="email">Email (opcional)</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="email.touched && email.invalid"
+                        [text]="'Si ingresa un email, debe tener un formato válido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on">
+                        <p-select formControlName="tipo_vivienda" inputId="tipo_vivienda" [options]="tipoViviendaList()"
+                            placeholder="" optionLabel="descripcion" styleClass="w-full max-w-lg"
+                            (onChange)="checkIfRequiresAval()" />
+                        <label for="tipo_vivienda">Tipo Vivienda</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="tipo_vivienda.touched && tipo_vivienda.invalid"
+                        [text]="'Seleccionar un tipo de vivienda.'">
+                    </p-message>
+                </div>
+            </div>
+        </form>
+    </p-panel>
+</div>

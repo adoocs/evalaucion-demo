@@ -1,0 +1,292 @@
+<div class="card flex flex-col gap-6">
+    <!-- Mensaje de éxito cuando ambos paneles están omitidos -->
+    <div *ngIf="omitirIngresoAdicional && omitirAportesTerceros"
+        class="p-4 bg-green-100 border-l-4 border-green-500 text-green-700 mb-4">
+        <div class="flex items-center">
+            <i class="pi pi-check-circle mr-2 text-green-500"></i>
+            <p><strong>¡Correcto!</strong> Todos los paneles de Ingreso Adicional han sido omitidos. Puede continuar al
+                siguiente paso.</p>
+        </div>
+    </div>
+
+    <!-- Mensaje de éxito cuando el formulario está completo -->
+    <div *ngIf="!omitirIngresoAdicional && !omitirAportesTerceros && isFormComplete()"
+        class="p-4 bg-green-100 border-l-4 border-green-500 text-green-700 mb-4">
+        <div class="flex items-center">
+            <i class="pi pi-check-circle mr-2 text-green-500"></i>
+            <p><strong>¡Correcto!</strong> La información del Ingreso Adicional ha sido completada correctamente.</p>
+        </div>
+    </div>
+
+    <!-- Mensaje cuando solo se ha omitido el panel principal -->
+    <div *ngIf="omitirIngresoAdicional && !omitirAportesTerceros && validatePanelAportesTerceros(false)"
+        class="p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 mb-4">
+        <div class="flex items-center">
+            <i class="pi pi-info-circle mr-2 text-blue-500"></i>
+            <p><strong>Información:</strong> El panel de Ingreso Adicional ha sido omitido. Complete el panel de Aportes
+                de Terceros o márquelo como omitido para continuar.</p>
+        </div>
+    </div>
+
+    <!-- Mensaje cuando solo se ha omitido el panel de aportes de terceros -->
+    <div *ngIf="!omitirIngresoAdicional && omitirAportesTerceros && validatePanelPrincipal(false)"
+        class="p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 mb-4">
+        <div class="flex items-center">
+            <i class="pi pi-info-circle mr-2 text-blue-500"></i>
+            <p><strong>Información:</strong> El panel de Aportes de Terceros ha sido omitido. Complete el panel de
+                Ingreso Adicional o márquelo como omitido para continuar.</p>
+        </div>
+    </div>
+
+    <form [formGroup]="ingresoAdicionalForm" class="flex flex-col">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <p-panel class="mb-0" [ngClass]="{'opacity-50': omitirIngresoAdicional}">
+                <ng-template pTemplate="header">
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold">INGRESO ADICIONAL:</span>
+                            <!-- Botones para omitir/desomitir que siempre están habilitados -->
+                            <div>
+                                <button type="button"
+                                    class="p-button p-button-sm p-button-rounded p-button-text"
+                                    [ngClass]="{'p-button-danger': !omitirIngresoAdicional, 'p-button-success': omitirIngresoAdicional}"
+                                    (click)="toggleOmitirIngresoAdicional()">
+                                    <i class="pi" [ngClass]="{'pi-times-circle': !omitirIngresoAdicional, 'pi-check-circle': omitirIngresoAdicional}"></i>
+                                    <span class="ml-1 text-xs">{{ omitirIngresoAdicional ? 'Habilitar' : 'Omitir' }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <p-button icon="pi pi-info-circle" severity="secondary" rounded text
+                            pTooltip="RECUERDA: Este no podrá producir más ingresos que su actividad principal y debe estar sustentada"
+                            tooltipPosition="top" />
+                    </div>
+                </ng-template>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
+                    <div class="flex flex-col gap-2">
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <input pInputText id="actividad" formControlName="actividad" autocomplete="off" required
+                                    autofocus class="w-full max-w-xl" [disabled]="omitirIngresoAdicional" />
+                                <label for="actividad">Actividad</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="actividad.touched && actividad.invalid && !omitirIngresoAdicional"
+                                [text]="'Actividad es requerido.'">
+                            </p-message>
+                        </div>
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <p-select formControlName="frecuencia" inputId="frecuencia" [options]="frecuenciaList"
+                                    optionLabel="name" styleClass="w-full max-w-xl"
+                                    [disabled]="omitirIngresoAdicional" />
+                                <label for="frecuencia">Frecuencia</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="frecuencia.touched && frecuencia.invalid && !omitirIngresoAdicional"
+                                [text]="'Seleccionar una frecuencia.'">
+                            </p-message>
+                        </div>
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <input pInputText id="importe_act" formControlName="importe_act" autocomplete="off"
+                                    required autofocus class="w-full max-w-xl" (input)="validarImporteAdicional()"
+                                    [disabled]="omitirIngresoAdicional" />
+                                <label for="importe_act">Importe</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="importe_act.touched && importe_act.invalid && !omitirIngresoAdicional"
+                                [text]="'Importe es requerido.'">
+                            </p-message>
+                            <!-- Mensaje de error para validación de importe -->
+                            <ng-container *ngIf="importe_act.value">
+                                <!-- Mensaje de error cuando la validación falla -->
+                                <div *ngIf="!validarImporteAdicional()"
+                                    class="mt-2 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 rounded shadow-sm">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <i class="pi pi-exclamation-triangle text-red-500"></i>
+                                        <p class="font-bold text-red-700">Error de validación:</p>
+                                    </div>
+                                    <p>{{ obtenerMensajeValidacion() }}</p>
+                                </div>
+
+                                <!-- Mensaje informativo cuando hay ingreso dependiente -->
+                                <div *ngIf="validarImporteAdicional() && detalleEconomico?.ingreso_dependiente?.importe"
+                                    class="mt-2 p-2 bg-blue-50 border-l-4 border-blue-300 text-blue-700 rounded">
+                                    <p class="text-sm">
+                                        <i class="pi pi-info-circle mr-2"></i>
+                                        Ingreso dependiente actual: {{ detalleEconomico?.ingreso_dependiente?.importe }}
+                                    </p>
+                                </div>
+
+                                <!-- Mensaje informativo cuando hay negocio -->
+                                <div *ngIf="validarImporteAdicional() && detalleEconomico?.negocio?.registro_ventas?.ventas_normales"
+                                    class="mt-2 p-2 bg-blue-50 border-l-4 border-blue-300 text-blue-700 rounded">
+                                    <p class="text-sm">
+                                        <i class="pi pi-info-circle mr-2"></i>
+                                        Ventas normales actuales: {{
+                                        detalleEconomico?.negocio?.registro_ventas?.ventas_normales }}
+                                    </p>
+                                </div>
+
+                                <!-- Mensaje cuando no hay detalle económico -->
+                                <div *ngIf="!detalleEconomico || (!detalleEconomico?.ingreso_dependiente?.importe && !detalleEconomico?.negocio?.registro_ventas?.ventas_normales)"
+                                    class="mt-2 p-2 bg-yellow-50 border-l-4 border-yellow-300 text-yellow-700 rounded">
+                                    <p class="text-sm">
+                                        <i class="pi pi-exclamation-circle mr-2"></i>
+                                        No se ha encontrado información de actividad económica. Por favor, complete
+                                        primero la sección de Actividad Económica.
+                                    </p>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="mb-6 flex items-center gap-2">
+                            <p-checkbox name="sustentable" formControlName="sustentable" binary="true"
+                                [disabled]="omitirIngresoAdicional"></p-checkbox>
+                            <label for="sustentable">Sustentable</label>
+                            <span *ngIf="sustentable.value" class="text-xs text-gray-500 ml-2">
+                                Presenta evidencias.
+                            </span>
+                            <i class="pi pi-info-circle text-blue-500 ml-1 cursor-pointer"
+                               pTooltip="Si marca 'Sustentable', el campo 'Detalle el sustento' será opcional."
+                               tooltipPosition="top"></i>
+                        </div>
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <input pInputText id="detalle" formControlName="detalle" autocomplete="off"
+                                    [required]="!sustentable.value"
+                                    autofocus class="w-full max-w-xl" [disabled]="omitirIngresoAdicional" />
+                                <label for="detalle">Detalle el sustento</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="detalle.touched && detalle.invalid && !omitirIngresoAdicional && !sustentable.value"
+                                [text]="'Detalle es requerido.'">
+                            </p-message>
+                        </div>
+                    </div>
+                </div>
+            </p-panel>
+
+            <p-panel class="mb-0" [ngClass]="{'opacity-50': omitirAportesTerceros}">
+                <ng-template pTemplate="header">
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold">APORTES DE TERCEROS (MENSUAL):</span>
+                            <!-- Botones para omitir/desomitir que siempre están habilitados -->
+                            <div>
+                                <button type="button"
+                                    class="p-button p-button-sm p-button-rounded p-button-text"
+                                    [ngClass]="{'p-button-danger': !omitirAportesTerceros, 'p-button-success': omitirAportesTerceros}"
+                                    (click)="toggleOmitirAportesTerceros()">
+                                    <i class="pi" [ngClass]="{'pi-times-circle': !omitirAportesTerceros, 'pi-check-circle': omitirAportesTerceros}"></i>
+                                    <span class="ml-1 text-xs">{{ omitirAportesTerceros ? 'Habilitar' : 'Omitir' }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <p-button icon="pi pi-info-circle" severity="secondary" rounded text
+                            pTooltip="Si completa un campo, deberá completar todos los campos de esta sección. El checkbox de cónyuge solo estará disponible cuando el aportante sea 'cónyuge', 'conyugé' o 'conviviente'."
+                            tooltipPosition="top" />
+                    </div>
+                </ng-template>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 p-4">
+                    <div class="flex flex-col gap-2">
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <p-select formControlName="aportante" inputId="aportante" [options]="aportanteList()"
+                                    optionLabel="descripcion" styleClass="w-full" [disabled]="omitirAportesTerceros" />
+                                <label for="aportante">Aportante</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="aportante.touched && aportante.invalid && !omitirAportesTerceros"
+                                [text]="'Seleccionar un Aportante.'">
+                            </p-message>
+                        </div>
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <input pInputText pKeyFilter="money" id="importe_tercero"
+                                    formControlName="importe_tercero" autocomplete="off" required autofocus
+                                    class="w-full" [disabled]="omitirAportesTerceros" />
+                                <label for="importe_tercero">Importe</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="importe_tercero.touched && importe_tercero.invalid && !omitirAportesTerceros"
+                                [text]="'Importe es requerido.'">
+                            </p-message>
+                        </div>
+                        <div class="mb-2">
+                            <p-floatlabel variant="on">
+                                <input pInputText id="motivo" formControlName="motivo" autocomplete="off" required
+                                    autofocus class="w-full" (keypress)="alpha($event)"
+                                    [disabled]="omitirAportesTerceros" />
+                                <label for="motivo">Motivo</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small"
+                                *ngIf="motivo.touched && motivo.invalid && !omitirAportesTerceros"
+                                [text]="'Motivo es requerido.'">
+                            </p-message>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <div class="mb-6 flex items-center gap-2">
+                            <p-checkbox name="firma_aval" formControlName="firma_aval" binary="true"
+                                [disabled]="omitirAportesTerceros"></p-checkbox>
+                            <label for="firma_aval">Aval</label>
+                            <span *ngIf="firma_aval.value" class="text-xs text-gray-500 ml-2">
+                                Firma como aval.
+                            </span>
+                        </div>
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2">
+                                <p-checkbox name="firma_conyuge" formControlName="firma_conyuge" binary="true"
+                                    [disabled]="omitirAportesTerceros || !esParejaConyuge"
+                                    (onChange)="verificarDeseleccionConyuge($event)"></p-checkbox>
+                                <label for="firma_conyuge" [ngClass]="{'text-gray-400': !esParejaConyuge}">Conyuge</label>
+                                <span *ngIf="firma_conyuge.value" class="text-xs text-gray-500 ml-2">
+                                    Firma como conyuge.
+                                </span>
+                            </div>
+                            <!-- Motivo de deselección -->
+                            <div *ngIf="mostrarMotivo && !firma_conyuge.value"
+                                class="mt-2 ml-6 p-2 bg-blue-50 border-l-2 border-blue-500 text-sm">
+                                <span class="font-semibold text-blue-700">Motivo:</span>
+                                <span class="text-blue-600">{{ motivoDeseleccionGuardado | slice:0:50 }}{{
+                                    motivoDeseleccionGuardado.length > 50 ? '...' : '' }}</span>
+                                <i *ngIf="motivoDeseleccionGuardado.length > 50"
+                                    class="pi pi-info-circle text-blue-500 ml-1 cursor-pointer"
+                                    pTooltip="{{ motivoDeseleccionGuardado }}" tooltipPosition="top"
+                                    [tooltipStyleClass]="'max-w-md'" [escape]="false"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </p-panel>
+        </div>
+    </form>
+</div>
+<p-toast></p-toast>
+
+<!-- Diálogo para motivo de deselección de firma cónyuge -->
+<p-dialog header="Motivo" [(visible)]="mostrarDialogoMotivo" [modal]="true" [style]="{width: '450px'}" [baseZIndex]="10000"
+    [draggable]="false" [resizable]="false" [closable]="false" [closeOnEscape]="false" styleClass="p-dialog-md">
+    <div class="flex flex-col gap-4 mt-2">
+        <p>Por favor, indique el motivo por el cual no firma como cónyuge:</p>
+        <p-floatlabel variant="on">
+            <textarea pTextarea [ngModel]="motivoDeseleccionConyuge" (ngModelChange)="motivoDeseleccionConyuge = $event" [ngModelOptions]="{standalone: true}" rows="5" cols="49" style="resize: none"></textarea>
+            <label for="on_label">Motivo</label>
+        </p-floatlabel>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="flex justify-end gap-2">
+            <p-button label="Cancelar" icon="pi pi-times" (click)="cancelarDeseleccionConyuge()"
+                styleClass="p-button-text"></p-button>
+            <p-button label="Guardar" icon="pi pi-check" (click)="confirmarDeseleccionConyuge()"
+                [disabled]="!motivoDeseleccionConyuge || motivoDeseleccionConyuge.trim() === ''"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,65 @@
+<p-toast />
+<p-toolbar styleClass="mb-6">
+    <ng-template #start>
+        <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+    </ng-template>
+
+    <ng-template #end>
+        <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+    </ng-template>
+</p-toolbar>
+<p-table
+    #dt
+    [value]="tasas()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['id', 'porcentaje']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedTasas"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} de tasas"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Administrar Tasas</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th style="width: 3rem">
+                <p-tableHeaderCheckbox />
+            </th>
+            @for (c of cols.slice(1, cols.length); track $index) {
+                <th pSortableColumn="{{c.field}}" style="min-width:'{{c.mw}}'rem">
+                    {{c.header}}
+                    <p-sortIcon field="{{c.field}}" />
+                </th>
+            }
+            <th style="min-width: 12rem"></th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-tasa>
+        <tr>
+            <td style="width: 3rem">
+                <p-tableCheckbox [value]="tasa" />
+            </td>
+            <td style="min-width: 8rem">{{tasa.id}}</td>
+            <td style="min-width: 8rem">{{tasa.porcentaje}} %</td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editTasa(tasa)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteTasa(tasa)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<app-tasa-create [display]="tasaDialog" [title]="title" [tasa]="tasa" [editabled]="editabled" (switchMessage)="switchMessageHandler($event)" (closedDialog)="hideDialog($event)"/>
+
+<p-confirmdialog [style]="{ width: '450px' }" />

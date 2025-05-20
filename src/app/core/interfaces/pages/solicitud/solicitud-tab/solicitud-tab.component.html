@@ -1,0 +1,50 @@
+<div [formGroup]="solicitudForm" class="card p-6 rounded-lg shadow-lg bg-white mt-6">
+  <p-panel header="Nueva Solicitud" [toggleable]="true">
+    <form [formGroup]="solicitudForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-4">
+      <div class="field md:col-span-1">
+        <p-floatlabel>
+          <p-datepicker formControlName="fecha" inputId="fecha" showIcon iconDisplay="input" [showButtonBar]="true"
+            dateFormat="yy-mm-dd" styleClass="w-full" [ngClass]="{'p-invalid': fecha.invalid && fecha.touched}" />
+          <label for="fecha">Fecha de pago</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small" *ngIf="fecha.touched && fecha.invalid"
+          [text]="'Fecha de pago es requerida'"></p-message>
+      </div>
+
+      <div class="field md:col-span-1">
+        <p-floatlabel>
+          <p-select formControlName="periodo" inputId="periodo" [options]="periodosList()" optionLabel="descripcion"
+            styleClass="w-full" [ngClass]="{'p-invalid': periodo.invalid && periodo.touched}" [showClear]="true" />
+          <label for="periodo">Periodo</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small" *ngIf="periodo.touched && periodo.invalid"
+          [text]="'Seleccionar un Periodo'"></p-message>
+      </div>
+
+      <div class="field md:col-span-1">
+        <p-floatlabel>
+          <input pInputText pKeyFilter="int" id="plazo" formControlName="plazo" autocomplete="off" class="w-full"
+            [ngClass]="{'p-invalid': plazo.invalid && plazo.touched}" />
+          <label for="plazo">Plazo</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small" *ngIf="plazo.touched && plazo.invalid"
+          [text]="'Plazo es requerido'"></p-message>
+      </div>
+
+      <div class="field md:col-span-1">
+        <p-floatlabel>
+          <input pInputText id="monto" pKeyFilter="money" formControlName="monto" autocomplete="off" class="w-full"
+            [ngClass]="{'p-invalid': monto.invalid && monto.touched}" (blur)="onMontoChange($event)" />
+          <div *ngIf="monto.value > 1500"
+            class="mt-2 p-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
+            <i class="pi pi-exclamation-triangle mr-2"></i>
+            <span> El monto es mayor a 1500. Se recomienda incluir AVAL y CÓNYUGE.</span>
+          </div>
+          <label for="monto">Monto</label>
+        </p-floatlabel>
+        <p-message severity="error" variant="simple" size="small" *ngIf="monto.touched && monto.invalid"
+          [text]="'Monto es requerido'"></p-message>
+      </div>
+    </form>
+  </p-panel>
+</div>

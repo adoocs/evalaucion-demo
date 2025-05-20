@@ -1,0 +1,87 @@
+<p-toast />
+<p-toolbar styleClass="mb-6">
+    <ng-template pTemplate="start">
+        <p-button label="Nueva Solicitud" icon="pi pi-plus" severity="secondary" class="mr-2" (click)="openNew()" />
+    </ng-template>
+
+    <ng-template pTemplate="end">
+        <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
+    </ng-template>
+</p-toolbar>
+
+<!-- Tabla de solicitudes -->
+<p-table
+    #dt
+    [value]="solicitudes()"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['id', 'n_credito', 'cliente', 'fecha', 'monto', 'plazo', 'v_gerencia']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} solicitudes"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+    [loading]="loading"
+>
+    <ng-template pTemplate="caption">
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Administrar Solicitudes</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" placeholder="Buscar..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+        <tr>
+            <th pSortableColumn="n_credito">N° Crédito <p-sortIcon field="n_credito"></p-sortIcon></th>
+            <th pSortableColumn="cliente">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
+            <th pSortableColumn="fecha">Fecha <p-sortIcon field="fecha"></p-sortIcon></th>
+            <th pSortableColumn="monto">Monto <p-sortIcon field="monto"></p-sortIcon></th>
+            <th pSortableColumn="plazo">Plazo <p-sortIcon field="plazo"></p-sortIcon></th>
+            <th pSortableColumn="v_gerencia">V° Gerencia <p-sortIcon field="v_gerencia"></p-sortIcon></th>
+            <th>Acciones</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-solicitud>
+        <tr>
+            <td>{{solicitud.n_credito}}</td>
+            <td>{{solicitud.cliente}}</td>
+            <td>{{solicitud.fecha}}</td>
+            <td>{{solicitud.monto | currency:'S/ '}}</td>
+            <td>{{solicitud.plazo}}</td>
+            <td>
+                <p-toggleswitch [(ngModel)]="solicitud.v_gerencia">
+                    <ng-template pTemplate="handle" let-checked="checked">
+                        <i [ngClass]="['!text-xs', 'pi', checked ? 'pi-check' : 'pi-times']"></i>
+                    </ng-template>
+                </p-toggleswitch>
+            </td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editSolicitud(solicitud)" />
+                <p-button icon="pi pi-eye" severity="info" [rounded]="true" [outlined]="true" (click)="editSolicitud(solicitud)" />
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="7" class="text-center p-4">No se encontraron solicitudes.</td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<!-- Diálogo para nueva solicitud -->
+<p-dialog
+    [(visible)]="displaySolicitudDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '100vw', height: '100vh', maxWidth: '100vw', maxHeight: '100vh'}"
+    [contentStyle]="{overflow: 'auto'}"
+    [closable]="true"
+    (onHide)="hideDialog()"
+>
+    <app-solicitud-panel *ngIf="displaySolicitudDialog" />
+</p-dialog>
+<p-confirmdialog [style]="{ width: '450px' }" />

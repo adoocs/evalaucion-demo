@@ -1,0 +1,327 @@
+import { TipoVivienda } from "../domain/tipo-vivienda.model";
+import { Tasa } from "../domain/tasa.model";
+import { Periodo } from "../domain/periodo.model";
+import { Tiempo } from "../domain/tiempo.model";
+import { SectorEconomico } from "../domain/sector-economico.model";
+import { ActividadEconomica } from "../domain/actividad-economica.model";
+import { Denominacion } from "../domain/denominacion.model";
+import { Cliente } from "../domain/cliente.model";
+import { Aval } from "../domain/aval.model";
+import { Conyuge } from "../domain/conyuge.model";
+import { CreditoAnterior } from "../domain/credito-anterior.model";
+import { GastoFinanciero } from "../domain/gasto-financiero.model";
+import { GastosOperativos } from "../domain/gastos-operativos.model";
+import { IngresoAdicional } from "../domain/ingreso-adicional.model";
+import { IngresoDependiente } from "../domain/ingreso-dependiente.model";
+import { Negocio } from "../domain/negocio.model";
+import { ReferenciaFamiliar } from "../domain/referencia-familiar.model";
+import { RegistroVentas } from "../domain/registro-ventas.model";
+import { Solicitud } from "../domain/solicitud.model";
+import { Aportante } from "../domain/aportante.model";
+import { FamiliaMiembros } from "../domain/familia-miembros.model";
+
+// Datos de ejemplo para TipoVivienda
+export const TIPO_VIVIENDAS: TipoVivienda[] = [
+  { id: 1, descripcion: 'Casa propia' },
+  { id: 2, descripcion: 'Alquilada' },
+  { id: 3, descripcion: 'Familiar' },
+  { id: 4, descripcion: 'Otro' }
+];
+
+// Datos de ejemplo para Tasa
+export const TASAS: Tasa[] = [
+  { id: 1, porcentaje: 5.5 },
+  { id: 2, porcentaje: 7.2 },
+  { id: 3, porcentaje: 8.5 }
+];
+
+// Datos de ejemplo para Periodo
+export const PERIODOS: Periodo[] = [
+  { id: 1, descripcion: 'Mensual' },
+  { id: 2, descripcion: 'Quincenal' },
+  { id: 3, descripcion: 'Semanal' }
+];
+
+// Datos de ejemplo para Tiempo
+export const TIEMPOS: Tiempo[] = [
+  { id: 1, descripcion: 'Mes', valor: 1 },
+  { id: 2, descripcion: 'Año', valor: 12 }
+];
+
+// Datos de ejemplo para SectorEconomico
+export const SECTORES_ECONOMICOS: SectorEconomico[] = [
+  { id: 1, descripcion: 'Comercio' },
+  { id: 2, descripcion: 'Servicios' },
+  { id: 3, descripcion: 'Industria' },
+  { id: 4, descripcion: 'Agricultura' }
+];
+
+// Datos de ejemplo para ActividadEconomica
+export const ACTIVIDADES_ECONOMICAS: ActividadEconomica[] = [
+  { id: 1, descripcion: 'Venta de ropa', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 2, descripcion: 'Restaurante', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 3, descripcion: 'Taller mecánico', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 4, descripcion: 'Cultivo de maíz', sector_economico: SECTORES_ECONOMICOS[3] }
+];
+
+// Datos de ejemplo para Denominacion
+export const DENOMINACIONES: Denominacion[] = [
+  { id: 1, descripcion: 'Alquiler', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 2, descripcion: 'Servicios básicos', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 3, descripcion: 'Materia prima', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 4, descripcion: 'Transporte', sector_economico: SECTORES_ECONOMICOS[0] }
+];
+
+// Datos de ejemplo para Cliente
+export const CLIENTES: Cliente[] = [
+  {
+    id: 1,
+    apellidos: 'Pérez López',
+    nombres: 'Juan Carlos',
+    dni: '12345678',
+    fecha_born: '1985-05-15',
+    estado_civil: 'Casado',
+    edad: 38,
+    genero: 'M',
+    direccion: 'Av. Principal 123',
+    celular: 987654321,
+    n_referencial: 123456,
+    grado_instruccion: 'Superior',
+    email: 'juan@example.com',
+    tipo_vivienda: TIPO_VIVIENDAS[0]
+  },
+  {
+    id: 2,
+    apellidos: 'Gómez Rodríguez',
+    nombres: 'María Elena',
+    dni: '87654321',
+    fecha_born: '1990-10-20',
+    estado_civil: 'Soltera',
+    edad: 33,
+    genero: 'F',
+    direccion: 'Jr. Secundaria 456',
+    celular: 912345678,
+    n_referencial: 654321,
+    grado_instruccion: 'Técnico',
+    email: 'maria@example.com',
+    tipo_vivienda: TIPO_VIVIENDAS[1]
+  }
+];
+
+// Datos de ejemplo para Aval
+export const AVALES: Aval[] = [
+  {
+    id: 1,
+    apellidos: 'Martínez Sánchez',
+    nombres: 'Roberto',
+    dni: '23456789',
+    direccion: 'Calle Los Pinos 789',
+    celular: '945678123',
+    n_referencial: 789123,
+    actividad: 'Comerciante',
+    parentesco: 'Hermano',
+    tipo_vivienda: TIPO_VIVIENDAS[0],
+    omitido: false
+  }
+];
+
+// Datos de ejemplo para Conyuge
+export const CONYUGES: Conyuge[] = [
+  {
+    id: 1,
+    apellidos: 'Torres Vega',
+    nombres: 'Ana María',
+    dni: '34567890',
+    celular: '956781234',
+    actividad: 'Docente',
+    omitido: false
+  }
+];
+
+// Datos de ejemplo para CreditoAnterior
+export const CREDITOS_ANTERIORES: CreditoAnterior[] = [
+  {
+    id: 1,
+
+    monto: 130,
+    saldo: 190,
+    fecha_pago: '2022-05-10',
+    estado: 'vigente',
+    tasa: TASAS[0],
+    periodo: PERIODOS[0],
+    cuotas_pagadas: 4,
+    cuotas_totales: 12,
+  }
+];
+
+// Datos de ejemplo para GastoFinanciero
+export const GASTOS_FINANCIEROS: GastoFinanciero[] = [
+  {
+    id: 1,
+    institucion: 'Banco ABC',
+    monto_credito: 1000,
+    n_pagadas: 5,
+    n_total: 10,
+    monto_cuota: 100,
+    saldo_credito: 500,
+    tarjeta: 'Visa',
+    comentario: 'Préstamo para remodelación',
+    periodo: PERIODOS[0]
+  }
+];
+
+// Datos de ejemplo para GastosOperativos
+export const GASTOS_OPERATIVOS: GastosOperativos[] = [
+  {
+    id: 1,
+    cantidad: 1,
+    importe: 800,
+    detalle: 'Alquiler de local',
+    denominacion: DENOMINACIONES[0]
+  },
+  {
+    id: 2,
+    cantidad: 1,
+    importe: 200,
+    detalle: 'Servicios de agua y luz',
+    denominacion: DENOMINACIONES[1]
+  }
+];
+
+// Datos de ejemplo para Aportante
+export const APORTANTES: Aportante[] = [
+  {
+    id: 1,
+    descripcion: 'Principal'
+  },
+  {
+    id: 2,
+    descripcion: 'Secundario'
+  }
+];
+
+
+// Datos de ejemplo para IngresoAdicional
+export const INGRESOS_ADICIONALES: IngresoAdicional[] = [
+  {
+    id: 1,
+    frecuencia: 'Mensual',
+    importe_act: 1500,
+    sustentable: true,
+    detalle: 'Alquiler de departamento',
+    firma_aval: true,
+    firma_conyuge: false,
+    actividad: 'Inmobiliaria',
+    motivo: '',
+    aportante: APORTANTES[0],
+    importe_tercero: 0
+  }
+];
+
+// Datos de ejemplo para IngresoDependiente
+export const INGRESOS_DEPENDIENTES: IngresoDependiente[] = [
+  {
+    id: 1,
+    frecuencia: 'Mensual',
+    importe: 2500,
+    tiempo_valor: 3,
+    actividad: 'Contador',
+    tiempo: TIEMPOS[0]
+  }
+];
+
+// Datos de ejemplo para RegistroVentas
+export const REGISTROS_VENTAS: RegistroVentas[] = [
+  {
+    id: 1,
+    ventas_normales: 5000,
+    ventas_bajas: 3500,
+    ventas_altas: 7000,
+    frecuencia: 'Mensual'
+  }
+];
+
+// Datos de ejemplo para Negocio
+export const NEGOCIOS: Negocio[] = [
+  {
+    id: 1,
+    tiempo_valor: 5,
+    direccion: 'Av. Comercial 567',
+    tiempo: TIEMPOS[0],
+    actividad_economica: ACTIVIDADES_ECONOMICAS[0],
+    registro_ventas: REGISTROS_VENTAS[0],
+    gastos_operativos: [GASTOS_OPERATIVOS[0], GASTOS_OPERATIVOS[1]]
+  }
+];
+
+// Datos de ejemplo para FamiliaMiembros
+export const FAMILIA_MIEMBROS: FamiliaMiembros[] = [
+  {
+    id: 1,
+    descripcion: 'Infantes',
+    n_hijos: 0,
+    condicion: true,
+  },
+  {
+    id: 2,
+    descripcion: 'Escolares',
+    n_hijos: 0,
+    condicion: true,
+  },
+  {
+    id: 3,
+    descripcion: 'Universitarios',
+    n_hijos: 0,
+    condicion: true,
+  },
+  {
+    id: 4,
+    descripcion: 'Mayores',
+    n_hijos: 0,
+    condicion: true,
+  }
+];
+
+// Datos de ejemplo para ReferenciaFamiliar
+export const REFERENCIAS_FAMILIARES: ReferenciaFamiliar[] = [
+  {
+    id: 1,
+    referencia_domicilio: 'calle zzzz',
+    familia_miembros: FAMILIA_MIEMBROS,
+  }
+];
+
+// Datos de ejemplo para Solicitud
+export const SOLICITUDES: Solicitud[] = [
+  {
+    id: 1,
+    n_credito: 10001,
+    fecha: '2023-10-15',
+    monto: 10000,
+    plazo: '12 meses',
+    v_gerencia: false,
+    puntaje_sentinel: 750,
+    cliente: 'Juan Carlos Pérez López',
+    aval: 'Roberto Martínez Sánchez',
+    conyugue: 'Ana María Torres Vega',
+    periodo: PERIODOS[0],
+    gasto_financiero: GASTOS_FINANCIEROS[0],
+    credito_anterior: CREDITOS_ANTERIORES[0],
+    referencia_familiar: REFERENCIAS_FAMILIARES[0],
+    ingreso_adicional: INGRESOS_ADICIONALES[0],
+    negocio: NEGOCIOS[0]
+  },
+  {
+    id: 2,
+    n_credito: 10002,
+    fecha: '2023-11-20',
+    monto: 5000,
+    plazo: '6 meses',
+    v_gerencia: true,
+    puntaje_sentinel: 820,
+    cliente: 'María Elena Gómez Rodríguez',
+    periodo: PERIODOS[1]
+  }
+];
+
+

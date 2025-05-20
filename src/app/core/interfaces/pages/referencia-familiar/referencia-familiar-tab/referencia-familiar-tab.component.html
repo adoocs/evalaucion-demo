@@ -1,0 +1,111 @@
+<div *ngIf="isFormComplete()" class="p-4 bg-green-100 border-l-4 border-green-500 text-green-700 mb-4">
+  <div class="flex items-center">
+    <i class="pi pi-check-circle mr-2 text-green-500"></i>
+    <p><strong>¡Correcto!</strong>
+      <span *ngIf="!omitirHijos">La información de Referencia Familiar ha sido completada correctamente.</span>
+      <span *ngIf="omitirHijos">La información de hijos ha sido omitida.</span>
+    </p>
+  </div>
+</div>
+
+<div class="card flex flex-col gap-6">
+  <form [formGroup]="referenciaFamiliarForm" class="flex flex-col">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <p-panel class="mb-0">
+        <ng-template pTemplate="header">
+          <div class="flex justify-between items-center w-full">
+            <span class="font-semibold">Referencia familiar</span>
+          </div>
+          <div>
+            <p-button icon="pi pi-info-circle" severity="secondary" rounded text pTooltip="RECUERDA: ...."
+              tooltipPosition="top" />
+          </div>
+        </ng-template>
+        <div [ngClass]="{'opacity-50': omitirHijos}">
+          <p-table [value]="familiaMiembrosList" dataKey="id" [tableStyle]="{ 'min-width': '20rem' }">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 15%">Descripción</th>
+                <th style="width: 10%">N° Hijos</th>
+                <th style="width: 10%">Condición</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-familia>
+              <tr>
+                <td>{{ familia.descripcion }}</td>
+
+                <td [pEditableColumn]="familia.n_hijos" pEditableColumnField="n_hijos">
+                  <p-cellEditor>
+                    <ng-template pTemplate="input">
+                      <input pInputText type="number" min="0" [(ngModel)]="familia.n_hijos"
+                        [ngModelOptions]="{ standalone: true }" [disabled]="omitirHijos" />
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                      <span *ngIf="familia.n_hijos === 0" class="placeholder-text">0</span>
+                      <span *ngIf="familia.n_hijos !== 0">{{ familia.n_hijos }}</span>
+                    </ng-template>
+                  </p-cellEditor>
+                </td>
+
+                <td [pEditableColumn]="familia.condicion" pEditableColumnField="condicion">
+                  <p-cellEditor>
+                    <ng-template pTemplate="input">
+                      <p-checkbox binary="true" [(ngModel)]="familia.condicion" [ngModelOptions]="{ standalone: true }"
+                        inputId="chk_aval_{{familia.id}}" [disabled]="omitirHijos ||
+                        (familia.descripcion === 'Escolares' || familia.descripcion === 'Universitarios')" />
+                      <label for="chk_aval_{{familia.id}}"> Gasta?</label>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                      <i class="pi"
+                        [ngClass]="familia.condicion ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"></i>
+                    </ng-template>
+                  </p-cellEditor>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center gap-2 mb-2">
+            <button type="button"
+              class="p-button p-button-sm p-button-rounded p-button-text"
+              [ngClass]="{'p-button-danger': !omitirHijos, 'p-button-success': omitirHijos}"
+              (click)="toggleOmitirHijos()">
+              <i class="pi" [ngClass]="{'pi-times-circle': !omitirHijos, 'pi-check-circle': omitirHijos}"></i>
+              <span class="ml-1 text-xs">{{ omitirHijos ? 'Habilitar' : 'Omitir' }}</span>
+            </button>
+            <span class="font-semibold">INFORMACIÓN DE HIJOS</span>
+          </div>
+          <div *ngIf="omitirHijos" class="mt-2">
+            <small class="text-gray-500">Al marcar esta opción, se omitirá la información de hijos y podrá continuar con el proceso.</small>
+          </div>
+        </div>
+      </p-panel>
+
+      <p-panel class="mb-0">
+        <ng-template pTemplate="header">
+          <div class="flex justify-between items-center w-full">
+            <span class="font-semibold">Domicilio:</span>
+          </div>
+        </ng-template>
+        <div class="grid gap-6 p-4">
+          <div class="flex flex-col gap-2">
+            <div class="mb-2">
+              <p-floatlabel variant="on">
+                <input pInputText id="referencia_domicilio" formControlName="referencia_domicilio" autocomplete="off"
+                  required autofocus class="w-full max-w-xl" (keypress)="alpha($event)" />
+                <label for="referencia_domicilio">Referencia</label>
+              </p-floatlabel>
+              <p-message severity="error" variant="simple" size="small"
+                *ngIf="referencia_domicilio.touched && referencia_domicilio.invalid"
+                [text]="'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'">
+              </p-message>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+    </div>
+  </form>
+</div>
+

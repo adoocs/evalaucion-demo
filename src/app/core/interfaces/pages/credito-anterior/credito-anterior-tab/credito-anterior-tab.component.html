@@ -1,0 +1,137 @@
+<div class="card p-6 rounded-lg shadow-lg bg-white mt-6">
+    <form [formGroup]="creditoAnteriorForm">
+        <div *ngIf="isFormComplete()" class="p-4 bg-green-100 border-l-4 border-green-500 text-green-700 mb-4">
+            <div class="flex items-center">
+                <i class="pi pi-check-circle mr-2 text-green-500"></i>
+                <p><strong>¡Correcto!</strong>
+                    <span *ngIf="!omitirCreditoAnterior">La información del Crédito Anterior ha sido completada correctamente.</span>
+                    <span *ngIf="omitirCreditoAnterior">El formulario de Crédito Anterior ha sido omitido.</span>
+                </p>
+            </div>
+        </div>
+
+        <p-panel class="mb-0" [ngClass]="{'opacity-50': omitirCreditoAnterior}">
+            <ng-template pTemplate="header">
+                <div class="flex justify-between items-center w-full">
+                    <span class="font-semibold">Referencia de Crédito Anterior</span>
+                    <div>
+                        <p-button icon="pi pi-info-circle" severity="secondary" rounded text
+                            pTooltip="Esta sección representa los créditos con la financiera Progresando"
+                            tooltipPosition="top" />
+                    </div>
+                </div>
+            </ng-template>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <p-select formControlName="estado" inputId="estado" [options]="estadoList" optionLabel="name" placeholder="Seleccionar Estado"
+                            styleClass="w-full" [disabled]="omitirCreditoAnterior" />
+                        <label for="estado">Estado</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="estado.touched && estado.invalid && !omitirCreditoAnterior"
+                        [text]="'Seleccionar un Estado.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText pKeyFilter="money" id="monto" formControlName="monto" class="w-full" required
+                            [disabled]="omitirCreditoAnterior" [ngClass]="{'ng-invalid ng-dirty': creditoAnteriorForm.errors?.['montoMayorQueSaldo'] && monto.touched && saldo.touched}" />
+                        <label for="monto">Monto</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="monto.touched && monto.invalid && !monto.errors?.['required'] && !omitirCreditoAnterior"
+                        [text]="'Monto debe ser un número válido mayor a 0.'">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="monto.touched && monto.errors?.['required'] && !omitirCreditoAnterior"
+                        [text]="'Monto es requerido.'">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="creditoAnteriorForm.errors?.['montoMayorQueSaldo'] && monto.touched && saldo.touched && !omitirCreditoAnterior"
+                        [text]="'El monto no debe superar al saldo.'">
+                    </p-message>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2 w-5/6">
+                        <div class="w-1/2">
+                            <p-floatlabel variant="on" class="w-full">
+                                <input pInputText pKeyFilter="pint" id="cuotas_pagadas" formControlName="cuotas_pagadas" class="w-full" required
+                                    [disabled]="omitirCreditoAnterior" />
+                                <label for="cuotas_pagadas">Cuotas Pagadas</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small" *ngIf="cuotas_pagadas.touched && cuotas_pagadas.invalid && !omitirCreditoAnterior"
+                                [text]="'Campo requerido.'">
+                            </p-message>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <span class="text-xl font-bold">/</span>
+                        </div>
+                        <div class="w-1/2">
+                            <p-floatlabel variant="on" class="w-full">
+                                <input pInputText pKeyFilter="pint" id="cuotas_totales" formControlName="cuotas_totales" class="w-full" required
+                                    [disabled]="omitirCreditoAnterior" />
+                                <label for="cuotas_totales">Cuotas Totales</label>
+                            </p-floatlabel>
+                            <p-message severity="error" variant="simple" size="small" *ngIf="cuotas_totales.touched && cuotas_totales.invalid && !omitirCreditoAnterior"
+                                [text]="'Campo requerido.'">
+                            </p-message>
+                        </div>
+                    </div>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="creditoAnteriorForm.errors?.['cuotasPagadasMayorQueTotales'] && cuotas_pagadas.touched && cuotas_totales.touched && !omitirCreditoAnterior"
+                        [text]="'Las cuotas pagadas no deben superar a las cuotas totales.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <p-select formControlName="tasa" inputId="tasa" [options]="tasaList()" optionLabel="porcentaje"
+                            styleClass="w-full" [disabled]="omitirCreditoAnterior" />
+                        <label for="tasa">Tasa</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="tasa.touched && tasa.invalid && !omitirCreditoAnterior"
+                        [text]="'Seleccionar una Tasa.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <p-select formControlName="periodo" inputId="periodo" [options]="periodoList()" optionLabel="descripcion"
+                            styleClass="w-full" [disabled]="omitirCreditoAnterior" />
+                        <label for="periodo">Periodo</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="periodo.touched && periodo.invalid && !omitirCreditoAnterior"
+                        [text]="'Seleccionar un Periodo.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="saldo" pKeyFilter="money" formControlName="saldo" class="w-full" required
+                            [disabled]="omitirCreditoAnterior" [ngClass]="{'ng-invalid ng-dirty': creditoAnteriorForm.errors?.['montoMayorQueSaldo'] && monto.touched && saldo.touched}" />
+                        <label for="saldo">Saldo</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="saldo.touched && saldo.invalid && !saldo.errors?.['required'] && !omitirCreditoAnterior"
+                        [text]="'Saldo debe ser un número válido mayor a 0.'">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="saldo.touched && saldo.errors?.['required'] && !omitirCreditoAnterior"
+                        [text]="'Saldo es requerido.'">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small" *ngIf="creditoAnteriorForm.errors?.['montoMayorQueSaldo'] && monto.touched && saldo.touched && !omitirCreditoAnterior"
+                        [text]="'El saldo debe ser mayor o igual al monto.'">
+                    </p-message>
+                </div>
+            </div>
+        </p-panel>
+        <div class="mb-4"></div>
+        <p-panel class="mb-0">
+            <div class="flex items-center gap-2 mb-2">
+                <p-checkbox [ngModel]="omitirCreditoAnterior" [ngModelOptions]="{standalone: true}" [binary]="true" inputId="omitirCreditoAnterior" (onChange)="onOmitirCreditoAnteriorChange($event)"></p-checkbox>
+                <label for="omitirCreditoAnterior" class="font-medium">Omitir crédito anterior</label>
+            </div>
+            <div *ngIf="omitirCreditoAnterior" class="mt-2">
+                <small class="text-gray-500">Al marcar esta opción, se omitirá el crédito anterior y podrá continuar con el proceso.</small>
+            </div>
+        </p-panel>
+    </form>
+</div>
+
+<p-toast></p-toast>

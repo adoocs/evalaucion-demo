@@ -1,0 +1,10 @@
+{
+  "/reniec-proxy": {
+    "target": "https://portal.heves.gob.pe",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/reniec-proxy": ""
+    }
+  }
+}

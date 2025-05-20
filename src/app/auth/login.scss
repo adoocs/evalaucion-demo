@@ -1,0 +1,110 @@
+/* Estilos para el componente de login con tema Atlantis */
+:host {
+  /* Estilos para el icono en el input de texto normal */
+  .p-input-icon-left {
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+
+    i {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0.75rem;
+      color: var(--text-color-secondary);
+      z-index: 1;
+    }
+
+    input {
+      padding-left: 2.5rem !important;
+    }
+  }
+
+  /* Estilos para el componente p-password */
+  p-password {
+    width: 100%;
+
+    ::ng-deep {
+      .p-password {
+        width: 100%;
+        position: relative;
+      }
+
+      .p-inputtext {
+        width: 100%;
+        padding-left: 2.5rem !important;
+      }
+    }
+  }
+
+  /* Asegurarse de que el icono del p-password esté correctamente posicionado */
+  .p-input-icon-left i + p-password ::ng-deep .p-inputtext {
+    padding-left: 2.5rem !important;
+  }
+
+  /* Posicionar el icono del p-password */
+  .p-input-icon-left i {
+    z-index: 2;
+  }
+
+  /* Estilos para el botón de inicio de sesión */
+  p-button {
+    ::ng-deep {
+      .p-button {
+        transition: all 0.3s ease;
+        font-weight: 600;
+
+        &.p-button-loading {
+          .p-button-label {
+            opacity: 0.6;
+          }
+
+          .p-button-loading-icon {
+            font-size: 1.2rem;
+          }
+        }
+
+        &:disabled {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+
+  /* Estilos específicos para el tema Atlantis */
+  .field {
+    margin-bottom: 1.5rem;
+  }
+
+  .p-divider {
+    ::ng-deep {
+      .p-divider-content {
+        background-color: var(--surface-0);
+      }
+    }
+  }
+
+  /* Estilos para los inputs */
+  ::ng-deep {
+    .p-inputtext {
+      border-radius: 6px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: var(--primary-400);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px var(--surface-0), 0 0 0 4px var(--primary-200);
+        border-color: var(--primary-500);
+      }
+    }
+
+    .p-password {
+      .p-password-panel {
+        border-radius: 6px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}

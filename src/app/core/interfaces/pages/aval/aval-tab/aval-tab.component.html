@@ -1,0 +1,199 @@
+<div class="card flex flex-col gap-4">
+    <form [formGroup]="avalForm" (input)="avalForm.updateValueAndValidity()">
+        <div class="space-y-4 mb-4">
+            <div *ngIf="showWarning" class="p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center">
+                    <i class="pi pi-exclamation-circle mr-2 text-red-500"></i>
+                    <p><strong>¡Atención!</strong> {{ requiredReason }}</p>
+                </div>
+            </div>
+
+            <div *ngIf="showRecommendation && !conyugeCompletado" class="p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                <div class="flex items-center">
+                    <i class="pi pi-exclamation-circle mr-2 text-red-500"></i>
+                    <p><strong>¡Atención!</strong> {{ recommendedReason }}</p>
+                </div>
+            </div>
+
+            <div *ngIf="((isRequired || isRecommended) && isFormComplete()) || (avalForm.get('omitido')?.value && avalForm.get('motivo')?.value)"
+                class="p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
+                <div class="flex items-center">
+                    <i class="pi pi-check-circle mr-2 text-green-500"></i>
+                    <p><strong>¡Correcto!</strong>
+                        <span *ngIf="isFormComplete()">La información del AVAL ha sido completada correctamente.</span>
+                        <span *ngIf="avalForm.get('omitido')?.value && avalForm.get('motivo')?.value">El formulario de
+                            AVAL ha sido omitido con el motivo: "{{ avalForm.get('motivo')?.value }}"</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <p-panel header="Datos del Aval" class="mb-0" [ngClass]="{'opacity-50': avalForm.get('omitido')?.value}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="dni" pKeyFilter="int" formControlName="dni" maxlength="8" minlength="8"
+                            autocomplete="off" required class="w-full pr-10" (input)="onDniInput()"
+                            [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="dni">DNI</label>
+                        <button *ngIf="showClearIcon" type="button"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            (click)="clearDni()">
+                            <i class="pi pi-times"></i>
+                        </button>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="dni.touched && dni.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'DNI es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="apellidos" formControlName="apellidos" class="h-10 text-lg w-full"
+                            (keypress)="alpha($event)" required autofocus [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="apellidos">Apellidos</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="apellidos.touched && apellidos.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Apellidos es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="nombres" formControlName="nombres" class="h-10 text-lg w-full"
+                            (keypress)="alpha($event)" required [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="nombres">Nombres</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="nombres.touched && nombres.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Nombres es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="direccion" formControlName="direccion" class="h-10 text-lg w-full"
+                            required [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="direccion">Dirección</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="direccion.touched && direccion.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Dirección es requerida.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="celular" pKeyFilter="int" formControlName="celular" maxlength="9"
+                            minlength="9" class="h-10 text-lg w-full" required
+                            [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="celular">Celular</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="celular.touched && celular.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Celular es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="n_referencial" pKeyFilter="int" formControlName="n_referencial"
+                            maxlength="9" minlength="9" class="h-10 text-lg w-full"
+                            [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="n_referencial">Telf. Referencial (opcional)</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="n_referencial.touched && n_referencial.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Si ingresa un teléfono referencial, debe tener 9 dígitos.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="actividad" formControlName="actividad" class="h-10 text-lg w-full"
+                            (keypress)="alpha($event)" required [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="actividad">Actividad</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="actividad.touched && actividad.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Actividad es requerida.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <input pInputText id="parentesco" formControlName="parentesco" class="h-10 text-lg w-full"
+                            (keypress)="alpha($event)" required [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="parentesco">Parentesco</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="parentesco.touched && parentesco.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Parentesco es requerido.'">
+                    </p-message>
+                </div>
+
+                <div>
+                    <p-floatlabel variant="on" class="w-5/6">
+                        <p-select formControlName="tipo_vivienda" inputId="tipo_vivienda"
+                            [options]="tipoViviendasList()" placeholder="" optionLabel="descripcion"
+                            styleClass="w-full h-10 text-lg" [disabled]="avalForm.get('omitido')?.value" />
+                        <label for="tipo_vivienda">Tipo Vivienda</label>
+                    </p-floatlabel>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="tipo_vivienda.touched && tipo_vivienda.invalid && !avalForm.get('omitido')?.value"
+                        [text]="'Seleccionar un tipo de vivienda.'">
+                    </p-message>
+                </div>
+            </div>
+        </p-panel>
+        <div class="mb-4"></div>
+        <p-panel class="mb-0">
+            <ng-template pTemplate="header">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold">AVAL:</span>
+                        <!-- Botones para omitir/desomitir que siempre están habilitados -->
+                        <div>
+                            <button type="button"
+                                class="p-button p-button-sm p-button-rounded p-button-text"
+                                [ngClass]="{'p-button-danger': !avalForm.get('omitido')?.value, 'p-button-success': avalForm.get('omitido')?.value}"
+                                (click)="toggleOmitirAval()">
+                                <i class="pi" [ngClass]="{'pi-times-circle': !avalForm.get('omitido')?.value, 'pi-check-circle': avalForm.get('omitido')?.value}"></i>
+                                <span class="ml-1 text-xs">{{ avalForm.get('omitido')?.value ? 'Habilitar' : 'Omitir' }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <div *ngIf="avalForm.get('omitido')?.value && avalForm.get('motivo')?.value" class="mt-2">
+                <small class="text-gray-500">Al marcar esta opción, se omitirá el formulario de AVAL y podrá continuar
+                    con el proceso.</small>
+                <div class="mt-2 p-3 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
+                    <p><strong>Motivo de omisión:</strong> {{ avalForm.get('motivo')?.value }}</p>
+                </div>
+            </div>
+        </p-panel>
+    </form>
+</div>
+
+<p-dialog header="Motivo de omisión" [(visible)]="motivoDialogVisible" [modal]="true" [style]="{width: '450px'}"
+    [closable]="false">
+    <div class="p-fluid">
+        <div class="field mt-2">
+            <p-floatlabel variant="on">
+                <textarea pTextarea id="motivo" [(ngModel)]="motivoTemp" rows="5" cols="49" style="resize: none"
+                    class="h-full"></textarea>
+                <label for="on_label">Motivo</label>
+            </p-floatlabel>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button icon="pi pi-times" label="Cancelar" (onClick)="cancelarMotivo()"
+            styleClass="p-button-text"></p-button>
+        <p-button icon="pi pi-check" label="Confirmar" (onClick)="confirmarMotivo()"></p-button>
+    </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>
