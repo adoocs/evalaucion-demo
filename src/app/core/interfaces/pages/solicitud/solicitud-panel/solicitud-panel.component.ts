@@ -124,8 +124,9 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   tareasPendientes: Task[] = [];
 
   constructor(
-    private solicitudService: SolicitudService,
-    private fichaTrabajoService: FichaService,
+    // Mantenemos las referencias a los servicios pero los comentamos para evitar advertencias
+    // private solicitudService: SolicitudService,
+    // private fichaTrabajoService: FichaService,
     private messageService: MessageToastService,
     private validationService: ValidationService,
     private tipoViviendaService: TipoViviendaService,
@@ -989,9 +990,13 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         puntaje_sentinel: this.solicitud.puntaje_sentinel
       };
 
-      console.log('Ficha de trabajo actualizada:', this.fichaTrabajo);
+      console.log('Ficha de trabajo actualizada (DEMO):', this.fichaTrabajo);
+
+      // Versión demo: Mostrar mensaje de éxito
+      this.messageService.infoMessageToast('Información', 'Datos actualizados correctamente (Versión Demo)');
     } catch (error) {
       console.error('Error al actualizar la ficha de trabajo:', error);
+      this.messageService.warnMessageToast('Advertencia', 'Error al actualizar los datos (Versión Demo)');
     }
   }
 
@@ -1360,16 +1365,23 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
 
     // Si hay errores, mostrarlos y no continuar
     if (errors.length > 0) {
-      this.messageService.errorMessageToast('Error', errors.join('\n'));
+      this.messageService.warnMessageToast('Error', errors.join('\n'));
       return;
     }
 
     // Mostrar advertencias si hay
     if (warnings.length > 0) {
-      this.messageService.warnMessageToast('Advertencias', warnings.join('\n'));
+      this.messageService.infoMessageToast('Advertencias', warnings.join('\n'));
     }
 
     this.displayJson = true;
+
+    // Versión demo: Simular la creación de la ficha de trabajo sin conectarse al backend
+    console.log('Ficha de Trabajo (DEMO):', this.fichaTrabajo);
+    this.messageService.successMessageToast('Éxito', 'Ficha de trabajo guardada correctamente (Versión Demo)');
+
+    // Comentamos la llamada al servicio real para evitar errores de conexión
+    /*
     this.fichaTrabajoService.createFichaTrabajo(this.fichaTrabajo).subscribe({
       next: (response) => {
         console.log('Ficha de Trabajo creada:', response);
@@ -1380,21 +1392,37 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         this.messageService.errorMessageToast('Error', 'No se pudo guardar la ficha de trabajo');
       }
     });
-    console.log('Ficha de Trabajo:', this.fichaTrabajo);
+    */
   }
 
   createSolicitud(): void {
+    // Versión demo: Simular la creación de la solicitud sin conectarse al backend
+    console.log('Creando solicitud (DEMO):', this.solicitud);
+    this.messageService.successMessageToast('Éxito', 'Solicitud creada correctamente (Versión Demo)');
+    this.switchMessageHandler('create');
+
+    // Comentamos la llamada al servicio real para evitar errores de conexión
+    /*
     this.solicitudService.create(this.solicitud).subscribe({
       next: () => this.switchMessageHandler('create'),
       error: () => this.switchMessageHandler('error')
     });
+    */
   }
 
   editSolicitud(): void {
+    // Versión demo: Simular la edición de la solicitud sin conectarse al backend
+    console.log('Editando solicitud (DEMO):', this.solicitud);
+    this.messageService.successMessageToast('Éxito', 'Solicitud actualizada correctamente (Versión Demo)');
+    this.switchMessageHandler('edit');
+
+    // Comentamos la llamada al servicio real para evitar errores de conexión
+    /*
     this.solicitudService.update(this.solicitud.id, this.solicitud).subscribe({
       next: () => this.switchMessageHandler('edit'),
       error: () => this.switchMessageHandler('error')
     });
+    */
   }
 
   switchMessageHandler(message: string): void {

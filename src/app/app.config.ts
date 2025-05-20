@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
       withEnabledBlockingInitialNavigation(),
       withViewTransitions()),
-    provideHttpClient(withFetch(), withInterceptors([errorInterceptor, tokenInterceptor, loadingInterceptor])),
+    provideHttpClient(withFetch(), /*withInterceptors([errorInterceptor, tokenInterceptor, loadingInterceptor])*/),
     provideAnimationsAsync(),
     providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
     // Proporcionar MessageService a nivel de aplicación para que esté disponible en todos los componentes

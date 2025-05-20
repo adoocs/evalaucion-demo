@@ -376,12 +376,21 @@ export class ClienteTabComponent implements OnInit {
 
   buscarDni() {
     const dni = this.dni.value;
-    this.clienteService.getById(dni).subscribe(resp => {
-      if (resp) {
-        this.dniEncontradoEnBD = true;
-        this.showClearIcon = true;
-      }
-    });
+    console.log('Buscando DNI en BD (DEMO):', dni);
+
+    // Versión demo: Simular la búsqueda del DNI en la base de datos
+    // Consideramos que los DNI que comienzan con 1 ya existen en la BD
+    const exists = dni && dni.startsWith('1');
+
+    if (exists) {
+      console.log('DNI encontrado en BD (DEMO)');
+      this.dniEncontradoEnBD = true;
+      this.showClearIcon = true;
+    } else {
+      console.log('DNI no encontrado en BD (DEMO)');
+      this.dniEncontradoEnBD = false;
+      this.showClearIcon = false;
+    }
   }
 
   clearDni() {
@@ -541,22 +550,34 @@ export class ClienteTabComponent implements OnInit {
   }
 
   callApi(dni: string) {
+    // Versión demo: Usar el servicio local para consultar DNI
+    console.log('Consultando DNI (DEMO):', dni);
+
     this.loadPersonService.consultarDni(dni).subscribe({
       next: (response) => {
-        if (response.persona.codigoRespuesta === '0000') {
+        console.log('Respuesta de consulta DNI (DEMO):', response);
+
+        if (response.success) {
           const client = this.loadPersonService.mapApiToCliente(response);
+          console.log('Cliente mapeado (DEMO):', client);
+
           this.clienteForm.patchValue({
             apellidos: client.apellidos,
             nombres: client.nombres,
             fecha_born: new Date(client.fecha_born ? client.fecha_born + 'T00:00:00.00' : Date.now()),
-            estado_civil: this.estadoCivilList.find(ec => ec.code === client.estado_civil),
-            genero: this.generoList.find(g => g.code === client.genero),
-            direccion: client.direccion
+            estado_civil: this.estadoCivilList.find(ec => ec.code === client.estado_civil) || this.estadoCivilList[0],
+            genero: this.generoList.find(g => g.code === client.genero) || this.generoList[0],
+            direccion: client.direccion || 'Dirección de ejemplo'
           });
         } else {
+          console.log('No se encontró información para el DNI (DEMO)');
           this.clienteForm.reset();
         }
       },
+      error: (error) => {
+        console.error('Error al consultar DNI (DEMO):', error);
+        this.clienteForm.reset();
+      }
     });
   }
 }

@@ -65,6 +65,25 @@ La aplicación incluye 2 solicitudes de ejemplo para demostrar la funcionalidad.
 4. Ejecuta la aplicación con `npm start`
 5. Abre tu navegador en `http://localhost:4200`
 
+## Funcionalidades disponibles en la versión demo
+
+### Consulta de DNI
+Para probar la consulta de DNI, puedes usar cualquiera de los siguientes DNIs:
+- 12345678 (Juan Carlos Pérez López)
+- 87654321 (María Elena Gómez Rodríguez)
+- 23456789 (Roberto Martínez Sánchez)
+- 34567890 (Ana María Torres Vega)
+
+### Validación de DNI
+- Los DNI que comienzan con "1" se consideran ya existentes en la base de datos
+- Los demás DNI se consideran nuevos
+
+### Creación de solicitudes
+Puedes crear nuevas solicitudes y todos los datos se almacenarán en memoria durante la sesión.
+
+### Edición de solicitudes
+Puedes editar las solicitudes existentes y los cambios se reflejarán inmediatamente.
+
 ## Diferencias con la versión de producción
 
 - La versión demo utiliza datos en memoria, mientras que la versión de producción se conecta a una API real
