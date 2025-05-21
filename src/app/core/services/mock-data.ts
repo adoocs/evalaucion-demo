@@ -51,25 +51,93 @@ export const TIEMPOS: Tiempo[] = [
 // Datos de ejemplo para SectorEconomico
 export const SECTORES_ECONOMICOS: SectorEconomico[] = [
   { id: 1, descripcion: 'Comercio' },
-  { id: 2, descripcion: 'Servicios' },
-  { id: 3, descripcion: 'Industria' },
-  { id: 4, descripcion: 'Agricultura' }
+  { id: 2, descripcion: 'Producción' },
+  { id: 3, descripcion: 'Servicios' },
+  { id: 4, descripcion: 'Transporte' }
 ];
 
 // Datos de ejemplo para ActividadEconomica
 export const ACTIVIDADES_ECONOMICAS: ActividadEconomica[] = [
-  { id: 1, descripcion: 'Venta de ropa', sector_economico: SECTORES_ECONOMICOS[0] },
-  { id: 2, descripcion: 'Restaurante', sector_economico: SECTORES_ECONOMICOS[1] },
-  { id: 3, descripcion: 'Taller mecánico', sector_economico: SECTORES_ECONOMICOS[2] },
-  { id: 4, descripcion: 'Cultivo de maíz', sector_economico: SECTORES_ECONOMICOS[3] }
+  // Sector Comercio
+  { id: 1, descripcion: 'Bodega / Bazar', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 2, descripcion: 'Bodega / Minimarket', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 3, descripcion: 'Bodega, venta de carnes o verduras', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 4, descripcion: 'Bodega, venta de carnes y verduras', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 5, descripcion: 'Leche, comercio', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 6, descripcion: 'Venta de abarrotes, al por mayor', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 7, descripcion: 'Venta de abarrotes, al por menor', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 8, descripcion: 'Venta de accesorios y/o repuestos para vehículos', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 9, descripcion: 'Venta de agregados para la construcción, distribución', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 10, descripcion: 'Venta de agua', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 11, descripcion: 'Venta de animales menores', sector_economico: SECTORES_ECONOMICOS[0] },
+
+  // Sector Producción
+  { id: 12, descripcion: 'Carpintería a pedido y en serie', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 13, descripcion: 'Extracción de minerales, distribución', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 14, descripcion: 'Ladrillos y agregados, fabricación y venta', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 15, descripcion: 'Maletas, fabricación y venta minorista', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 16, descripcion: 'Manualidades, adornos y decoraciones para escolares, docentes y demás trabajos', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 17, descripcion: 'Pesca artesanal', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 18, descripcion: 'Prendas de vestir (ropa), confección y venta minorista', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 19, descripcion: 'Producción de artesanias, distribución y venta', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 20, descripcion: 'Repuestos y accesorios para automóviles, fabricación', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 21, descripcion: 'Soldador, carpintería metálica a pedido y en serie', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 22, descripcion: 'Venta de pan, Panaderías', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 23, descripcion: 'Venta de tortas, postres, pan, Pastelería', sector_economico: SECTORES_ECONOMICOS[1] },
+
+  // Sector Servicios
+  { id: 24, descripcion: 'Academia, dueño o profesor', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 25, descripcion: 'Agencia de viaje', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 26, descripcion: 'Alquiler de casa', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 27, descripcion: 'Alquiler de cuartos', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 28, descripcion: 'Alquiler de equipos para construcción', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 29, descripcion: 'Alquiler de ropa y disfraces', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 30, descripcion: 'Alquiler de vehículos', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 31, descripcion: 'Animador de eventos, fiestas infantiles, presentador', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 32, descripcion: 'Decoración de eventos', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 33, descripcion: 'Discotecas / Pub', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 34, descripcion: 'Estudio fotográfico', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 35, descripcion: 'Estudio gráfico, diseño de logos, letreros, videos promocionales, etc.', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 36, descripcion: 'Funeraria', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 37, descripcion: 'Gimnasios', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 38, descripcion: 'Guarderia', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 39, descripcion: 'Hotel / Hostal', sector_economico: SECTORES_ECONOMICOS[2] },
+
+  // Sector Transporte
+  { id: 40, descripcion: 'Mototaxi, chofer', sector_economico: SECTORES_ECONOMICOS[3] },
+  { id: 41, descripcion: 'Taxi, chofer', sector_economico: SECTORES_ECONOMICOS[3] },
+  { id: 42, descripcion: 'Transporte de carga pesada', sector_economico: SECTORES_ECONOMICOS[3] },
+  { id: 43, descripcion: 'Transporte interprovincial de pasajeros (ciudades aledañas)', sector_economico: SECTORES_ECONOMICOS[3] },
+  { id: 44, descripcion: 'Transporte urbano de pasajeros, micros, custer, combis', sector_economico: SECTORES_ECONOMICOS[3] }
 ];
 
 // Datos de ejemplo para Denominacion
 export const DENOMINACIONES: Denominacion[] = [
-  { id: 1, descripcion: 'Alquiler', sector_economico: SECTORES_ECONOMICOS[1] },
-  { id: 2, descripcion: 'Servicios básicos', sector_economico: SECTORES_ECONOMICOS[1] },
-  { id: 3, descripcion: 'Materia prima', sector_economico: SECTORES_ECONOMICOS[2] },
-  { id: 4, descripcion: 'Transporte', sector_economico: SECTORES_ECONOMICOS[0] }
+  // Sector Comercio (id: 1)
+  { id: 1, descripcion: 'Personal a cargo', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 2, descripcion: 'Servicios básicos', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 3, descripcion: 'Transporte', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 4, descripcion: 'Alquileres del negocio', sector_economico: SECTORES_ECONOMICOS[0] },
+  { id: 5, descripcion: 'Otros', sector_economico: SECTORES_ECONOMICOS[0] },
+
+  // Sector Producción (id: 2)
+  { id: 6, descripcion: 'Personal a cargo', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 7, descripcion: 'Servicios básicos', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 8, descripcion: 'Transporte', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 9, descripcion: 'Alquileres del negocio', sector_economico: SECTORES_ECONOMICOS[1] },
+  { id: 10, descripcion: 'Otros', sector_economico: SECTORES_ECONOMICOS[1] },
+
+  // Sector Servicios (id: 3)
+  { id: 11, descripcion: 'Personal a cargo', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 12, descripcion: 'Servicios básicos', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 13, descripcion: 'Transporte', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 14, descripcion: 'Alquileres del negocio', sector_economico: SECTORES_ECONOMICOS[2] },
+  { id: 15, descripcion: 'Otros', sector_economico: SECTORES_ECONOMICOS[2] },
+
+  // Sector Transporte (id: 4)
+  { id: 16, descripcion: 'Cochera', sector_economico: SECTORES_ECONOMICOS[3] },
+  { id: 17, descripcion: 'Alquiler de vehículo', sector_economico: SECTORES_ECONOMICOS[3] },
+  { id: 18, descripcion: 'Otros', sector_economico: SECTORES_ECONOMICOS[3] },
 ];
 
 // Datos de ejemplo para Cliente
@@ -177,14 +245,21 @@ export const GASTOS_OPERATIVOS: GastosOperativos[] = [
     cantidad: 1,
     importe: 800,
     detalle: 'Alquiler de local',
-    denominacion: DENOMINACIONES[0]
+    denominacion: DENOMINACIONES[3] // Alquileres del negocio (Comercio)
   },
   {
     id: 2,
     cantidad: 1,
     importe: 200,
     detalle: 'Servicios de agua y luz',
-    denominacion: DENOMINACIONES[1]
+    denominacion: DENOMINACIONES[1] // Servicios básicos (Comercio)
+  },
+  {
+    id: 3,
+    cantidad: 1,
+    importe: 500,
+    detalle: 'Pago a empleados',
+    denominacion: DENOMINACIONES[0] // Personal a cargo (Comercio)
   }
 ];
 
@@ -288,9 +363,9 @@ export const NEGOCIOS: Negocio[] = [
     tiempo_valor: 5,
     direccion: 'Av. Comercial 567',
     tiempo: TIEMPOS[0],
-    actividad_economica: ACTIVIDADES_ECONOMICAS[0],
+    actividad_economica: ACTIVIDADES_ECONOMICAS[2], // Bodega, venta de carnes o verduras
     registro_ventas: REGISTROS_VENTAS[0],
-    gastos_operativos: [GASTOS_OPERATIVOS[0], GASTOS_OPERATIVOS[1]]
+    gastos_operativos: [GASTOS_OPERATIVOS[0], GASTOS_OPERATIVOS[1], GASTOS_OPERATIVOS[2]]
   }
 ];
 

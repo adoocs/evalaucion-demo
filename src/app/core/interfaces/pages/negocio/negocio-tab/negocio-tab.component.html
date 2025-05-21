@@ -53,24 +53,33 @@
             [text]="'Campo es requerido.'"></p-message>
         </div>
         <div class="mb-6">
-          <p-select [options]="actividadEconomicasList" formControlName="actividad_economica"
-            optionLabel="actividad_economica" [filter]="true" filterBy="nombre" [showClear]="true"
-            placeholder="Seleccione una actividad económica" class="w-full"
-            pTooltip="RECUERDA: Esta deberá ser su actividad principal" tooltipPosition="top">
-            <ng-template #selectedItem let-selectedOption>
-              <div class="flex items-center gap-2">
-                <div>{{ selectedOption.descripcion }}</div>
-              </div>
-            </ng-template>
-            <ng-template let-actividad #item>
-              <div class="flex items-center gap-2">
-                <div>{{ actividad.descripcion }}</div>
-              </div>
-            </ng-template>
-          </p-select>
+          <p-floatlabel variant="on">
+            <p-select [options]="actividadEconomicasList" formControlName="actividad_economica"
+              optionLabel="descripcion" [filter]="true" filterBy="descripcion" [showClear]="true"
+              [disabled]="!sector.value" styleClass="w-full"
+              pTooltip="RECUERDA: Esta deberá ser su actividad principal" tooltipPosition="top">
+              <ng-template #selectedItem let-selectedOption>
+                <div class="flex items-center gap-2">
+                  <div>{{ selectedOption.descripcion }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-actividad #item>
+                <div class="flex items-center gap-2">
+                  <div>{{ actividad.descripcion }}</div>
+                </div>
+              </ng-template>
+            </p-select>
+            <label for="actividad_economica">Actividad económica</label>
+          </p-floatlabel>
           <p-message severity="error" variant="simple" size="small"
             *ngIf="actividad_economica.touched && actividad_economica.invalid"
             [text]="'Campo es requerido.'"></p-message>
+          <small *ngIf="!sector.value" class="text-blue-500">
+            <i class="pi pi-info-circle mr-1"></i>Primero seleccione un sector económico
+          </small>
+          <small *ngIf="sector.value && actividadEconomicasList.length === 0" class="text-yellow-500">
+            <i class="pi pi-exclamation-triangle mr-1"></i>No hay actividades económicas para este sector
+          </small>
         </div>
         <div class="mb-8 w-full">
           <p-floatlabel variant="on">

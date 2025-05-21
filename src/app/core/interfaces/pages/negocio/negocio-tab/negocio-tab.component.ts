@@ -122,12 +122,19 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.initiateForm();
 
+    // Cargar datos iniciales
     this.tiempoService.loadInitialData();
     this.sectorEconomicoService.loadInitialData();
     this.actividadEconomica.loadInitialData();
     this.denominacionService.loadInitialData();
+
+    // Inicializar listas
+    this.actividadEconomicasList = [];
+    this.denominacionesFilter = [];
+    this.gastosOperativosList = [];
     this.isPanelCollapsed = true;
 
+    // Configurar suscripciones para actualizar opciones de tiempo
     this.negocioForm.get('tiempo_valor')?.valueChanges.subscribe(() => {
       this.actualizarOpcionesTiempo();
     });
@@ -439,18 +446,37 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   }
 
   sectorEconomicoOnChage(sector: any) {
-    this.actividadEconomicasList = this.actividadEconomicasAllList().filter((actividades: any) => {
-      return actividades.sector_economico_id === sector.value.id;
-    })
-    this.denominacionesFilter = this.denominacionesAll().filter((denominacion: any) => {
-      return denominacion.sector_economico_id === sector.value.id;
-    });
-    console.log('denominacionesFilter', this.denominacionesFilter);
-    this.gastosOperativosList = this.denominacionesFilter.map((denominacion) => {
-      return { id: -1, importe: 0, cantidad: 0, detalle: '', denominacion: { id: denominacion.id, descripcion: denominacion.descripcion, sector_economico: { id: denominacion.sector_economico_id, descripcion: '' } } };
+    // Filtrar actividades económicas por sector seleccionado
+    this.actividadEconomicasList = this.actividadEconomicasAllList().filter((actividad: any) => {
+      return actividad.sector_economico && actividad.sector_economico.id === sector.value.id;
     });
 
-    console.log('fomr', this.negocioForm.value)
+    console.log('Actividades filtradas por sector:', this.actividadEconomicasList);
+
+    // Limpiar el valor de actividad_economica cuando se cambia el sector
+    this.negocioForm.get('actividad_economica')?.setValue(null);
+
+    // Filtrar denominaciones por sector seleccionado
+    this.denominacionesFilter = this.denominacionesAll().filter((denominacion: any) => {
+      return denominacion.sector_economico && denominacion.sector_economico.id === sector.value.id;
+    });
+
+    console.log('Denominaciones filtradas por sector:', this.denominacionesFilter);
+
+    // Crear gastos operativos basados en las denominaciones filtradas
+    this.gastosOperativosList = this.denominacionesFilter.map((denominacion) => {
+      return {
+        id: -1,
+        importe: 0,
+        cantidad: 0,
+        detalle: '',
+        denominacion: {
+          id: denominacion.id,
+          descripcion: denominacion.descripcion,
+          sector_economico: denominacion.sector_economico
+        }
+      };
+    });
   }
 
   calcularTotalGastos(): number {

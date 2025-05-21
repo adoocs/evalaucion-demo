@@ -45,7 +45,6 @@ import { FichaTrabajo } from '../../../../domain/ficha-trabajo.model';
     <p-toast />
     <div class="card">
       <h5>Nueva Solicitud</h5>
-      <p>Complete el formulario para crear una nueva solicitud de crédito.</p>
 
       <app-solicitud-panel #solicitudPanel (switchMessage)="handleSwitchMessage($event)" />
     </div>

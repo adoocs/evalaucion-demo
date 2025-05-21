@@ -181,9 +181,6 @@
                                     [ngClass]="{'text-red-500': gastoFinanciero.monto_cuota > gastoFinanciero.saldo_credito || gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito}">
                                     {{ gastoFinanciero.saldo_credito }}
                                 </span>
-                                <div *ngIf="gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito" class="text-red-500 text-xs mt-1">
-                                    Monto crédito no puede ser menor al saldo
-                                </div>
                             </div>
                         </ng-template>
                     </p-cellEditor>
