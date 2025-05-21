@@ -25,9 +25,9 @@
           <p-table [value]="familiaMiembrosList" dataKey="id" [tableStyle]="{ 'min-width': '20rem' }">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 15%">Descripción</th>
-                <th style="width: 10%">N° Hijos</th>
-                <th style="width: 10%">Condición</th>
+                <th style="width: 40%" class="text-center font-bold">Descripción</th>
+                <th style="width: 30%" class="text-center font-bold">N° Hijos</th>
+                <th style="width: 30%" class="text-center font-bold">Gasto Escolar</th>
               </tr>
             </ng-template>
 
@@ -35,11 +35,12 @@
               <tr>
                 <td>{{ familia.descripcion }}</td>
 
-                <td [pEditableColumn]="familia.n_hijos" pEditableColumnField="n_hijos">
+                <td [pEditableColumn]="familia.n_hijos" pEditableColumnField="n_hijos" class="text-center">
                   <p-cellEditor>
                     <ng-template pTemplate="input">
                       <input pInputText type="number" min="0" [(ngModel)]="familia.n_hijos"
-                        [ngModelOptions]="{ standalone: true }" [disabled]="omitirHijos" />
+                        [ngModelOptions]="{ standalone: true }" [disabled]="omitirHijos"
+                        aria-label="Cantidad" />
                     </ng-template>
                     <ng-template pTemplate="output">
                       <span *ngIf="familia.n_hijos === 0" class="placeholder-text">0</span>
@@ -48,19 +49,35 @@
                   </p-cellEditor>
                 </td>
 
-                <td [pEditableColumn]="familia.condicion" pEditableColumnField="condicion">
-                  <p-cellEditor>
-                    <ng-template pTemplate="input">
-                      <p-checkbox binary="true" [(ngModel)]="familia.condicion" [ngModelOptions]="{ standalone: true }"
-                        inputId="chk_aval_{{familia.id}}" [disabled]="omitirHijos ||
-                        (familia.descripcion === 'Escolares' || familia.descripcion === 'Universitarios')" />
-                      <label for="chk_aval_{{familia.id}}"> Gasta?</label>
-                    </ng-template>
-                    <ng-template pTemplate="output">
-                      <i class="pi"
-                        [ngClass]="familia.condicion ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"></i>
-                    </ng-template>
-                  </p-cellEditor>
+                <td [pEditableColumn]="familia.condicion" pEditableColumnField="condicion" class="text-center">
+                  <ng-container *ngIf="familia.descripcion === 'Mayores'">
+                    <div class="font-bold mb-2">Vive en domicilio</div>
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <p-checkbox binary="true" [(ngModel)]="familia.condicion" [ngModelOptions]="{ standalone: true }"
+                          inputId="chk_aval_{{familia.id}}" [disabled]="omitirHijos" />
+                        <label for="chk_aval_{{familia.id}}"> Aplica?</label>
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        <i class="pi"
+                          [ngClass]="familia.condicion ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"></i>
+                      </ng-template>
+                    </p-cellEditor>
+                  </ng-container>
+                  <ng-container *ngIf="familia.descripcion !== 'Mayores'">
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <p-checkbox binary="true" [(ngModel)]="familia.condicion" [ngModelOptions]="{ standalone: true }"
+                          inputId="chk_aval_{{familia.id}}" [disabled]="omitirHijos ||
+                          (familia.descripcion === 'Escolares' || familia.descripcion === 'Universitarios')" />
+                        <label for="chk_aval_{{familia.id}}"> Aplica?</label>
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        <i class="pi"
+                          [ngClass]="familia.condicion ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"></i>
+                      </ng-template>
+                    </p-cellEditor>
+                  </ng-container>
                 </td>
               </tr>
             </ng-template>
@@ -90,17 +107,35 @@
           </div>
         </ng-template>
         <div class="grid gap-6 p-4">
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-4">
             <div class="mb-2">
               <p-floatlabel variant="on">
                 <input pInputText id="referencia_domicilio" formControlName="referencia_domicilio" autocomplete="off"
-                  required autofocus class="w-full max-w-xl" (keypress)="alpha($event)" />
+                  required autofocus class="w-full max-w-xl" (keypress)="validarCaracteresDireccion($event)" />
                 <label for="referencia_domicilio">Referencia</label>
               </p-floatlabel>
               <p-message severity="error" variant="simple" size="small"
                 *ngIf="referencia_domicilio.touched && referencia_domicilio.invalid"
                 [text]="'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'">
               </p-message>
+            </div>
+
+            <div class="mt-4">
+              <div class="border rounded-md overflow-hidden map-container">
+                <iframe width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen
+                  [src]="getMapUrl() | safe: 'resourceUrl'" title="Mapa de ubicación">
+                </iframe>
+              </div>
+              <div class="flex justify-between mt-2">
+                <div>
+                  <span class="text-sm text-gray-600">Latitud: </span>
+                  <span class="text-sm font-semibold">{{referenciaFamiliarForm.get('latitud')?.value || '-'}}</span>
+                </div>
+                <div>
+                  <span class="text-sm text-gray-600">Longitud: </span>
+                  <span class="text-sm font-semibold">{{referenciaFamiliarForm.get('longitud')?.value || '-'}}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -4,3 +4,17 @@
     color: #888;
     font-style: italic;
 }
+
+.map-container {
+    height: 250px;
+    position: relative;
+
+    iframe {
+        border: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+}

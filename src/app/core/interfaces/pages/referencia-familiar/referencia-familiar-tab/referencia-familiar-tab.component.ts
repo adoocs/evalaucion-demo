@@ -25,6 +25,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FamiliaMiembros } from '../../../../domain/familia-miembros.model';
 import { LocalReferenciaFamiliarService, LocalFamiliaMiembrosService } from '../../../../services/local-data-container.service';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
+import { SafePipe } from '../../../../../shared/pipes/safe.pipe';
 
 @Component({
   selector: 'app-referencia-familiar-tab',
@@ -52,7 +53,8 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
     KeyFilterModule,
     CheckboxModule,
     TooltipModule,
-    Message
+    Message,
+    SafePipe
   ],
   templateUrl: './referencia-familiar-tab.component.html',
   styleUrl: './referencia-familiar-tab.component.scss',
@@ -62,7 +64,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
 
   @Input() display: boolean = false;
   @Output() closedDialog = new EventEmitter<boolean>();
-  @Input() referenciaFamiliar: ReferenciaFamiliar = { id: 0, referencia_domicilio: '' };
+  @Input() referenciaFamiliar: ReferenciaFamiliar = { id: 0, referencia_domicilio: '', latitud: -7.4006, longitud: -79.5671 };
   @Input() familia: FamiliaMiembros = { id: 0, descripcion: '', n_hijos: 0, condicion: false };
   @Input() title = '';
   @Input() editabled: boolean = false;
@@ -104,6 +106,8 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
       this.referenciaFamiliarForm.patchValue({
         id: this.referenciaFamiliar.id,
         referencia_domicilio: this.referenciaFamiliar.referencia_domicilio,
+        latitud: this.referenciaFamiliar.latitud || 0,
+        longitud: this.referenciaFamiliar.longitud || 0,
         familia_miembros: this.referenciaFamiliar.familia_miembros
       });
     }
@@ -123,7 +127,17 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
     this.referenciaFamiliarForm = this.fb.group({
       id: [this.referenciaFamiliar.id, [Validators.required, Validators.minLength(1)]],
       referencia_domicilio: [this.referenciaFamiliar.referencia_domicilio, [Validators.required, Validators.minLength(1)]],
+      latitud: [this.referenciaFamiliar.latitud || this.PACASMAYO_LAT],
+      longitud: [this.referenciaFamiliar.longitud || this.PACASMAYO_LNG],
     });
+
+    // Suscribirse a los cambios en el campo de referencia_domicilio
+    this.referenciaFamiliarForm.get('referencia_domicilio')?.valueChanges.subscribe(value => {
+      if (value && value.length > 3) {
+        this.buscarDireccion(value);
+      }
+    });
+
     this.referenciaFamiliarForm.reset();
   }
 
@@ -205,13 +219,75 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
     this.displayFamilia = close;
   }
 
-  alpha(event: KeyboardEvent) {
-    const pattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]$/;
+  validarCaracteresDireccion(event: KeyboardEvent) {
+    // Patrón actualizado para permitir letras, números, espacios y caracteres especiales comunes en direcciones
+    const pattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s\.,#\-_°/]$/;
     const key = event.key;
 
     if (!pattern.test(key)) {
         event.preventDefault();
     }
+  }
+
+  // Método para actualizar las coordenadas del mapa
+  actualizarCoordenadas(lat: number, lng: number) {
+    this.referenciaFamiliarForm.patchValue({
+      latitud: lat,
+      longitud: lng
+    });
+  }
+
+  // Coordenadas predeterminadas para Pacasmayo
+  private readonly PACASMAYO_LAT = -7.4006;
+  private readonly PACASMAYO_LNG = -79.5671;
+
+  // Método para obtener la URL del mapa con las coordenadas actuales o la dirección
+  getMapUrl(): string {
+    const direccion = this.referenciaFamiliarForm.get('referencia_domicilio')?.value;
+
+    // Si hay una dirección con suficiente longitud, usamos la dirección para la búsqueda
+    if (direccion && direccion.length > 3) {
+      const direccionCompleta = `${direccion}, Pacasmayo, Perú`;
+      return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(direccionCompleta)}&zoom=15`;
+    } else {
+      // Si no hay dirección, usamos las coordenadas
+      const lat = this.referenciaFamiliarForm.get('latitud')?.value || this.PACASMAYO_LAT;
+      const lng = this.referenciaFamiliarForm.get('longitud')?.value || this.PACASMAYO_LNG;
+      return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${lat},${lng}&zoom=15`;
+    }
+  }
+
+  // Método para abrir el mapa en una nueva ventana
+  abrirMapaCompleto() {
+    const direccion = this.referenciaFamiliarForm.get('referencia_domicilio')?.value;
+
+    // Si hay una dirección con suficiente longitud, usamos la dirección para la búsqueda
+    if (direccion && direccion.length > 3) {
+      const direccionCompleta = `${direccion}, Pacasmayo, Perú`;
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccionCompleta)}`, '_blank');
+    } else {
+      // Si no hay dirección, usamos las coordenadas
+      const lat = this.referenciaFamiliarForm.get('latitud')?.value || this.PACASMAYO_LAT;
+      const lng = this.referenciaFamiliarForm.get('longitud')?.value || this.PACASMAYO_LNG;
+      window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+    }
+  }
+
+  // Método para buscar una dirección y actualizar las coordenadas
+  buscarDireccion(_direccion: string) {
+    // En una implementación real, usaríamos la API de Geocoding de Google para obtener las coordenadas exactas
+    // basadas en la dirección proporcionada (_direccion)
+
+    // Como alternativa, podemos simular coordenadas cercanas a Pacasmayo
+    // Generamos una pequeña variación aleatoria para simular diferentes ubicaciones en Pacasmayo
+    const latVariation = (Math.random() - 0.5) * 0.01; // Variación de ±0.005 grados
+    const lngVariation = (Math.random() - 0.5) * 0.01; // Variación de ±0.005 grados
+
+    const newLat = this.PACASMAYO_LAT + latVariation;
+    const newLng = this.PACASMAYO_LNG + lngVariation;
+
+    // Actualizamos las coordenadas en el formulario
+    this.actualizarCoordenadas(newLat, newLng);
   }
 
   /**
@@ -336,7 +412,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
 
       // Reiniciar los miembros de familia
       this.familiaMiembrosList.forEach(m => {
-        m.n_hijos = 0;
+        m.n_hijos = 5;
         if (m.descripcion === 'Escolares' || m.descripcion === 'Universitarios') {
           m.condicion = true;
         } else {
