@@ -1,246 +1,338 @@
-<div class="p-4">
-  <div class="text-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">Resumen de Solicitud</h2>
-    <p class="text-gray-600">Revise la información antes de guardar la solicitud</p>
+<div class="surface-card shadow-2 border-round p-3">
+  <!-- Encabezado -->
+  <div class="text-center mb-3">
+    <div class="text-3xl font-bold text-900">Resumen de Solicitud</div>
+    <div class="text-500">Revise la información antes de guardar la solicitud</div>
+    <p-divider styleClass="my-2"></p-divider>
   </div>
 
   <!-- Mensaje cuando no hay datos -->
-  <div *ngIf="!fichaTrabajo?.cliente && !solicitud?.monto" class="p-4 bg-yellow-50 border-round text-center">
-    <i class="pi pi-info-circle text-yellow-500 text-2xl mb-3 block"></i>
-    <h3 class="text-xl font-medium text-yellow-700 mb-2">No hay datos disponibles</h3>
-    <p class="text-yellow-600">
+  <div *ngIf="!fichaTrabajo?.cliente && !solicitud?.monto" class="p-3 bg-yellow-50 border-round text-center mb-3">
+    <i class="pi pi-info-circle text-yellow-500 text-2xl mb-2 block"></i>
+    <div class="text-xl font-medium text-yellow-700 mb-1">No hay datos disponibles</div>
+    <div class="text-yellow-600">
       No se encontraron datos para mostrar en el resumen. Por favor, complete los formularios en las pestañas anteriores.
-    </p>
-  </div>
-
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="solicitud">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Información General</h3>
-
-    <div class="grid">
-      <div class="col-12 md:col-6">
-        <div class="mb-3" *ngIf="solicitud?.n_credito">
-          <span class="font-bold text-gray-700">Número de Crédito:</span>
-          <span class="ml-2">{{ solicitud.n_credito }}</span>
-        </div>
-        <div class="mb-3" *ngIf="solicitud?.fecha">
-          <span class="font-bold text-gray-700">Fecha:</span>
-          <span class="ml-2">{{ formatoFecha(solicitud.fecha) }}</span>
-        </div>
-        <div class="mb-3" *ngIf="solicitud?.periodo">
-          <span class="font-bold text-gray-700">Periodo:</span>
-          <span class="ml-2">{{ solicitud.periodo?.descripcion || solicitud.periodo }}</span>
-        </div>
-      </div>
-      <div class="col-12 md:col-6">
-        <div class="mb-3" *ngIf="solicitud?.monto">
-          <span class="font-bold text-gray-700">Monto:</span>
-          <span class="ml-2">{{ formatoMoneda(solicitud.monto) }}</span>
-        </div>
-        <div class="mb-3" *ngIf="solicitud?.plazo">
-          <span class="font-bold text-gray-700">Plazo:</span>
-          <span class="ml-2">{{ solicitud.plazo }}</span>
-        </div>
-      </div>
     </div>
   </div>
 
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.cliente">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Datos del Cliente</h3>
-
-    <div class="grid">
-      <div class="col-12">
-        <div class="mb-3" *ngIf="fichaTrabajo.cliente.nombres || fichaTrabajo.cliente.apellidos">
-          <span class="font-bold text-gray-700">Nombre Completo:</span>
-          <span class="ml-2">{{ fichaTrabajo.cliente.nombres }} {{ fichaTrabajo.cliente.apellidos }}</span>
+  <!-- Grid principal de 2 columnas -->
+  <div class="grid">
+    <!-- Columna 1 -->
+    <div class="col-12 md:col-6 pr-md-2">
+      <!-- Información General -->
+      <p-panel header="Información General" [toggleable]="true" styleClass="mb-2" *ngIf="solicitud">
+        <ng-template pTemplate="icons">
+          <i class="pi pi-file-edit text-primary mr-2"></i>
+        </ng-template>
+        <div class="p-fluid">
+          <div *ngIf="solicitud?.n_credito" class="mb-2">
+            <div class="text-500 font-medium mb-1">Número de Crédito</div>
+            <div class="text-900">{{ solicitud.n_credito }}</div>
+          </div>
+          <div *ngIf="solicitud?.fecha" class="mb-2">
+            <div class="text-500 font-medium mb-1">Fecha</div>
+            <div class="text-900">{{ formatoFecha(solicitud.fecha) }}</div>
+          </div>
+          <div *ngIf="solicitud?.periodo" class="mb-2">
+            <div class="text-500 font-medium mb-1">Periodo</div>
+            <div class="text-900">{{ solicitud.periodo?.descripcion || solicitud.periodo }}</div>
+          </div>
+          <div *ngIf="solicitud?.monto" class="mb-2">
+            <div class="text-500 font-medium mb-1">Monto</div>
+            <div class="text-900 font-bold text-primary">{{ formatoMoneda(solicitud.monto) }}</div>
+          </div>
+          <div *ngIf="solicitud?.plazo" class="mb-2">
+            <div class="text-500 font-medium mb-1">Plazo</div>
+            <div class="text-900">{{ solicitud.plazo }}</div>
+          </div>
+          <div *ngIf="solicitud?.tasa" class="mb-2">
+            <div class="text-500 font-medium mb-1">Tasa</div>
+            <div class="text-900">{{ solicitud.tasa }}%</div>
+          </div>
+          <div *ngIf="solicitud?.cuota" class="mb-2">
+            <div class="text-500 font-medium mb-1">Cuota</div>
+            <div class="text-900 font-bold text-primary">{{ formatoMoneda(solicitud.cuota) }}</div>
+          </div>
         </div>
-      </div>
+      </p-panel>
+
+      <!-- Datos del Cliente -->
+      <p-panel header="Datos del Cliente" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.cliente">
+        <ng-template pTemplate="icons">
+          <i class="pi pi-user text-primary mr-2"></i>
+        </ng-template>
+        <div class="p-fluid">
+          <div *ngIf="fichaTrabajo.cliente.nombres || fichaTrabajo.cliente.apellidos" class="mb-2">
+            <div class="text-500 font-medium mb-1">Nombre Completo</div>
+            <div class="text-900">{{ fichaTrabajo.cliente.nombres }} {{ fichaTrabajo.cliente.apellidos }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.cliente.documento" class="mb-2">
+            <div class="text-500 font-medium mb-1">DNI</div>
+            <div class="text-900">{{ fichaTrabajo.cliente.dni }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.cliente.telefono" class="mb-2">
+            <div class="text-500 font-medium mb-1">Teléfono</div>
+            <div class="text-900">{{ fichaTrabajo.cliente.telefono }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.cliente.direccion" class="mb-2">
+            <div class="text-500 font-medium mb-1">Dirección</div>
+            <div class="text-900">{{ fichaTrabajo.cliente.direccion }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.cliente.fecha_nacimiento" class="mb-2">
+            <div class="text-500 font-medium mb-1">Fecha de Nacimiento</div>
+            <div class="text-900">{{ formatoFecha(fichaTrabajo.cliente.fecha_nacimiento) }}</div>
+          </div>
+        </div>
+      </p-panel>
+
+      <!-- Datos del Aval -->
+      <p-panel header="Datos del Aval" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.aval">
+        <ng-template pTemplate="icons">
+          <i class="pi pi-shield text-primary mr-2"></i>
+        </ng-template>
+        <div *ngIf="fichaTrabajo.aval.omitido" class="p-message p-message-info p-2 mb-2">
+          <i class="pi pi-info-circle p-message-icon"></i>
+          <span class="p-message-text">Aval omitido: {{ fichaTrabajo.aval.motivo }}</span>
+        </div>
+        <div *ngIf="!fichaTrabajo.aval.omitido" class="p-fluid">
+          <div *ngIf="fichaTrabajo.aval.nombres || fichaTrabajo.aval.apellidos" class="mb-2">
+            <div class="text-500 font-medium mb-1">Nombre Completo</div>
+            <div class="text-900">{{ fichaTrabajo.aval.nombres }} {{ fichaTrabajo.aval.apellidos }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.aval.dni" class="mb-2">
+            <div class="text-500 font-medium mb-1">DNI</div>
+            <div class="text-900">{{ fichaTrabajo.aval.dni }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.aval.telefono" class="mb-2">
+            <div class="text-500 font-medium mb-1">Teléfono</div>
+            <div class="text-900">{{ fichaTrabajo.aval.telefono }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.aval.direccion" class="mb-2">
+            <div class="text-500 font-medium mb-1">Dirección</div>
+            <div class="text-900">{{ fichaTrabajo.aval.direccion }}</div>
+          </div>
+        </div>
+      </p-panel>
+<!-- Datos del Cónyuge -->
+<p-panel header="Datos del Cónyuge" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.conyuge">
+  <ng-template pTemplate="icons">
+    <i class="pi pi-heart text-primary mr-2"></i>
+  </ng-template>
+  <div *ngIf="fichaTrabajo.conyuge.omitido" class="p-message p-message-info p-2 mb-2">
+    <i class="pi pi-info-circle p-message-icon"></i>
+    <span class="p-message-text">Cónyuge omitido: {{ fichaTrabajo.conyuge.motivo }}</span>
+  </div>
+  <div *ngIf="!fichaTrabajo.conyuge.omitido" class="p-fluid">
+    <div *ngIf="fichaTrabajo.conyuge.nombres || fichaTrabajo.conyuge.apellidos" class="mb-2">
+      <div class="text-500 font-medium mb-1">Nombre Completo</div>
+      <div class="text-900">{{ fichaTrabajo.conyuge.nombres }} {{ fichaTrabajo.conyuge.apellidos }}</div>
+    </div>
+    <div *ngIf="fichaTrabajo.conyuge.dni" class="mb-2">
+      <div class="text-500 font-medium mb-1">DNI</div>
+      <div class="text-900">{{ fichaTrabajo.conyuge.dni }}</div>
+    </div>
+    <div *ngIf="fichaTrabajo.conyuge.celular" class="mb-2">
+      <div class="text-500 font-medium mb-1">Teléfono</div>
+      <div class="text-900">{{ fichaTrabajo.conyuge.celular }}</div>
+    </div>
+    <div *ngIf="fichaTrabajo.conyuge.actividad" class="mb-2">
+      <div class="text-500 font-medium mb-1">Teléfono</div>
+      <div class="text-900">{{ fichaTrabajo.conyuge.actividad }}</div>
     </div>
   </div>
+</p-panel>
 
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.aval">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Datos del Aval</h3>
+<!-- Actividad Económica (ancho completo) -->
+<p-panel header="Actividad Económica" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.detalleEconomico">
+  <ng-template pTemplate="icons">
+    <i class="pi pi-briefcase text-primary mr-2"></i>
+  </ng-template>
 
-    <div *ngIf="fichaTrabajo.aval.omitido" class="p-3 bg-blue-50 border-left-3 border-blue-500 mb-3">
-      <span class="text-blue-700">Aval omitido: {{ fichaTrabajo.aval.motivo }}</span>
-    </div>
-
-    <div *ngIf="!fichaTrabajo.aval.omitido" class="grid">
-      <div class="col-12">
-        <div class="mb-3" *ngIf="fichaTrabajo.aval.nombres || fichaTrabajo.aval.apellidos">
-          <span class="font-bold text-gray-700">Nombre Completo:</span>
-          <span class="ml-2">{{ fichaTrabajo.aval.nombres }} {{ fichaTrabajo.aval.apellidos }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.conyuge">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Datos del Cónyuge</h3>
-
-    <div *ngIf="fichaTrabajo.conyuge.omitido" class="p-3 bg-blue-50 border-left-3 border-blue-500 mb-3">
-      <span class="text-blue-700">Cónyuge omitido: {{ fichaTrabajo.conyuge.motivo }}</span>
-    </div>
-
-    <div *ngIf="!fichaTrabajo.conyuge.omitido" class="grid">
-      <div class="col-12">
-        <div class="mb-3" *ngIf="fichaTrabajo.conyuge.nombres || fichaTrabajo.conyuge.apellidos">
-          <span class="font-bold text-gray-700">Nombre Completo:</span>
-          <span class="ml-2">{{ fichaTrabajo.conyuge.nombres }} {{ fichaTrabajo.conyuge.apellidos }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.detalleEconomico">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Actividad Económica</h3>
-
+  <div class="grid">
     <!-- Sección de Negocio -->
-    <div *ngIf="fichaTrabajo.detalleEconomico.negocio">
-      <div class="p-3 bg-blue-50 border-round mb-3">
-        <span class="font-bold text-blue-800">Tipo de Actividad: Negocio</span>
-      </div>
-
+    <div class="col-12 md:col-6" *ngIf="fichaTrabajo.detalleEconomico.negocio">
+      <p-tag severity="info" value="Tipo de Actividad: Negocio" styleClass="mb-2 block"></p-tag>
       <div class="grid">
         <div class="col-12 md:col-6">
-          <div class="mb-3" *ngIf="fichaTrabajo.detalleEconomico.negocio.actividad_economica?.descripcion">
-            <span class="font-bold text-gray-700">Actividad:</span>
-            <span class="ml-2">{{ fichaTrabajo.detalleEconomico.negocio.actividad_economica.descripcion }}</span>
+          <div *ngIf="fichaTrabajo.detalleEconomico.negocio.actividad_economica?.descripcion" class="mb-2">
+            <div class="text-500 font-medium mb-1">Actividad</div>
+            <div class="text-900">{{ fichaTrabajo.detalleEconomico.negocio.actividad_economica.descripcion }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.detalleEconomico.negocio.tiempo_actividad" class="mb-2">
+            <div class="text-500 font-medium mb-1">Tiempo de Actividad</div>
+            <div class="text-900">{{ fichaTrabajo.detalleEconomico.negocio.tiempo_actividad }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.detalleEconomico.negocio.direccion" class="mb-2">
+            <div class="text-500 font-medium mb-1">Dirección</div>
+            <div class="text-900">{{ fichaTrabajo.detalleEconomico.negocio.direccion }}</div>
           </div>
         </div>
         <div class="col-12 md:col-6">
-          <div class="mb-3" *ngIf="fichaTrabajo.detalleEconomico.negocio.registro_ventas?.ventas_normales">
-            <span class="font-bold text-gray-700">Ventas Normales:</span>
-            <span class="ml-2">{{ formatoMoneda(fichaTrabajo.detalleEconomico.negocio.registro_ventas.ventas_normales) }}</span>
+          <div *ngIf="fichaTrabajo.detalleEconomico.negocio.registro_ventas?.ventas_normales" class="mb-2">
+            <div class="text-500 font-medium mb-1">Ventas Normales</div>
+            <div class="text-900 font-bold text-primary">{{ formatoMoneda(fichaTrabajo.detalleEconomico.negocio.registro_ventas.ventas_normales) }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.detalleEconomico.negocio.registro_ventas?.ventas_bajas" class="mb-2">
+            <div class="text-500 font-medium mb-1">Ventas Bajas</div>
+            <div class="text-900">{{ formatoMoneda(fichaTrabajo.detalleEconomico.negocio.registro_ventas.ventas_bajas) }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.detalleEconomico.negocio.registro_ventas?.ventas_altas" class="mb-2">
+            <div class="text-500 font-medium mb-1">Ventas Altas</div>
+            <div class="text-900">{{ formatoMoneda(fichaTrabajo.detalleEconomico.negocio.registro_ventas.ventas_altas) }}</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Sección de Ingreso Dependiente -->
-    <div *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente">
-      <div class="p-3 bg-blue-50 border-round mb-3">
-        <span class="font-bold text-blue-800">Tipo de Actividad: Ingreso Dependiente</span>
-      </div>
-
+    <div class="col-12 md:col-6" *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente">
+      <p-tag severity="info" value="Tipo de Actividad: Ingreso Dependiente" styleClass="mb-2 block"></p-tag>
       <div class="grid">
         <div class="col-12 md:col-6">
-          <div class="mb-3" *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente.actividad">
-            <span class="font-bold text-gray-700">Actividad:</span>
-            <span class="ml-2">{{ fichaTrabajo.detalleEconomico.ingreso_dependiente.actividad }}</span>
+          <div *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente.actividad" class="mb-2">
+            <div class="text-500 font-medium mb-1">Actividad</div>
+            <div class="text-900">{{ fichaTrabajo.detalleEconomico.ingreso_dependiente.actividad }}</div>
           </div>
         </div>
         <div class="col-12 md:col-6">
-          <div class="mb-3" *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente.importe">
-            <span class="font-bold text-gray-700">Importe:</span>
-            <span class="ml-2">{{ formatoMoneda(fichaTrabajo.detalleEconomico.ingreso_dependiente.importe) }}</span>
+          <div *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente.importe" class="mb-2">
+            <div class="text-500 font-medium mb-1">Importe</div>
+            <div class="text-900 font-bold text-primary">{{ formatoMoneda(fichaTrabajo.detalleEconomico.ingreso_dependiente.importe) }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.detalleEconomico.ingreso_dependiente.tiempo_trabajo" class="mb-2">
+            <div class="text-500 font-medium mb-1">Tiempo de Trabajo</div>
+            <div class="text-900">{{ fichaTrabajo.detalleEconomico.ingreso_dependiente.tiempo_trabajo }}</div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</p-panel>
+    <!-- Columna 2 -->
+    <div class="col-12 md:col-6 pl-md-2">
+      <!-- Puntaje Sentinel -->
 
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.ingreso_adicional">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Ingreso Adicional</h3>
 
-    <div *ngIf="fichaTrabajo.ingreso_adicional.omitido" class="p-3 bg-blue-50 border-left-3 border-blue-500 mb-3">
-      <span class="text-blue-700">Ingreso adicional omitido</span>
-    </div>
 
-    <div *ngIf="!fichaTrabajo.ingreso_adicional.omitido">
-      <div class="grid">
-        <div class="col-12 md:col-6">
-          <div class="mb-3" *ngIf="fichaTrabajo.ingreso_adicional.actividad">
-            <span class="font-bold text-gray-700">Actividad:</span>
-            <span class="ml-2">{{ fichaTrabajo.ingreso_adicional.actividad }}</span>
+
+
+
+      <!-- Ingreso Adicional -->
+      <p-panel header="Ingreso Adicional" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.ingreso_adicional">
+        <ng-template pTemplate="icons">
+          <i class="pi pi-dollar text-primary mr-2"></i>
+        </ng-template>
+        <div *ngIf="fichaTrabajo.ingreso_adicional.omitido" class="p-message p-message-info p-2 mb-2">
+          <i class="pi pi-info-circle p-message-icon"></i>
+          <span class="p-message-text">Ingreso adicional omitido</span>
+        </div>
+        <div *ngIf="!fichaTrabajo.ingreso_adicional.omitido">
+          <div *ngIf="fichaTrabajo.ingreso_adicional.actividad" class="mb-2">
+            <div class="text-500 font-medium mb-1">Actividad</div>
+            <div class="text-900">{{ fichaTrabajo.ingreso_adicional.actividad }}</div>
           </div>
-        </div>
-        <div class="col-12 md:col-6">
-          <div class="mb-3" *ngIf="fichaTrabajo.ingreso_adicional.importe_act !== undefined">
-            <span class="font-bold text-gray-700">Importe:</span>
-            <span class="ml-2">{{ formatoMoneda(fichaTrabajo.ingreso_adicional.importe_act) }}</span>
+          <div *ngIf="fichaTrabajo.ingreso_adicional.importe_act !== undefined" class="mb-2">
+            <div class="text-500 font-medium mb-1">Importe</div>
+            <div class="text-900 font-bold text-primary">{{ formatoMoneda(fichaTrabajo.ingreso_adicional.importe_act) }}</div>
           </div>
-        </div>
-      </div>
+          <div *ngIf="fichaTrabajo.ingreso_adicional.frecuencia" class="mb-2">
+            <div class="text-500 font-medium mb-1">Frecuencia</div>
+            <div class="text-900">{{ fichaTrabajo.ingreso_adicional.frecuencia }}</div>
+          </div>
+          <div *ngIf="fichaTrabajo.ingreso_adicional.tiempo_actividad" class="mb-2">
+            <div class="text-500 font-medium mb-1">Tiempo de Actividad</div>
+            <div class="text-900">{{ fichaTrabajo.ingreso_adicional.tiempo_actividad }}</div>
+          </div>
 
-      <!-- Información de Aporte de Terceros -->
-      <div *ngIf="fichaTrabajo.ingreso_adicional.aportante?.descripcion || fichaTrabajo.ingreso_adicional.importe_tercero" class="mt-4">
-        <div class="p-3 bg-blue-50 border-round mb-3">
-          <span class="font-bold text-blue-800">Aporte de Terceros</span>
-        </div>
-
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="mb-3" *ngIf="fichaTrabajo.ingreso_adicional.aportante?.descripcion">
-              <span class="font-bold text-gray-700">Aportante:</span>
-              <span class="ml-2">{{ fichaTrabajo.ingreso_adicional.aportante.descripcion }}</span>
+          <!-- Información de Aporte de Terceros -->
+          <div *ngIf="fichaTrabajo.ingreso_adicional.aportante?.descripcion || fichaTrabajo.ingreso_adicional.importe_tercero" class="mt-2">
+            <p-tag severity="info" value="Aporte de Terceros" styleClass="mb-2"></p-tag>
+            <div *ngIf="fichaTrabajo.ingreso_adicional.aportante?.descripcion" class="mb-2">
+              <div class="text-500 font-medium mb-1">Aportante</div>
+              <div class="text-900">{{ fichaTrabajo.ingreso_adicional.aportante.descripcion }}</div>
+            </div>
+            <div *ngIf="fichaTrabajo.ingreso_adicional.importe_tercero !== undefined" class="mb-2">
+              <div class="text-500 font-medium mb-1">Importe</div>
+              <div class="text-900 font-bold text-primary">{{ formatoMoneda(fichaTrabajo.ingreso_adicional.importe_tercero) }}</div>
+            </div>
+            <div *ngIf="fichaTrabajo.ingreso_adicional.parentesco_aportante" class="mb-2">
+              <div class="text-500 font-medium mb-1">Parentesco</div>
+              <div class="text-900">{{ fichaTrabajo.ingreso_adicional.parentesco_aportante }}</div>
             </div>
           </div>
-          <div class="col-12 md:col-6">
-            <div class="mb-3" *ngIf="fichaTrabajo.ingreso_adicional.importe_tercero !== undefined">
-              <span class="font-bold text-gray-700">Importe:</span>
-              <span class="ml-2">{{ formatoMoneda(fichaTrabajo.ingreso_adicional.importe_tercero) }}</span>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.gasto_financieros">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Gastos Financieros</h3>
-
-    <div *ngIf="fichaTrabajo.gasto_financieros.length === 0" class="p-3 bg-blue-50 border-left-3 border-blue-500 mb-3">
-      <span class="text-blue-700">No se registraron gastos financieros</span>
-    </div>
-
-    <div *ngIf="fichaTrabajo.gasto_financieros.length > 0">
-      <div *ngFor="let gasto of fichaTrabajo.gasto_financieros; let i = index" class="p-3 mb-2" [ngClass]="{'bg-gray-50': i % 2 === 0}">
-        <div class="grid">
-          <div class="col-12 md:col-6" *ngIf="gasto.entidad?.descripcion">
-            <span class="font-bold text-gray-700">Entidad:</span>
-            <span class="ml-2">{{ gasto.entidad.descripcion }}</span>
-          </div>
-          <div class="col-12 md:col-6" *ngIf="gasto.monto_credito !== undefined">
-            <span class="font-bold text-gray-700">Monto:</span>
-            <span class="ml-2">{{ formatoMoneda(gasto.monto_credito) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="fichaTrabajo?.referencia_familiar">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Referencia Familiar</h3>
-
-    <div *ngIf="fichaTrabajo.referencia_familiar.omitido" class="p-3 bg-blue-50 border-left-3 border-blue-500 mb-3">
-      <span class="text-blue-700">Referencia familiar omitida</span>
-    </div>
-
-    <div *ngIf="!fichaTrabajo.referencia_familiar.omitido">
-      <div class="mb-3" *ngIf="fichaTrabajo.referencia_familiar.referencia_domicilio">
-        <span class="font-bold text-gray-700">Referencia de Domicilio:</span>
-        <span class="ml-2">{{ fichaTrabajo.referencia_familiar.referencia_domicilio }}</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card p-4 border-1 border-gray-200 mb-4" *ngIf="solicitud?.puntaje_sentinel">
-    <h3 class="text-xl font-bold text-gray-700 mb-3 border-bottom-1 border-gray-300 pb-2">Puntaje Sentinel</h3>
-
-    <div class="grid">
-      <div class="col-12">
-        <div class="mb-3">
-          <span class="font-bold text-gray-700">Puntaje:</span>
-          <span class="ml-2">{{ solicitud.puntaje_sentinel }}</span>
-          <span class="ml-2" [ngClass]="{
+      </p-panel>
+      <p-panel header="Puntaje Sentinel" [toggleable]="true" styleClass="mb-2" *ngIf="solicitud?.puntaje_sentinel">
+        <ng-template pTemplate="icons">
+          <i class="pi pi-chart-line text-primary mr-2"></i>
+        </ng-template>
+        <div class="text-center py-2">
+          <div class="text-5xl font-bold mb-2" [ngClass]="{
             'text-green-600': solicitud.puntaje_sentinel >= 598,
             'text-yellow-600': solicitud.puntaje_sentinel >= 147 && solicitud.puntaje_sentinel < 598,
             'text-red-600': solicitud.puntaje_sentinel < 147
-          }">{{ getNombreRangoPuntaje(solicitud.puntaje_sentinel) }}</span>
+          }">{{ solicitud.puntaje_sentinel }}</div>
+          <p-tag [severity]="getSeveridadPuntaje(solicitud.puntaje_sentinel)" [value]="getNombreRangoPuntaje(solicitud.puntaje_sentinel)"></p-tag>
+
+          <div *ngIf="solicitud.historial_crediticio" class="mt-3 text-left">
+            <div class="text-500 font-medium mb-1">Historial Crediticio</div>
+            <div class="text-900">{{ solicitud.historial_crediticio }}</div>
+          </div>
+
+          <div *ngIf="solicitud.observaciones_sentinel" class="mt-2 text-left">
+            <div class="text-500 font-medium mb-1">Observaciones</div>
+            <div class="text-900">{{ solicitud.observaciones_sentinel }}</div>
+          </div>
         </div>
-      </div>
+      </p-panel>
     </div>
   </div>
+<!-- Gastos Financieros -->
+<p-panel header="Gastos Financieros" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.gasto_financieros">
+  <ng-template pTemplate="icons">
+    <i class="pi pi-credit-card text-primary mr-2"></i>
+  </ng-template>
+  <div *ngIf="fichaTrabajo.gasto_financieros.length === 0" class="p-message p-message-info p-2 mb-2">
+    <i class="pi pi-info-circle p-message-icon"></i>
+    <span class="p-message-text">No se registraron gastos financieros</span>
+  </div>
+  <div *ngIf="fichaTrabajo.gasto_financieros.length > 0">
+    <p-table [value]="fichaTrabajo.gasto_financieros" styleClass="p-datatable-sm" [tableStyle]="{'min-width': '100%'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Entidad</th>
+          <th>Monto</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-gasto>
+        <tr>
+          <td>{{ gasto.institucion }}</td>
+          <td>{{ formatoMoneda(gasto.monto_credito) }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-panel>
 
-
+  <!-- Referencia Familiar -->
+  <p-panel header="Referencia Familiar" [toggleable]="true" styleClass="mb-2" *ngIf="fichaTrabajo?.referencia_familiar">
+    <ng-template pTemplate="icons">
+      <i class="pi pi-users text-primary mr-2"></i>
+    </ng-template>
+    <div *ngIf="fichaTrabajo.referencia_familiar.omitido" class="p-message p-message-info p-2 mb-2">
+      <i class="pi pi-info-circle p-message-icon"></i>
+      <span class="p-message-text">Referencia familiar omitida</span>
+    </div>
+    <div *ngIf="!fichaTrabajo.referencia_familiar.omitido" class="p-fluid">
+      <div *ngIf="fichaTrabajo.referencia_familiar.descripcion" class="mb-2">
+        <div class="text-500 font-medium mb-1">Nombre</div>
+        <div class="text-900">{{ fichaTrabajo.referencia_familiar.descripcion }}</div>
+      </div>
+      <div *ngIf="fichaTrabajo.referencia_familiar.referencia_domicilio" class="mb-2">
+        <div class="text-500 font-medium mb-1">Referencia de Domicilio</div>
+        <div class="text-900">{{ fichaTrabajo.referencia_familiar.referencia_domicilio }}</div>
+      </div>
+    </div>
+  </p-panel>
+</div>
 </div>

@@ -24,8 +24,7 @@ import { FamiliaMiembros } from "../domain/familia-miembros.model";
 export const TIPO_VIVIENDAS: TipoVivienda[] = [
   { id: 1, descripcion: 'Casa propia' },
   { id: 2, descripcion: 'Alquilada' },
-  { id: 3, descripcion: 'Familiar' },
-  { id: 4, descripcion: 'Otro' }
+  { id: 3, descripcion: 'Familiar' }
 ];
 
 // Datos de ejemplo para Tasa
@@ -192,12 +191,52 @@ export const GASTOS_OPERATIVOS: GastosOperativos[] = [
 export const APORTANTES: Aportante[] = [
   {
     id: 1,
-    descripcion: 'Principal'
+    descripcion: 'Madre',
   },
   {
     id: 2,
-    descripcion: 'Secundario'
-  }
+    descripcion: 'Padre',
+  },
+  {
+    id: 3,
+    descripcion: 'Cónyuge',
+  },
+  {
+    id: 4,
+    descripcion: 'Conviviente',
+  },
+  {
+    id: 5,
+    descripcion: 'Expareja',
+  },
+  {
+    id: 6,
+    descripcion: 'Pareja',
+  },
+  {
+    id: 7,
+    descripcion: 'Hijo(a)',
+  },
+  {
+    id: 8,
+    descripcion: 'Hermano(a)',
+  },
+  {
+    id: 9,
+    descripcion: 'Primo(a)',
+  },
+  {
+    id: 10,
+    descripcion: 'Sobrino(a)',
+  },
+  {
+    id: 11,
+    descripcion: 'Tío(a)',
+  },
+  {
+    id: 12,
+    descripcion: 'Otro',
+  },
 ];
 
 
