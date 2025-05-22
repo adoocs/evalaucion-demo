@@ -110,7 +110,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Valida en tiempo real que el monto no supere al saldo
+   * Valida en tiempo real que el monto sea mayor o igual al saldo
    * Muestra mensajes de error en los campos correspondientes
    */
   validateMontoSaldo(): void {
@@ -121,7 +121,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
 
     // Solo validamos si ambos campos tienen valores
     if (monto !== null && saldo !== null && monto !== '' && saldo !== '') {
-      if (parseFloat(monto) > parseFloat(saldo)) {
+      if (parseFloat(monto) < parseFloat(saldo)) {
         // Establecer error en el formulario
         this.creditoAnteriorForm.setErrors({ 'montoMayorQueSaldo': true });
 
@@ -129,7 +129,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
         if (montoControl?.touched && saldoControl?.touched) {
           this.messageService.warnMessageToast(
             'Validación',
-            'El monto no debe superar al saldo'
+            'El monto debe ser mayor o igual al saldo'
           );
         }
       } else {
@@ -204,9 +204,9 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Validador personalizado para asegurar que el monto no supere al saldo
+   * Validador personalizado para asegurar que el monto sea mayor o igual al saldo
    * @param group - El FormGroup a validar
-   * @returns Un objeto con el error si el monto es mayor que el saldo, null en caso contrario
+   * @returns Un objeto con el error si el monto es menor que el saldo, null en caso contrario
    */
   montoSaldoValidator(group: FormGroup): { [key: string]: any } | null {
     const montoControl = group.get('monto');
@@ -218,7 +218,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
     if (monto !== null && saldo !== null && monto !== '' && saldo !== '' &&
         !isNaN(parseFloat(monto)) && !isNaN(parseFloat(saldo))) {
 
-      if (parseFloat(monto) > parseFloat(saldo)) {
+      if (parseFloat(monto) < parseFloat(saldo)) {
         return { 'montoMayorQueSaldo': true };
       }
     }
@@ -287,8 +287,8 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
     const monto = this.creditoAnteriorForm.get('monto')?.value;
     const saldo = this.creditoAnteriorForm.get('saldo')?.value;
 
-    if (monto > saldo) {
-      this.showWarnMessage('Error', 'El monto no debe superar al saldo');
+    if (monto < saldo) {
+      this.showWarnMessage('Error', 'El monto debe ser mayor o igual al saldo');
       return;
     }
 

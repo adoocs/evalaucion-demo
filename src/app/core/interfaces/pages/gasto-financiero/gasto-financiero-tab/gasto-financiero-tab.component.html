@@ -71,13 +71,9 @@
                         <ng-template pTemplate="output">
                             <div>
                                 <span *ngIf="gastoFinanciero.monto_credito === 0" class="placeholder-text">0</span>
-                                <span *ngIf="gastoFinanciero.monto_credito !== 0"
-                                    [ngClass]="{'text-red-500': gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito}">
+                                <span *ngIf="gastoFinanciero.monto_credito !== 0">
                                     {{ gastoFinanciero.monto_credito }}
                                 </span>
-                                <div *ngIf="gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito" class="text-red-500 text-xs mt-1">
-                                    No puede ser menor al saldo
-                                </div>
                             </div>
                         </ng-template>
                     </p-cellEditor>
@@ -178,7 +174,7 @@
                             <div>
                                 <span *ngIf="gastoFinanciero.saldo_credito === 0" class="placeholder-text">0</span>
                                 <span *ngIf="gastoFinanciero.saldo_credito !== 0"
-                                    [ngClass]="{'text-red-500': gastoFinanciero.monto_cuota > gastoFinanciero.saldo_credito || gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito}">
+                                    [ngClass]="{'text-red-500': gastoFinanciero.monto_cuota > gastoFinanciero.saldo_credito}">
                                     {{ gastoFinanciero.saldo_credito }}
                                 </span>
                             </div>

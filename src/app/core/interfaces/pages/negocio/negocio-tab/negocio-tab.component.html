@@ -10,8 +10,9 @@
       <div class="flex items-center p-3 rounded-lg transition-colors"
            [ngClass]="{'bg-blue-50 border border-blue-200': tipoActividadSeleccionada === 'negocio'}">
         <p-radioButton name="tipoActividad" [value]="'negocio'" [(ngModel)]="tipoActividadSeleccionada"
-          [ngModelOptions]="{standalone: true}" inputId="negocio" (onChange)="cambiarTipoActividad('negocio')"></p-radioButton>
-        <label for="negocio" class="ml-2 cursor-pointer font-medium text-lg" (click)="cambiarTipoActividad('negocio')">
+          [ngModelOptions]="{standalone: true}" inputId="negocio"
+          (click)="cambiarTipoActividad('negocio')"></p-radioButton>
+        <label for="negocio" class="ml-2 cursor-pointer font-medium text-lg">
           <i class="pi pi-briefcase mr-2 text-blue-600"></i>
           Negocio
         </label>
@@ -20,8 +21,9 @@
       <div class="flex items-center p-3 rounded-lg transition-colors"
            [ngClass]="{'bg-blue-50 border border-blue-200': tipoActividadSeleccionada === 'dependiente'}">
         <p-radioButton name="tipoActividad" [value]="'dependiente'" [(ngModel)]="tipoActividadSeleccionada"
-          [ngModelOptions]="{standalone: true}" inputId="dependiente" (onChange)="cambiarTipoActividad('dependiente')"></p-radioButton>
-        <label for="dependiente" class="ml-2 cursor-pointer font-medium text-lg" (click)="cambiarTipoActividad('dependiente')">
+          [ngModelOptions]="{standalone: true}" inputId="dependiente"
+          (click)="cambiarTipoActividad('dependiente')"></p-radioButton>
+        <label for="dependiente" class="ml-2 cursor-pointer font-medium text-lg">
           <i class="pi pi-user mr-2 text-blue-600"></i>
           Ingreso Dependiente
         </label>

@@ -22,10 +22,9 @@ import { FamiliaMiembros } from "../domain/familia-miembros.model";
 
 // Datos de ejemplo para TipoVivienda
 export const TIPO_VIVIENDAS: TipoVivienda[] = [
-  { id: 1, descripcion: 'Casa propia' },
+  { id: 1, descripcion: 'Propia' },
   { id: 2, descripcion: 'Alquilada' },
-  { id: 3, descripcion: 'Familiar' },
-  { id: 4, descripcion: 'Otro' }
+  { id: 3, descripcion: 'Familiar' }
 ];
 
 // Datos de ejemplo para Tasa

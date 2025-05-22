@@ -63,7 +63,7 @@ export class LocalValidationService {
 
     // Verificar si el cliente tiene casa propia
     const tipoViviendaPropia = tiposVivienda.find(tv =>
-      tv.descripcion.toLowerCase() === 'propia'
+      tv.descripcion.toLowerCase().includes('propia')
     );
 
     const tieneViviendaPropia = tipoViviendaPropia &&

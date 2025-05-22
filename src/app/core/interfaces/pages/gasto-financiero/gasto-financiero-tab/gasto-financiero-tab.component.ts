@@ -144,12 +144,7 @@ export class GastoFinancieroTabComponent implements OnInit {
         break;
       case 'monto_credito':
       case 'saldo_credito':
-        if (data.monto_credito < data.saldo_credito) {
-          this.messageService.warnMessageToast(
-            'Error en Monto Crédito',
-            'El monto del crédito no puede ser menor al saldo del crédito'
-          );
-        }
+        // Ya no validamos que el monto_credito no sea menor que el saldo_credito
         if (data.monto_cuota > data.saldo_credito) {
           this.messageService.warnMessageToast(
             'Error en Monto Cuota',
@@ -340,17 +335,12 @@ export class GastoFinancieroTabComponent implements OnInit {
   }
 
   /**
-   * Valida que el monto_credito no sea menor que el saldo_credito
-   * @param gastoFinanciero El gasto financiero a validar
-   * @returns true si la validación es exitosa, false en caso contrario
+   * Valida que el monto_credito sea válido
+   * @param _ El gasto financiero a validar (no utilizado)
+   * @returns true siempre, ya que no hay validaciones específicas para el monto de crédito
    */
-  validarMontoCredito(gastoFinanciero: GastoFinanciero): boolean {
-    if (gastoFinanciero.monto_credito > 0 && gastoFinanciero.saldo_credito > 0) {
-      if (gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito) {
-        this.errorMontoCredito = 'El monto del crédito no puede ser menor al saldo del crédito';
-        return false;
-      }
-    }
+  validarMontoCredito(_: GastoFinanciero): boolean {
+    // Ya no validamos que el monto_credito no sea menor que el saldo_credito
     this.errorMontoCredito = '';
     return true;
   }
@@ -396,10 +386,7 @@ export class GastoFinancieroTabComponent implements OnInit {
         isValid = false;
         errorMessages.push('El monto de la cuota no puede ser mayor al saldo del crédito');
       }
-      if (!this.validarMontoCredito(gastoFinanciero)) {
-        isValid = false;
-        errorMessages.push('El monto del crédito no puede ser menor al saldo del crédito');
-      }
+      // Ya no validamos que el monto_credito no sea menor que el saldo_credito
     }
     if (!isValid && markAsTouched) {
       if (camposIncompletos) {
@@ -442,8 +429,7 @@ export class GastoFinancieroTabComponent implements OnInit {
       }
 
       if (gastoFinanciero.n_pagadas > gastoFinanciero.n_total ||
-          gastoFinanciero.monto_cuota > gastoFinanciero.saldo_credito ||
-          gastoFinanciero.monto_credito < gastoFinanciero.saldo_credito) {
+          gastoFinanciero.monto_cuota > gastoFinanciero.saldo_credito) {
         return false;
       }
     }

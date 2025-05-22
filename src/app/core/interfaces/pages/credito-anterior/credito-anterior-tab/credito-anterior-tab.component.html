@@ -46,7 +46,7 @@
                         [text]="'Monto es requerido.'">
                     </p-message>
                     <p-message severity="error" variant="simple" size="small" *ngIf="creditoAnteriorForm.errors?.['montoMayorQueSaldo'] && monto.touched && saldo.touched && !omitirCreditoAnterior"
-                        [text]="'El monto no debe superar al saldo.'">
+                        [text]="'El monto debe ser mayor o igual al saldo.'">
                     </p-message>
                 </div>
 
@@ -116,7 +116,7 @@
                         [text]="'Saldo es requerido.'">
                     </p-message>
                     <p-message severity="error" variant="simple" size="small" *ngIf="creditoAnteriorForm.errors?.['montoMayorQueSaldo'] && monto.touched && saldo.touched && !omitirCreditoAnterior"
-                        [text]="'El saldo debe ser mayor o igual al monto.'">
+                        [text]="'El saldo no puede superar al monto.'">
                     </p-message>
                 </div>
             </div>

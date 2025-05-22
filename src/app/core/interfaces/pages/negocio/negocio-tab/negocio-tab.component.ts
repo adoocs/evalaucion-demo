@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, computed, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, signal, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { Message } from 'primeng/message';
@@ -63,7 +63,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
   styleUrl: './negocio-tab.component.scss',
   providers: [LocalNegocioService, LocalTiempoService, ConfirmationService, LocalActividadEconomicaService, LocalIngresoDependienteService, LocalRegistroVentasService, LocalGastosOperativosService, MessageToastService],
 })
-export class NegocioTabComponent implements OnInit, OnChanges {
+export class NegocioTabComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() display: boolean = false;
   @Output() closedDialog = new EventEmitter<boolean>();
@@ -109,7 +109,6 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   errorVentasBajas: string = '';
 
   constructor(
-    private negocioService: LocalNegocioService,
     private tiempoService: LocalTiempoService,
     private sectorEconomicoService: LocalSectorEconomicoService,
     private actividadEconomica: LocalActividadEconomicaService,
@@ -120,6 +119,9 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit(): void {
+    console.log('Inicializando componente NegocioTabComponent');
+
+    // Inicializar formularios
     this.initiateForm();
 
     // Cargar datos iniciales
@@ -134,6 +136,12 @@ export class NegocioTabComponent implements OnInit, OnChanges {
     this.gastosOperativosList = [];
     this.isPanelCollapsed = true;
 
+    // Inicializar variables de error
+    this.errorRegistroVentas = '';
+    this.errorVentasNormales = '';
+    this.errorVentasAltas = '';
+    this.errorVentasBajas = '';
+
     // Configurar suscripciones para actualizar opciones de tiempo
     this.negocioForm.get('tiempo_valor')?.valueChanges.subscribe(() => {
       this.actualizarOpcionesTiempo();
@@ -146,9 +154,10 @@ export class NegocioTabComponent implements OnInit, OnChanges {
     this.negocioForm.disable();
     this.ingresoDependienteForm.disable();
 
-    // Si ya hay un tipo de actividad seleccionado, actualizar el estado de los formularios
+    // Si ya hay un tipo de actividad seleccionado, habilitar el formulario correspondiente
     if (this.tipoActividadSeleccionada) {
-      this.actualizarEstadoFormularios();
+      console.log(`Tipo de actividad ya seleccionado: ${this.tipoActividadSeleccionada}`);
+      this.habilitarFormularioSeleccionado(this.tipoActividadSeleccionada);
     }
   }
 
@@ -192,17 +201,36 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   }
 
   actualizarEstadoFormularios(): void {
-    if (this.tipoActividadSeleccionada === 'negocio') {
-      this.negocioForm.enable();
-      this.ingresoDependienteForm.disable();
-    } else if (this.tipoActividadSeleccionada === 'dependiente') {
-      this.negocioForm.disable();
-
-      this.ingresoDependienteForm.enable();
-    } else {
-      this.negocioForm.disable();
-      this.ingresoDependienteForm.disable();
+    // Primero, asegurarse de que ambos formularios estén inicializados
+    if (!this.negocioForm || !this.ingresoDependienteForm) {
+      console.warn('Los formularios no están inicializados correctamente');
+      return;
     }
+
+    // Usar setTimeout para asegurar que la actualización ocurra después del ciclo de detección de cambios
+    setTimeout(() => {
+      if (this.tipoActividadSeleccionada === 'negocio') {
+        // Habilitar formulario de negocio
+        this.negocioForm.enable();
+        // Deshabilitar formulario de ingreso dependiente
+        this.ingresoDependienteForm.disable();
+
+        console.log('Formulario de negocio habilitado, formulario de ingreso dependiente deshabilitado');
+      } else if (this.tipoActividadSeleccionada === 'dependiente') {
+        // Deshabilitar formulario de negocio
+        this.negocioForm.disable();
+        // Habilitar formulario de ingreso dependiente
+        this.ingresoDependienteForm.enable();
+
+        console.log('Formulario de negocio deshabilitado, formulario de ingreso dependiente habilitado');
+      } else {
+        // Si no hay selección, deshabilitar ambos formularios
+        this.negocioForm.disable();
+        this.ingresoDependienteForm.disable();
+
+        console.log('Ambos formularios deshabilitados');
+      }
+    }, 0);
   }
 
   /**
@@ -210,26 +238,31 @@ export class NegocioTabComponent implements OnInit, OnChanges {
    * @param nuevoTipo El nuevo tipo de actividad económica ('negocio' o 'dependiente')
    */
   cambiarTipoActividad(nuevoTipo: 'negocio' | 'dependiente'): void {
+    console.log(`Intentando cambiar a: ${nuevoTipo}, tipo actual: ${this.tipoActividadSeleccionada}`);
+
+    // Si ya está seleccionado este tipo, solo asegurar que el formulario esté habilitado
     if (this.tipoActividadSeleccionada === nuevoTipo) {
+      console.log(`El tipo ${nuevoTipo} ya está seleccionado, asegurando que el formulario esté habilitado`);
+      this.habilitarFormularioSeleccionado(nuevoTipo);
       return;
     }
 
     const tipoAnterior = this.tipoActividadSeleccionada;
     let formularioConDatos = false;
 
-    if (tipoAnterior === 'negocio') {
+    // Verificar si hay datos en el formulario anterior
+    if (tipoAnterior === 'negocio' && this.negocioForm) {
       formularioConDatos = this.hayDatosEnFormulario(this.negocioForm);
-    } else if (tipoAnterior === 'dependiente') {
+    } else if (tipoAnterior === 'dependiente' && this.ingresoDependienteForm) {
       formularioConDatos = this.hayDatosEnFormulario(this.ingresoDependienteForm);
     }
 
+    // Si hay datos en el formulario anterior, mostrar confirmación
     if (tipoAnterior && formularioConDatos) {
-      const radioButtonActual = document.querySelector(`input[name="tipoActividad"][value="${tipoAnterior}"]`) as HTMLInputElement;
-      if (radioButtonActual) {
-        radioButtonActual.checked = true;
-      }
+      console.log(`El formulario anterior (${tipoAnterior}) tiene datos, mostrando confirmación`);
 
-      this.tipoActividadSeleccionada = tipoAnterior;
+      // Mantener el radio button en su estado actual hasta que se confirme el cambio
+      this.restaurarRadioButton(tipoAnterior);
 
       this.confirmationService.confirm({
         header: 'Confirmación',
@@ -238,10 +271,15 @@ export class NegocioTabComponent implements OnInit, OnChanges {
         acceptLabel: 'Sí, cambiar',
         rejectLabel: 'No, cancelar',
         accept: () => {
+          console.log(`Confirmado cambio a ${nuevoTipo}`);
+          // Resetear el formulario anterior
           this.resetearFormularioAnterior(tipoAnterior);
+
+          // Cambiar el tipo seleccionado
           this.tipoActividadSeleccionada = nuevoTipo;
-          // Actualizar inmediatamente el estado de los formularios
-          this.actualizarEstadoFormularios();
+
+          // Habilitar el formulario seleccionado
+          this.habilitarFormularioSeleccionado(nuevoTipo);
 
           // Mostrar mensaje toast informativo
           this.messageToastService.infoMessageToast(
@@ -250,21 +288,66 @@ export class NegocioTabComponent implements OnInit, OnChanges {
           );
         },
         reject: () => {
+          console.log(`Rechazado cambio, manteniendo ${tipoAnterior}`);
+          // Mantener el tipo anterior
           this.tipoActividadSeleccionada = tipoAnterior;
-          // Actualizar inmediatamente el estado de los formularios
-          this.actualizarEstadoFormularios();
+
+          // Restaurar el radio button
+          this.restaurarRadioButton(tipoAnterior);
+
+          // Habilitar el formulario anterior
+          this.habilitarFormularioSeleccionado(tipoAnterior);
         }
       });
     } else {
+      console.log(`Cambiando directamente a ${nuevoTipo}`);
+      // Si no hay datos o no hay tipo anterior, simplemente cambiar
       this.tipoActividadSeleccionada = nuevoTipo;
-      // Actualizar inmediatamente el estado de los formularios
-      this.actualizarEstadoFormularios();
+
+      // Habilitar el formulario seleccionado
+      this.habilitarFormularioSeleccionado(nuevoTipo);
 
       // Mostrar mensaje toast informativo
       this.messageToastService.infoMessageToast(
         'Información',
         `Se ha seleccionado ${nuevoTipo === 'negocio' ? 'Negocio' : 'Ingreso Dependiente'}. Por favor complete todos los campos requeridos.`
       );
+    }
+  }
+
+  /**
+   * Restaura el estado del radio button según el tipo seleccionado
+   * @param tipo El tipo de actividad económica ('negocio' o 'dependiente')
+   */
+  private restaurarRadioButton(tipo: 'negocio' | 'dependiente'): void {
+    // Asegurar que el radio button correcto esté seleccionado
+    const radioButton = document.querySelector(`input[name="tipoActividad"][value="${tipo}"]`) as HTMLInputElement;
+    if (radioButton) {
+      radioButton.checked = true;
+    }
+  }
+
+  /**
+   * Habilita el formulario correspondiente al tipo seleccionado
+   * @param tipo El tipo de actividad económica ('negocio' o 'dependiente')
+   */
+  private habilitarFormularioSeleccionado(tipo: 'negocio' | 'dependiente'): void {
+    console.log(`Habilitando formulario para: ${tipo}`);
+
+    if (tipo === 'negocio') {
+      // Habilitar formulario de negocio
+      this.negocioForm.enable();
+      // Deshabilitar formulario de ingreso dependiente
+      this.ingresoDependienteForm.disable();
+
+      console.log('Formulario de negocio habilitado, formulario de ingreso dependiente deshabilitado');
+    } else if (tipo === 'dependiente') {
+      // Deshabilitar formulario de negocio
+      this.negocioForm.disable();
+      // Habilitar formulario de ingreso dependiente
+      this.ingresoDependienteForm.enable();
+
+      console.log('Formulario de negocio deshabilitado, formulario de ingreso dependiente habilitado');
     }
   }
 
@@ -304,22 +387,63 @@ export class NegocioTabComponent implements OnInit, OnChanges {
   private resetearFormularioAnterior(tipoAnterior: 'negocio' | 'dependiente' | null): void {
     // Establecer submitted a false para no mostrar los errores de validación
     this.submitted = false;
+    this.formSubmitted = false;
 
-    if (tipoAnterior === 'negocio') {
+    if (tipoAnterior === 'negocio' && this.negocioForm) {
+      // Resetear el formulario de negocio
       this.negocioForm.reset();
+
+      // Resetear los gastos operativos
+      this.gastosOperativosList = [];
+
+      // Limpiar errores de validación de ventas
+      this.errorRegistroVentas = '';
+      this.errorVentasNormales = '';
+      this.errorVentasAltas = '';
+      this.errorVentasBajas = '';
+
       // Marcar todos los campos como no tocados
-      Object.keys(this.negocioForm.controls).forEach(key => {
-        const control = this.negocioForm.get(key);
-        control?.markAsUntouched();
-      });
-    } else if (tipoAnterior === 'dependiente') {
+      this.resetearControlesFormulario(this.negocioForm);
+
+    } else if (tipoAnterior === 'dependiente' && this.ingresoDependienteForm) {
+      // Resetear el formulario de ingreso dependiente
       this.ingresoDependienteForm.reset();
+
       // Marcar todos los campos como no tocados
-      Object.keys(this.ingresoDependienteForm.controls).forEach(key => {
-        const control = this.ingresoDependienteForm.get(key);
-        control?.markAsUntouched();
-      });
+      this.resetearControlesFormulario(this.ingresoDependienteForm);
     }
+  }
+
+  /**
+   * Resetea todos los controles de un formulario, incluyendo controles anidados
+   * @param form El formulario cuyos controles se resetearán
+   */
+  private resetearControlesFormulario(form: FormGroup): void {
+    // Recorrer todos los controles del formulario
+    Object.keys(form.controls).forEach(key => {
+      const control = form.get(key);
+
+      if (control instanceof FormGroup) {
+        // Si es un FormGroup anidado, resetear sus controles recursivamente
+        this.resetearControlesFormulario(control);
+      } else if (control instanceof FormArray) {
+        // Si es un FormArray, resetear cada elemento
+        for (let i = 0; i < control.length; i++) {
+          if (control.at(i) instanceof FormGroup) {
+            this.resetearControlesFormulario(control.at(i) as FormGroup);
+          } else {
+            control.at(i).reset();
+            control.at(i).markAsUntouched();
+            control.at(i).markAsPristine();
+          }
+        }
+      } else if (control) {
+        // Resetear el control individual
+        control.markAsUntouched();
+        control.markAsPristine();
+        control.setErrors(null);
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -489,6 +613,42 @@ export class NegocioTabComponent implements OnInit, OnChanges {
       this.switchMessageHandler('tab');
       this.display = false;
       this.closedDialog.emit(false);
+    }
+  }
+
+  /**
+   * Método del ciclo de vida que se ejecuta cuando el componente se destruye
+   * Limpia los recursos para evitar memory leaks
+   */
+  ngOnDestroy(): void {
+    console.log('Destruyendo componente NegocioTabComponent');
+
+    // Desuscribirse de todas las suscripciones
+    try {
+      // Limpiar suscripciones de formularios
+      if (this.negocioForm) {
+        const tiempoValorControl = this.negocioForm.get('tiempo_valor');
+        if (tiempoValorControl) {
+          // Crear una suscripción temporal y desuscribirse inmediatamente
+          const tempSub = tiempoValorControl.valueChanges.subscribe();
+          if (tempSub) {
+            tempSub.unsubscribe();
+          }
+        }
+      }
+
+      if (this.ingresoDependienteForm) {
+        const ingresoTiempoValorControl = this.ingresoDependienteForm.get('ingreso_tiempo_valor');
+        if (ingresoTiempoValorControl) {
+          // Crear una suscripción temporal y desuscribirse inmediatamente
+          const tempSub = ingresoTiempoValorControl.valueChanges.subscribe();
+          if (tempSub) {
+            tempSub.unsubscribe();
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error al limpiar suscripciones:', error);
     }
   }
 
