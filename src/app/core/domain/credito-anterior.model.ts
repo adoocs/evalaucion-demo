@@ -5,7 +5,6 @@ export interface CreditoAnterior {
     id: number,
     monto: number,
     saldo: number,
-    fecha_pago: string,
     estado: string,
     tasa: Tasa,
     periodo: Periodo,

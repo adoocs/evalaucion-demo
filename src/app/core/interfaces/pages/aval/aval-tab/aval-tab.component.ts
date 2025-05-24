@@ -147,13 +147,14 @@ export class AvalTabComponent implements OnInit {
       if (this.avalForm) {
         const requiredFields = [
           'apellidos', 'nombres', 'dni', 'direccion',
-          'celular', 'actividad', 'parentesco', 'tipo_vivienda'
+          'celular', 'n_referencial', 'actividad', 'parentesco', 'tipo_vivienda'
         ];
         requiredFields.forEach(field => {
           const control = this.avalForm.get(field);
           if (control) {
             control.setErrors(null);
             control.markAsUntouched();
+            control.disable(); // Deshabilitar el control
           }
         });
       }
@@ -161,13 +162,16 @@ export class AvalTabComponent implements OnInit {
       this.avalForm.patchValue({ motivo: '' });
       const requiredFields = [
         'apellidos', 'nombres', 'dni', 'direccion',
-        'celular', 'actividad', 'parentesco', 'tipo_vivienda'
+        'celular', 'n_referencial', 'actividad', 'parentesco', 'tipo_vivienda'
       ];
 
       requiredFields.forEach(field => {
         const control = this.avalForm.get(field);
         if (control) {
-          control.setValidators([Validators.required]);
+          control.enable(); // Habilitar el control
+          if (field !== 'n_referencial') { // n_referencial es opcional
+            control.setValidators([Validators.required]);
+          }
           control.updateValueAndValidity();
         }
       });
@@ -183,7 +187,7 @@ export class AvalTabComponent implements OnInit {
       if (this.avalForm) {
         const requiredFields = [
           'apellidos', 'nombres', 'dni', 'direccion',
-          'celular', 'actividad', 'parentesco', 'tipo_vivienda'
+          'celular', 'n_referencial', 'actividad', 'parentesco', 'tipo_vivienda'
         ];
 
         requiredFields.forEach(field => {
@@ -191,6 +195,7 @@ export class AvalTabComponent implements OnInit {
           if (control) {
             control.setErrors(null);
             control.markAsUntouched();
+            control.disable(); // Asegurar que estén deshabilitados
           }
         });
       }
@@ -220,13 +225,16 @@ export class AvalTabComponent implements OnInit {
     this.motivoDialogVisible = false;
     const requiredFields = [
       'apellidos', 'nombres', 'dni', 'direccion',
-      'celular', 'actividad', 'parentesco', 'tipo_vivienda'
+      'celular', 'n_referencial', 'actividad', 'parentesco', 'tipo_vivienda'
     ];
 
     requiredFields.forEach(field => {
       const control = this.avalForm.get(field);
       if (control) {
-        control.setValidators([Validators.required]);
+        control.enable(); // Habilitar el control
+        if (field !== 'n_referencial') { // n_referencial es opcional
+          control.setValidators([Validators.required]);
+        }
         control.updateValueAndValidity();
       }
     });

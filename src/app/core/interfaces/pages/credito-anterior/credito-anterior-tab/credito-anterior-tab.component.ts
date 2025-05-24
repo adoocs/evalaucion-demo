@@ -65,7 +65,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
 
   @Input() display: boolean = false;
   @Output() closedDialog = new EventEmitter<boolean>();
-  @Input() creditoAnterior: CreditoAnterior = { id: 0, monto: 0, saldo: 0, fecha_pago: '', estado: '', tasa: { id: 0, porcentaje: 0 }, periodo: { id: 0, descripcion: '' }, cuotas_pagadas: 0, cuotas_totales: 0 };
+  @Input() creditoAnterior: CreditoAnterior = { id: 0, monto: 0, saldo: 0, estado: '', tasa: { id: 0, porcentaje: 0 }, periodo: { id: 0, descripcion: '' }, cuotas_pagadas: 0, cuotas_totales: 0 };
   @Input() title = '';
   @Input() editabled: boolean = false;
 
@@ -84,6 +84,14 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
    */
   onOmitirCreditoAnteriorChange(event: any): void {
     this.omitirCreditoAnterior = event;
+    this.confirmarOmision();
+  }
+
+  /**
+   * Alterna el estado de omitir crédito anterior
+   */
+  toggleOmitirCreditoAnterior(): void {
+    this.omitirCreditoAnterior = !this.omitirCreditoAnterior;
     this.confirmarOmision();
   }
 
@@ -155,7 +163,6 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
       id: credito.id || null,
       monto: credito.monto || null,
       saldo: credito.saldo || null,
-      fecha_pago: credito.fecha_pago ? new Date(credito.fecha_pago) : null,
       cuotas_pagadas: credito.cuotas_pagadas || null,
       cuotas_totales: credito.cuotas_totales || null,
       estado: credito.estado || '',
@@ -234,7 +241,6 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
       id: formValue.id || 0,
       monto: formValue.monto || 0,
       saldo: formValue.saldo || 0,
-      fecha_pago: fechaPago,
       estado: formValue.estado.code || '',
       tasa: formValue.tasa || { id: 0, porcentaje: 0 },
       periodo: formValue.periodo || { id: 0, descripcion: '' },
@@ -478,10 +484,14 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
         omitido: true
       });
 
+      // Deshabilitar todos los controles excepto 'omitido'
       Object.keys(this.creditoAnteriorForm.controls).forEach(key => {
         const control = this.creditoAnteriorForm.get(key);
-        control?.setErrors(null);
-        control?.markAsUntouched();
+        if (control && key !== 'omitido') {
+          control.setErrors(null);
+          control.markAsUntouched();
+          control.disable(); // Deshabilitar el control
+        }
       });
     } else {
       const requiredFields = [
@@ -490,6 +500,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
       requiredFields.forEach(field => {
         const control = this.creditoAnteriorForm.get(field);
         if (control) {
+          control.enable(); // Habilitar el control
           control.setValidators([Validators.required]);
           control.updateValueAndValidity();
           control.markAsUntouched();
@@ -549,28 +560,7 @@ export class CreditoAnteriorTabComponent implements OnInit, OnChanges {
         );
       }
       return false;
-    }
-
-    // Validar específicamente que el monto no supere al saldo
-    const montoControl = this.creditoAnteriorForm.get('monto');
-    const saldoControl = this.creditoAnteriorForm.get('saldo');
-    const monto = montoControl?.value;
-    const saldo = saldoControl?.value;
-
-    if (monto !== null && saldo !== null && monto !== '' && saldo !== '' &&
-        !isNaN(parseFloat(monto)) && !isNaN(parseFloat(saldo))) {
-
-      if (parseFloat(monto) > parseFloat(saldo)) {
-        // Mostrar mensaje solo si se solicita marcar como tocados
-        if (markAsTouched) {
-          this.messageService.warnMessageToast(
-            'Error',
-            'El monto no debe superar al saldo'
-          );
-        }
-        return false;
-      }
-    }
+    }  
 
     return true;
   }

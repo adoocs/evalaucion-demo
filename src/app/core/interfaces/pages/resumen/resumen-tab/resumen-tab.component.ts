@@ -158,4 +158,30 @@ export class ResumenTabComponent implements OnInit {
     const suma = nombre.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colores[suma % colores.length];
   }
+
+  /**
+   * Calcula el total de gastos operativos
+   * @param gastosOperativos Array de gastos operativos
+   * @returns Total de gastos operativos
+   */
+  calcularTotalGastosOperativos(gastosOperativos: any[]): number {
+    if (!gastosOperativos || gastosOperativos.length === 0) return 0;
+
+    return gastosOperativos.reduce((total, gasto) => {
+      const cantidad = gasto.cantidad || 0;
+      const importe = gasto.importe || 0;
+      return total + (cantidad * importe);
+    }, 0);
+  }
+
+  /**
+   * Filtra los miembros de familia que tienen 1 o más hijos
+   * @param familiaMiembros Array de miembros de familia
+   * @returns Array filtrado con miembros que tienen n_hijos >= 1
+   */
+  getFamiliaMiembrosConHijos(familiaMiembros: any[]): any[] {
+    if (!familiaMiembros || familiaMiembros.length === 0) return [];
+
+    return familiaMiembros.filter(miembro => miembro.n_hijos >= 1);
+  }
 }

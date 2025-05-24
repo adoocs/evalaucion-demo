@@ -10,10 +10,22 @@
             </div>
         </div>
 
-        <p-panel class="mb-0" [ngClass]="{'opacity-50': omitirCreditoAnterior}">
+        <p-panel class="mb-0">
             <ng-template pTemplate="header">
                 <div class="flex justify-between items-center w-full">
-                    <span class="font-semibold">Referencia de Crédito Anterior</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold">Referencia de Crédito Anterior</span>
+                        <!-- Botones para omitir/desomitir que siempre están habilitados -->
+                        <div>
+                            <button type="button"
+                                class="p-button p-button-sm p-button-rounded p-button-text"
+                                [ngClass]="{'p-button-danger': !omitirCreditoAnterior, 'p-button-success': omitirCreditoAnterior}"
+                                (click)="toggleOmitirCreditoAnterior()">
+                                <i class="pi" [ngClass]="{'pi-times-circle': !omitirCreditoAnterior, 'pi-check-circle': omitirCreditoAnterior}"></i>
+                                <span class="ml-1 text-xs">{{ omitirCreditoAnterior ? 'Habilitar' : 'Omitir' }}</span>
+                            </button>
+                        </div>
+                    </div>
                     <div>
                         <p-button icon="pi pi-info-circle" severity="secondary" rounded text
                             pTooltip="Esta sección representa los créditos con la financiera Progresando"
@@ -21,7 +33,7 @@
                     </div>
                 </div>
             </ng-template>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4" [ngClass]="{'opacity-50': omitirCreditoAnterior}">
                 <div>
                     <p-floatlabel variant="on" class="w-5/6">
                         <p-select formControlName="estado" inputId="estado" [options]="estadoList" optionLabel="name" placeholder="Seleccionar Estado"
@@ -119,16 +131,6 @@
                         [text]="'El saldo no puede superar al monto.'">
                     </p-message>
                 </div>
-            </div>
-        </p-panel>
-        <div class="mb-4"></div>
-        <p-panel class="mb-0">
-            <div class="flex items-center gap-2 mb-2">
-                <p-checkbox [ngModel]="omitirCreditoAnterior" [ngModelOptions]="{standalone: true}" [binary]="true" inputId="omitirCreditoAnterior" (onChange)="onOmitirCreditoAnteriorChange($event)"></p-checkbox>
-                <label for="omitirCreditoAnterior" class="font-medium">Omitir crédito anterior</label>
-            </div>
-            <div *ngIf="omitirCreditoAnterior" class="mt-2">
-                <small class="text-gray-500">Al marcar esta opción, se omitirá el crédito anterior y podrá continuar con el proceso.</small>
             </div>
         </p-panel>
     </form>

@@ -328,6 +328,7 @@ export class ConyugeTabComponent implements OnChanges {
           if (control) {
             control.setErrors(null);
             control.markAsUntouched();
+            control.disable(); // Deshabilitar el control
           }
         });
       }
@@ -341,6 +342,7 @@ export class ConyugeTabComponent implements OnChanges {
       requiredFields.forEach(field => {
         const control = this.conyugeForm.get(field);
         if (control) {
+          control.enable(); // Habilitar el control
           control.setValidators([Validators.required]);
           control.updateValueAndValidity();
         }
@@ -363,6 +365,7 @@ export class ConyugeTabComponent implements OnChanges {
           if (control) {
             control.setErrors(null);
             control.markAsUntouched();
+            control.disable(); // Asegurar que estén deshabilitados
           }
         });
       }
@@ -395,6 +398,7 @@ export class ConyugeTabComponent implements OnChanges {
     requiredFields.forEach(field => {
       const control = this.conyugeForm.get(field);
       if (control) {
+        control.enable(); // Habilitar el control
         control.setValidators([Validators.required]);
         control.updateValueAndValidity();
       }

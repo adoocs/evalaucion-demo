@@ -9,8 +9,25 @@
   </div>
 </div>
 
-<p-panel header="Dato de Experian" styleClass="w-full" [ngClass]="{'opacity-50': puntajeForm.get('omitido')?.value}">
-  <div class="flex flex-row flex-wrap p-6 align-items-start">
+<p-panel styleClass="w-full">
+  <ng-template pTemplate="header">
+    <div class="flex justify-between items-center w-full">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold">Dato de Experian</span>
+        <!-- Botones para omitir/desomitir que siempre están habilitados -->
+        <div>
+          <button type="button"
+            class="p-button p-button-sm p-button-rounded p-button-text"
+            [ngClass]="{'p-button-danger': !puntajeForm.get('omitido')?.value, 'p-button-success': puntajeForm.get('omitido')?.value}"
+            (click)="toggleOmitirPuntajeSentinel()">
+            <i class="pi" [ngClass]="{'pi-times-circle': !puntajeForm.get('omitido')?.value, 'pi-check-circle': puntajeForm.get('omitido')?.value}"></i>
+            <span class="ml-1 text-xs">{{ puntajeForm.get('omitido')?.value ? 'Habilitar' : 'Omitir' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <div class="flex flex-row flex-wrap p-6 align-items-start" [ngClass]="{'opacity-50': puntajeForm.get('omitido')?.value}">
 
     <div class="flex flex-column mr-8" style="flex: 0 0 340px;">
       <form [formGroup]="puntajeForm" class="w-full">
@@ -70,31 +87,9 @@
     </div>
 
   </div>
-</p-panel>
-<div class="mb-4"></div>
-<!-- Panel de omisión -->
-<p-panel>
-  <ng-template pTemplate="header">
-    <div class="flex justify-between items-center w-full">
-      <div class="flex items-center gap-2">
-        <span class="font-semibold">PUNTAJE EXPERIAN:</span>
-        <!-- Botones para omitir/habilitar que siempre están habilitados -->
-        <div>
-          <button type="button"
-            class="p-button p-button-sm p-button-rounded p-button-text"
-            [ngClass]="{'p-button-danger': !puntajeForm.get('omitido')?.value, 'p-button-success': puntajeForm.get('omitido')?.value}"
-            (click)="toggleOmitirPuntajeSentinel()">
-            <i class="pi" [ngClass]="{'pi-times-circle': !puntajeForm.get('omitido')?.value, 'pi-check-circle': puntajeForm.get('omitido')?.value}"></i>
-            <span class="ml-1 text-xs">{{ puntajeForm.get('omitido')?.value ? 'Habilitar' : 'Omitir' }}</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </ng-template>
-  <form [formGroup]="puntajeForm" class="w-full">
-    <div *ngIf="puntajeForm.get('omitido')?.value" class="mt-2">
-      <small class="text-gray-600">Al marcar esta opción, se omitirá el formulario de Puntaje Sentinel y podrá continuar
-        con el proceso.</small>
-    </div>
-  </form>
+
+  <!-- Información de omisión -->
+  <div *ngIf="puntajeForm.get('omitido')?.value" class="mt-2 p-3 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
+    <p><strong>Información:</strong> Se ha omitido el puntaje sentinel y podrá continuar con el proceso.</p>
+  </div>
 </p-panel>

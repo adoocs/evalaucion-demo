@@ -835,12 +835,15 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
         actividad: null
       });
 
-      // Limpiar los errores de validación solo de los campos del panel principal
+      // Limpiar los errores de validación y deshabilitar los campos del panel principal
       const camposPrincipales = ['id', 'descripcion', 'frecuencia', 'importe_act', 'sustentable', 'detalle', 'actividad'];
       camposPrincipales.forEach(key => {
         const control = this.ingresoAdicionalForm.get(key);
-        control?.setErrors(null);
-        control?.markAsUntouched();
+        if (control) {
+          control.setErrors(null);
+          control.markAsUntouched();
+          control.disable(); // Deshabilitar el control
+        }
       });
 
       // Forzar la detección de cambios para actualizar la vista
@@ -848,24 +851,36 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
     } else {
       // Si se desmarca la opción de omitir, restaurar las validaciones pero no marcar como tocados
 
-      // Restaurar los validadores para los campos obligatorios
-      this.ingresoAdicionalForm.get('actividad')?.setValidators([Validators.required]);
-      this.ingresoAdicionalForm.get('frecuencia')?.setValidators([Validators.required]);
-      this.ingresoAdicionalForm.get('importe_act')?.setValidators([Validators.required, Validators.min(0)]);
-      this.ingresoAdicionalForm.get('detalle')?.setValidators([Validators.required]);
+      // Habilitar y restaurar los validadores para los campos obligatorios
+      const actividadControl = this.ingresoAdicionalForm.get('actividad');
+      const frecuenciaControl = this.ingresoAdicionalForm.get('frecuencia');
+      const importeControl = this.ingresoAdicionalForm.get('importe_act');
+      const detalleControl = this.ingresoAdicionalForm.get('detalle');
 
-      // Actualizar los validadores pero mantener los campos como no tocados
-      this.ingresoAdicionalForm.get('actividad')?.updateValueAndValidity();
-      this.ingresoAdicionalForm.get('actividad')?.markAsUntouched();
+      actividadControl?.enable();
+      actividadControl?.setValidators([Validators.required]);
+      actividadControl?.updateValueAndValidity();
+      actividadControl?.markAsUntouched();
 
-      this.ingresoAdicionalForm.get('frecuencia')?.updateValueAndValidity();
-      this.ingresoAdicionalForm.get('frecuencia')?.markAsUntouched();
+      frecuenciaControl?.enable();
+      frecuenciaControl?.setValidators([Validators.required]);
+      frecuenciaControl?.updateValueAndValidity();
+      frecuenciaControl?.markAsUntouched();
 
-      this.ingresoAdicionalForm.get('importe_act')?.updateValueAndValidity();
-      this.ingresoAdicionalForm.get('importe_act')?.markAsUntouched();
+      importeControl?.enable();
+      importeControl?.setValidators([Validators.required, Validators.min(0)]);
+      importeControl?.updateValueAndValidity();
+      importeControl?.markAsUntouched();
 
-      this.ingresoAdicionalForm.get('detalle')?.updateValueAndValidity();
-      this.ingresoAdicionalForm.get('detalle')?.markAsUntouched();
+      detalleControl?.enable();
+      detalleControl?.setValidators([Validators.required]);
+      detalleControl?.updateValueAndValidity();
+      detalleControl?.markAsUntouched();
+
+      // También habilitar los campos no requeridos
+      this.ingresoAdicionalForm.get('id')?.enable();
+      this.ingresoAdicionalForm.get('descripcion')?.enable();
+      this.ingresoAdicionalForm.get('sustentable')?.enable();
 
       // Mostrar mensaje si el otro panel está omitido
       if (this.omitirAportesTerceros) {
@@ -907,24 +922,33 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
         firma_conyuge: false
       });
 
-      // Limpiar los errores de validación de los campos del panel
+      // Limpiar los errores de validación y deshabilitar los campos del panel
       const camposAportesTerceros = ['motivo', 'aportante', 'importe_tercero', 'firma_aval', 'firma_conyuge'];
       camposAportesTerceros.forEach(key => {
         const control = this.ingresoAdicionalForm.get(key);
-        control?.setErrors(null);
-        control?.markAsUntouched();
+        if (control) {
+          control.setErrors(null);
+          control.markAsUntouched();
+          control.disable(); // Deshabilitar el control
+        }
       });
 
       // Actualizar los validadores
       this.setupAportesTercerosValidation();
     } else {
       // Si se desmarca la opción de omitir, restaurar las validaciones pero no marcar como tocados
-      this.setupAportesTercerosValidation();
 
-      // Marcar todos los campos del panel de Aportes de Terceros como no tocados
-      this.ingresoAdicionalForm.get('motivo')?.markAsUntouched();
-      this.ingresoAdicionalForm.get('aportante')?.markAsUntouched();
-      this.ingresoAdicionalForm.get('importe_tercero')?.markAsUntouched();
+      // Habilitar los campos del panel de Aportes de Terceros
+      const camposAportesTerceros = ['motivo', 'aportante', 'importe_tercero', 'firma_aval', 'firma_conyuge'];
+      camposAportesTerceros.forEach(key => {
+        const control = this.ingresoAdicionalForm.get(key);
+        if (control) {
+          control.enable(); // Habilitar el control
+          control.markAsUntouched();
+        }
+      });
+
+      this.setupAportesTercerosValidation();
 
       // Mostrar mensaje si el otro panel está omitido
       if (this.omitirIngresoAdicional) {

@@ -27,8 +27,25 @@
             </div>
         </div>
 
-        <p-panel header="Datos del Cónyuge o Conviviente" class="mb-0" [ngClass]="{'opacity-50': conyugeForm.get('omitido')?.value}">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+        <p-panel class="mb-0">
+            <ng-template pTemplate="header">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold">Datos del Cónyuge o Conviviente</span>
+                        <!-- Botones para omitir/desomitir que siempre están habilitados -->
+                        <div>
+                            <button type="button"
+                                class="p-button p-button-sm p-button-rounded p-button-text"
+                                [ngClass]="{'p-button-danger': !conyugeForm.get('omitido')?.value, 'p-button-success': conyugeForm.get('omitido')?.value}"
+                                (click)="toggleOmitirConyuge()">
+                                <i class="pi" [ngClass]="{'pi-times-circle': !conyugeForm.get('omitido')?.value, 'pi-check-circle': conyugeForm.get('omitido')?.value}"></i>
+                                <span class="ml-1 text-xs">{{ conyugeForm.get('omitido')?.value ? 'Habilitar' : 'Omitir' }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4" [ngClass]="{'opacity-50': conyugeForm.get('omitido')?.value}">
                 <div>
                     <p-floatlabel variant="on" class="w-5/6">
                         <input pInputText id="dni" pKeyFilter="int" formControlName="dni" maxlength="8" minlength="8" autocomplete="off" required
@@ -89,31 +106,9 @@
                     </p-message>
                 </div>
             </div>
-        </p-panel>
-        <div class="mb-4"></div>
-        <p-panel class="mb-0">
-            <ng-template pTemplate="header">
-                <div class="flex justify-between items-center w-full">
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold">CÓNYUGE:</span>
-                        <!-- Botones para omitir/desomitir que siempre están habilitados -->
-                        <div>
-                            <button type="button"
-                                class="p-button p-button-sm p-button-rounded p-button-text"
-                                [ngClass]="{'p-button-danger': !conyugeForm.get('omitido')?.value, 'p-button-success': conyugeForm.get('omitido')?.value}"
-                                (click)="toggleOmitirConyuge()">
-                                <i class="pi" [ngClass]="{'pi-times-circle': !conyugeForm.get('omitido')?.value, 'pi-check-circle': conyugeForm.get('omitido')?.value}"></i>
-                                <span class="ml-1 text-xs">{{ conyugeForm.get('omitido')?.value ? 'Habilitar' : 'Omitir' }}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </ng-template>
-            <div *ngIf="conyugeForm.get('omitido')?.value && conyugeForm.get('motivo')?.value" class="mt-2">
-                <small class="text-gray-500">Al marcar esta opción, se omitirá el formulario de Cónyuge y podrá continuar con el proceso.</small>
-                <div class="mt-2 p-3 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
-                    <p><strong>Motivo de omisión:</strong> {{ conyugeForm.get('motivo')?.value }}</p>
-                </div>
+            <!-- Información de omisión -->
+            <div *ngIf="conyugeForm.get('omitido')?.value && conyugeForm.get('motivo')?.value" class="mt-2 p-3 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
+                <p><strong>Motivo de omisión:</strong> {{ conyugeForm.get('motivo')?.value }}</p>
             </div>
         </p-panel>
     </form>

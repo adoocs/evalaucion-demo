@@ -14,11 +14,23 @@
       <p-panel class="mb-0">
         <ng-template pTemplate="header">
           <div class="flex justify-between items-center w-full">
-            <span class="font-semibold">Referencia familiar</span>
-          </div>
-          <div>
-            <p-button icon="pi pi-info-circle" severity="secondary" rounded text pTooltip="RECUERDA: ...."
-              tooltipPosition="top" />
+            <div class="flex items-center gap-2">
+              <span class="font-semibold">Referencia familiar</span>
+              <!-- Botones para omitir/desomitir que siempre están habilitados -->
+              <div>
+                <button type="button"
+                  class="p-button p-button-sm p-button-rounded p-button-text"
+                  [ngClass]="{'p-button-danger': !omitirHijos, 'p-button-success': omitirHijos}"
+                  (click)="toggleOmitirHijos()">
+                  <i class="pi" [ngClass]="{'pi-times-circle': !omitirHijos, 'pi-check-circle': omitirHijos}"></i>
+                  <span class="ml-1 text-xs">{{ omitirHijos ? 'Habilitar' : 'Omitir' }}</span>
+                </button>
+              </div>
+            </div>
+            <div>
+              <p-button icon="pi pi-info-circle" severity="secondary" rounded text pTooltip="RECUERDA: ...."
+                tooltipPosition="top" />
+            </div>
           </div>
         </ng-template>
         <div [ngClass]="{'opacity-50': omitirHijos}">
@@ -35,7 +47,7 @@
               <tr>
                 <td>{{ familia.descripcion }}</td>
 
-                <td [pEditableColumn]="familia.n_hijos" pEditableColumnField="n_hijos" class="text-center">
+                <td [pEditableColumn]="!omitirHijos ? familia.n_hijos : null" pEditableColumnField="n_hijos" class="text-center">
                   <p-cellEditor>
                     <ng-template pTemplate="input">
                       <input pInputText type="number" min="0" [(ngModel)]="familia.n_hijos"
@@ -49,7 +61,7 @@
                   </p-cellEditor>
                 </td>
 
-                <td [pEditableColumn]="familia.condicion" pEditableColumnField="condicion" class="text-center">
+                <td [pEditableColumn]="!omitirHijos ? familia.condicion : null" pEditableColumnField="condicion" class="text-center">
                   <ng-container *ngIf="familia.descripcion === 'Mayores'">
                     <div class="font-bold mb-2">Vive en domicilio</div>
                     <p-cellEditor>
@@ -83,20 +95,10 @@
             </ng-template>
           </p-table>
         </div>
-        <div class="mt-4">
-          <div class="flex items-center gap-2 mb-2">
-            <button type="button"
-              class="p-button p-button-sm p-button-rounded p-button-text"
-              [ngClass]="{'p-button-danger': !omitirHijos, 'p-button-success': omitirHijos}"
-              (click)="toggleOmitirHijos()">
-              <i class="pi" [ngClass]="{'pi-times-circle': !omitirHijos, 'pi-check-circle': omitirHijos}"></i>
-              <span class="ml-1 text-xs">{{ omitirHijos ? 'Habilitar' : 'Omitir' }}</span>
-            </button>
-            <span class="font-semibold">INFORMACIÓN DE HIJOS</span>
-          </div>
-          <div *ngIf="omitirHijos" class="mt-2">
-            <small class="text-gray-500">Al marcar esta opción, se omitirá la información de hijos y podrá continuar con el proceso.</small>
-          </div>
+
+        <!-- Información de omisión -->
+        <div *ngIf="omitirHijos" class="mt-2 p-3 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
+          <p><strong>Información:</strong> Se ha omitido la información de hijos y podrá continuar con el proceso.</p>
         </div>
       </p-panel>
 
@@ -108,16 +110,31 @@
         </ng-template>
         <div class="grid gap-6 p-4">
           <div class="flex flex-col gap-4">
-            <div class="mb-2">
-              <p-floatlabel variant="on">
-                <input pInputText id="referencia_domicilio" formControlName="referencia_domicilio" autocomplete="off"
-                  required autofocus class="w-full max-w-xl" (keypress)="validarCaracteresDireccion($event)" />
-                <label for="referencia_domicilio">Referencia</label>
-              </p-floatlabel>
-              <p-message severity="error" variant="simple" size="small"
-                *ngIf="referencia_domicilio.touched && referencia_domicilio.invalid"
-                [text]="'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'">
-              </p-message>
+            <!-- Grid para referencia y dirección -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="mb-2">
+                <p-floatlabel variant="on">
+                  <input pInputText id="referencia_domicilio" formControlName="referencia_domicilio" autocomplete="off"
+                    required autofocus class="w-full" (keypress)="validarCaracteresDireccion($event)" />
+                  <label for="referencia_domicilio">Referencia</label>
+                </p-floatlabel>
+                <p-message severity="error" variant="simple" size="small"
+                  *ngIf="referencia_domicilio.touched && referencia_domicilio.invalid"
+                  [text]="'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'">
+                </p-message>
+              </div>
+
+              <div class="mb-2">
+                <p-floatlabel variant="on">
+                  <input pInputText id="direccion" formControlName="direccion" autocomplete="off"
+                    class="w-full" (keypress)="validarCaracteresDireccion($event)" />
+                  <label for="direccion">Dirección</label>
+                </p-floatlabel>
+                <p-message severity="error" variant="simple" size="small"
+                  *ngIf="direccion.touched && direccion.invalid"
+                  [text]="'La dirección debe tener al menos 3 caracteres'">
+                </p-message>
+              </div>
             </div>
 
             <div class="mt-4">

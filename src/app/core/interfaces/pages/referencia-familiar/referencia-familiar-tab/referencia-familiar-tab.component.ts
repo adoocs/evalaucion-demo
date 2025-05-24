@@ -106,6 +106,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
       this.referenciaFamiliarForm.patchValue({
         id: this.referenciaFamiliar.id,
         referencia_domicilio: this.referenciaFamiliar.referencia_domicilio,
+        direccion: this.referenciaFamiliar.direccion,
         latitud: this.referenciaFamiliar.latitud || 0,
         longitud: this.referenciaFamiliar.longitud || 0,
         familia_miembros: this.referenciaFamiliar.familia_miembros
@@ -127,6 +128,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
     this.referenciaFamiliarForm = this.fb.group({
       id: [this.referenciaFamiliar.id, [Validators.required, Validators.minLength(1)]],
       referencia_domicilio: [this.referenciaFamiliar.referencia_domicilio, [Validators.required, Validators.minLength(1)]],
+      direccion: [this.referenciaFamiliar.direccion, [Validators.minLength(3)]],
       latitud: [this.referenciaFamiliar.latitud || this.PACASMAYO_LAT],
       longitud: [this.referenciaFamiliar.longitud || this.PACASMAYO_LNG],
     });
@@ -213,6 +215,10 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
 
   get referencia_domicilio() {
     return this.referenciaFamiliarForm.controls['referencia_domicilio'];
+  }
+
+  get direccion() {
+    return this.referenciaFamiliarForm.controls['direccion'];
   }
 
   closeFamilia(close: boolean) {

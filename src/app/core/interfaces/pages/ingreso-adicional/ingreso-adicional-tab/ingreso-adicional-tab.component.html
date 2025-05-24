@@ -40,7 +40,7 @@
 
     <form [formGroup]="ingresoAdicionalForm" class="flex flex-col">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <p-panel class="mb-0" [ngClass]="{'opacity-50': omitirIngresoAdicional}">
+            <p-panel class="mb-0">
                 <ng-template pTemplate="header">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-2">
@@ -63,7 +63,7 @@
                             tooltipPosition="top" />
                     </div>
                 </ng-template>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4" [ngClass]="{'opacity-50': omitirIngresoAdicional}">
                     <div class="flex flex-col gap-2">
                         <div class="mb-2">
                             <p-floatlabel variant="on">
@@ -170,7 +170,7 @@
                 </div>
             </p-panel>
 
-            <p-panel class="mb-0" [ngClass]="{'opacity-50': omitirAportesTerceros}">
+            <p-panel class="mb-0">
                 <ng-template pTemplate="header">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-2">
@@ -193,7 +193,7 @@
                             tooltipPosition="top" />
                     </div>
                 </ng-template>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 p-4" [ngClass]="{'opacity-50': omitirAportesTerceros}">
                     <div class="flex flex-col gap-2">
                         <div class="mb-2">
                             <p-floatlabel variant="on">

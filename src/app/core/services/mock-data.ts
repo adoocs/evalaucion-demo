@@ -212,7 +212,6 @@ export const CREDITOS_ANTERIORES: CreditoAnterior[] = [
 
     monto: 130,
     saldo: 190,
-    fecha_pago: '2022-05-10',
     estado: 'vigente',
     tasa: TASAS[0],
     periodo: PERIODOS[0],
