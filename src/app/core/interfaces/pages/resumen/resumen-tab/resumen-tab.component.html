@@ -513,8 +513,8 @@
             <td>{{ gasto.periodo.descripcion }}</td>
             <td>{{ formatoMoneda(gasto.monto_cuota) }}</td>
             <td>{{ formatoMoneda(gasto.saldo_credito) }}</td>
-            <td>{{ gasto.tarjeta }}</td>
-            <td>{{ gasto.comentario }}</td>
+            <td>{{ gasto.tarjeta ? 'Sí' : 'No' }}</td>
+            <td>{{ gasto.comentario || 'Sin comentario' }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -573,8 +573,12 @@
               <td>{{ miembro.descripcion }}</td>
               <td class="font-bold">{{ miembro.n_hijos }}</td>
               <td>
+                @if (miembro.descripcion === 'Mayores'){
+                  <div class="font-bold mb-2">Vive en domicilio</div>
+                }
                 <p-tag [severity]="miembro.condicion ? 'success' : 'danger'"
-                       [value]="miembro.condicion ? 'Sí aplica' : 'No aplica'"></p-tag>
+                       [value]="miembro.condicion ? 'Sí aplica' : 'No aplica'">
+                </p-tag>
               </td>
             </tr>
           </ng-template>
