@@ -1,0 +1,183 @@
+/* Colores de fondo intensificados */
+.bg-red-50 {
+  background-color: #ffcdd2 !important;
+  border-color: #e57373 !important;
+  color: #c62828 !important;
+}
+
+.bg-orange-50 {
+  background-color: #ffe0b2 !important;
+  border-color: #ffb74d !important;
+  color: #e65100 !important;
+}
+
+.bg-yellow-50 {
+  background-color: #fff9c4 !important;
+  border-color: #fff176 !important;
+  color: #f57f17 !important;
+}
+
+.bg-green-50 {
+  background-color: #c8e6c9 !important;
+  border-color: #81c784 !important;
+  color: #2e7d32 !important;
+}
+
+.bg-green-100 {
+  background-color: #a5d6a7 !important;
+  border-color: #4caf50 !important;
+  color: #1b5e20 !important;
+}
+
+/* Estilos para el input */
+.p-inputtext {
+  transition: all 0.3s ease;
+  font-size: 1.5rem !important;
+  height: 3rem;
+  font-weight: 600;
+
+  &.bg-red-50 {
+    background-color: #ffebee !important;
+    border: 2px solid #ef5350 !important;
+    color: #c62828 !important;
+  }
+
+  &.bg-orange-50 {
+    background-color: #fff3e0 !important;
+    border: 2px solid #ff7043 !important;
+    color: #e65100 !important;
+  }
+
+  &.bg-yellow-50 {
+    background-color: #fffde7 !important;
+    border: 2px solid #ffd600 !important;
+    color: #f57f17 !important;
+  }
+
+  &.bg-green-50 {
+    background-color: #e8f5e9 !important;
+    border: 2px solid #66bb6a !important;
+    color: #2e7d32 !important;
+  }
+
+  &.bg-green-100 {
+    background-color: #c8e6c9 !important;
+    border: 2px solid #43a047 !important;
+    color: #1b5e20 !important;
+  }
+}
+
+/* Estilos para la tabla */
+.p-datatable {
+  .p-datatable-thead>tr>th {
+    font-weight: 700;
+    padding: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .p-datatable-tbody>tr>td {
+    padding: 1.5rem;
+    font-weight: 500;
+    font-size: 1.2rem;
+  }
+
+  th,
+  td {
+    &.bg-red-50 {
+      background: linear-gradient(to bottom, #ffcdd2, #ef9a9a) !important;
+      box-shadow: inset 0 -4px 0 #d32f2f;
+    }
+
+    &.bg-orange-50 {
+      background: linear-gradient(to bottom, #ffe0b2, #ffcc80) !important;
+      box-shadow: inset 0 -4px 0 #f57c00;
+    }
+
+    &.bg-yellow-50 {
+      background: linear-gradient(to bottom, #fff9c4, #fff59d) !important;
+      box-shadow: inset 0 -4px 0 #ffa000;
+    }
+
+    &.bg-green-50 {
+      background: linear-gradient(to bottom, #c8e6c9, #a5d6a7) !important;
+      box-shadow: inset 0 -4px 0 #388e3c;
+    }
+
+    &.bg-green-100 {
+      background: linear-gradient(to bottom, #a5d6a7, #81c784) !important;
+      box-shadow: inset 0 -4px 0 #2e7d32;
+    }
+  }
+}
+
+/* Estilos para el panel */
+.p-panel {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .p-panel-header {
+    padding: 1.25rem;
+    background: linear-gradient(to right, #3f51b5, #2196f3);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-bottom: 2px solid #1565c0;
+  }
+
+  .p-panel-content {
+    background-color: #fafafa;
+  }
+
+  .p-panel-title {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Animación mejorada para el icono */
+.animated-icon {
+  color: #1565c0;
+  filter: drop-shadow(0 0 4px rgba(33, 150, 243, 0.7));
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.9;
+    filter: drop-shadow(0 0 8px rgba(33, 150, 243, 0.9));
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Sombra más pronunciada */
+.shadow-1 {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilo para el mensaje de puntaje actual */
+.puntaje-actual {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+
+  .valor-puntaje {
+    font-size: 1.4rem;
+    display: block;
+    margin-top: 0.5rem;
+  }
+}
