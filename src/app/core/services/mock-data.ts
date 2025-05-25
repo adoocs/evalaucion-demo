@@ -365,6 +365,15 @@ export const NEGOCIOS: Negocio[] = [
     actividad_economica: ACTIVIDADES_ECONOMICAS[2], // Bodega, venta de carnes o verduras
     registro_ventas: REGISTROS_VENTAS[0],
     gastos_operativos: [GASTOS_OPERATIVOS[0], GASTOS_OPERATIVOS[1], GASTOS_OPERATIVOS[2]]
+  },
+  {
+    id: 2,
+    tiempo_valor: 3,
+    direccion: 'Jr. Los Olivos 123',
+    tiempo: TIEMPOS[0],
+    actividad_economica: ACTIVIDADES_ECONOMICAS[0], // Bodega / Bazar
+    registro_ventas: REGISTROS_VENTAS[0],
+    gastos_operativos: [GASTOS_OPERATIVOS[1]]
   }
 ];
 

@@ -249,6 +249,13 @@ export class AvalTabComponent implements OnInit {
   }
 
   updateFormValues(aval: Partial<Aval> = {}): void {
+    console.log('Actualizando formulario de aval:', aval);
+
+    // Buscar el tipo de vivienda completo
+    const tipoViviendaCompleto = this.tipoViviendasList().find(tv => tv.id === aval.tipo_vivienda?.id);
+
+    console.log('Tipo vivienda encontrado para aval:', tipoViviendaCompleto);
+
     this.avalForm.patchValue({
       id: aval.id || null,
       apellidos: aval.apellidos || '',
@@ -259,10 +266,12 @@ export class AvalTabComponent implements OnInit {
       n_referencial: aval.n_referencial || null,
       actividad: aval.actividad || '',
       parentesco: aval.parentesco || '',
-      tipo_vivienda: aval.tipo_vivienda || null,
+      tipo_vivienda: tipoViviendaCompleto,
       omitido: aval.omitido || false,
       motivo: aval.motivo || ''
     });
+
+    console.log('Formulario de aval actualizado');
   }
 
   initiateForm(): void {

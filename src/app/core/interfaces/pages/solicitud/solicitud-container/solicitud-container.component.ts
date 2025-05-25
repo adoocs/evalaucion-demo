@@ -96,8 +96,8 @@ export class SolicitudContainerComponent implements OnInit {
   }
 
   editSolicitud(solicitud: Solicitud): void {
-    this.selectedSolicitud = { ...solicitud };
-    this.displaySolicitudDialog = true;
+    // Navegar al componente de edición en lugar de abrir un diálogo
+    this.router.navigate(['/solicitudes/editar', solicitud.id]);
   }
 
   /**

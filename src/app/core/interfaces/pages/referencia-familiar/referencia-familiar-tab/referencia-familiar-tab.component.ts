@@ -103,6 +103,8 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
 
   updateFormValues() {
     if (this.referenciaFamiliar) {
+      console.log('Actualizando formulario de referencia familiar:', this.referenciaFamiliar);
+
       this.referenciaFamiliarForm.patchValue({
         id: this.referenciaFamiliar.id,
         referencia_domicilio: this.referenciaFamiliar.referencia_domicilio,
@@ -111,6 +113,19 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
         longitud: this.referenciaFamiliar.longitud || 0,
         familia_miembros: this.referenciaFamiliar.familia_miembros
       });
+
+      // Cargar los miembros de la familia en la tabla
+      if (this.referenciaFamiliar.familia_miembros && this.referenciaFamiliar.familia_miembros.length > 0) {
+        // Cargar los datos existentes en la lista
+        this.familiaMiembrosList = [...this.referenciaFamiliar.familia_miembros];
+        console.log('Miembros de familia cargados en la tabla:', this.familiaMiembrosList);
+      } else {
+        // Si no hay datos, usar la lista base
+        this.familiaMiembrosList = [...this.familiaMiembrosBase];
+        console.log('No hay miembros de familia para cargar, usando lista base');
+      }
+
+      console.log('Formulario de referencia familiar actualizado');
     }
   }
 

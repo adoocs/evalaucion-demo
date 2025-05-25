@@ -1,7 +1,8 @@
 <div class="card">
   <div class="flex justify-between w-full">
     <div class="flex gap-4">
-      <p-button *ngIf="activeIndex === tabs.length - 1" label="Guardar Solicitud" icon="pi pi-save" severity="success" (click)="createSolicitud()" />
+      <p-button *ngIf="activeIndex === tabs.length - 1 && !modoEdicion" label="Guardar Solicitud" icon="pi pi-save" severity="success" (click)="createSolicitud()" />
+      <p-button *ngIf="activeIndex === tabs.length - 1 && modoEdicion" label="Actualizar Solicitud" icon="pi pi-save" severity="success" (click)="editSolicitud()" />
       <p-button *ngIf="activeIndex !== tabs.length - 1" label="Guardar Datos" icon="pi pi-check" (click)="submit()" />
       <p-button label="Ver JSON" icon="pi pi-code" severity="info" (click)="displayJson = !displayJson" />
     </div>
@@ -75,7 +76,7 @@
       </p-tabpanel>
 
       <p-tabpanel [value]="10">
-        <app-resumen-tab #resumenTab [fichaTrabajo]="fichaTrabajo" [solicitud]="solicitud"></app-resumen-tab>
+        <app-resumen-tab #resumenTab [fichaTrabajo]="fichaTrabajoInternal" [solicitud]="solicitud"></app-resumen-tab>
       </p-tabpanel>
 
 
@@ -93,5 +94,5 @@
 <!-- Toast estático para tareas pendientes -->
 <p-toast key="task-toast" position="top-right" [baseZIndex]="5000" [style]="{width: '400px'}" />
 <p-dialog header="JSON Viewer" [(visible)]="displayJson" (visibleChange)="visibleJsonChange($event)" [style]="{width: '50vw'}">
-  <pre>{{ fichaTrabajo | json }}</pre>
+  <pre>{{ fichaTrabajoInternal | json }}</pre>
 </p-dialog>

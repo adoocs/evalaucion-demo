@@ -167,22 +167,45 @@ export class ClienteTabComponent implements OnInit {
   updateFormValues(cliente: Cliente): void {
     if (!cliente) return;
 
+    console.log('Actualizando formulario de cliente:', cliente);
+
+    // Buscar objetos completos para los selects
+    const estadoCivilCompleto = this.estadoCivilList.find(ec => ec.code === cliente.estado_civil);
+    const generoCompleto = this.generoList.find(g => g.code === cliente.genero);
+    const gradoInstruccionCompleto = this.gradoInstruccionList.find(gi => gi.code === cliente.grado_instruccion);
+    const tipoViviendaCompleto = this.tipoViviendaList().find(tv => tv.id === cliente.tipo_vivienda?.id);
+
+    console.log('Estado civil encontrado:', estadoCivilCompleto);
+    console.log('Género encontrado:', generoCompleto);
+    console.log('Grado instrucción encontrado:', gradoInstruccionCompleto);
+    console.log('Tipo vivienda encontrado:', tipoViviendaCompleto);
+
     this.clienteForm.patchValue({
       id: cliente.id,
       apellidos: cliente.apellidos,
       nombres: cliente.nombres,
       dni: cliente.dni,
       fecha_born: cliente.fecha_born ? new Date(cliente.fecha_born + 'T00:00:00') : null,
-      estado_civil: cliente.estado_civil,
+      estado_civil: estadoCivilCompleto,
       edad: cliente.edad,
-      genero: cliente.genero,
+      genero: generoCompleto,
       direccion: cliente.direccion,
       celular: cliente.celular,
       n_referencial: cliente.n_referencial,
-      grado_instruccion: cliente.grado_instruccion,
+      grado_instruccion: gradoInstruccionCompleto,
       email: cliente.email,
-      tipo_vivienda: cliente.tipo_vivienda
+      tipo_vivienda: tipoViviendaCompleto
     });
+
+    // Calcular la edad si hay fecha de nacimiento
+    if (cliente.fecha_born) {
+      this.calculateAge(new Date(cliente.fecha_born + 'T00:00:00'));
+    }
+
+    // Verificar si requiere aval después de cargar los datos
+    this.checkIfRequiresAval();
+
+    console.log('Formulario de cliente actualizado');
   }
 
   initiateForm() {

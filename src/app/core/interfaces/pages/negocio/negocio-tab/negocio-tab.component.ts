@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, signal, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { Message } from 'primeng/message';
@@ -115,7 +115,8 @@ export class NegocioTabComponent implements OnInit, OnChanges, OnDestroy {
     private denominacionService: LocalDenominacionService,
     private fb: FormBuilder,
     private confirmationService: ConfirmationService,
-    private messageToastService: MessageToastService
+    private messageToastService: MessageToastService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -453,32 +454,129 @@ export class NegocioTabComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   updateFormValues() {
+    console.log('=== ACTUALIZANDO FORMULARIO DE ACTIVIDAD ECONÓMICA ===');
+    console.log('Detalle económico recibido:', this.detalleEconomico);
+
     if (this.detalleEconomico.negocio) {
-      this.negocioForm.patchValue({
-        id: this.detalleEconomico.negocio.id,
-        tiempo_valor: this.detalleEconomico.negocio.tiempo_valor,
-        direccion: this.detalleEconomico.negocio.direccion,
-        // sector: this.negocio.sector,
-        actividad_economica: this.detalleEconomico.negocio.actividad_economica?.descripcion,
-        tiempo: this.detalleEconomico.negocio.tiempo?.descripcion,
-        ventas_normales: this.detalleEconomico.negocio.registro_ventas?.ventas_normales,
-        ventas_bajas: this.detalleEconomico.negocio.registro_ventas?.ventas_bajas,
-        ventas_altas: this.detalleEconomico.negocio.registro_ventas?.ventas_altas,
-        frecuencia: this.detalleEconomico.negocio.registro_ventas?.frecuencia,
-        gastos_operativos: this.detalleEconomico.negocio.gastos_operativos?.map(g => g.id),
-      });
+      console.log('Cargando datos de negocio:', this.detalleEconomico.negocio);
+
+      // Establecer el tipo de actividad y forzar detección de cambios
+      this.tipoActividadSeleccionada = 'negocio';
+      console.log('Tipo de actividad establecido:', this.tipoActividadSeleccionada);
+
+      // Habilitar el formulario de negocio
+      this.habilitarFormularioSeleccionado('negocio');
+
+      // Forzar detección de cambios para actualizar la UI
+      this.cdr.detectChanges();
+
+      // Buscar el sector económico completo
+      const sectorCompleto = this.sectoresList().find(s =>
+        s.id === this.detalleEconomico.negocio?.actividad_economica?.sector_economico?.id
+      );
+
+      if (sectorCompleto) {
+        console.log('Sector encontrado:', sectorCompleto);
+
+        // Primero establecer el sector para cargar las actividades económicas
+        this.negocioForm.patchValue({
+          sector: sectorCompleto
+        });
+
+        // Ejecutar el cambio de sector para cargar las actividades
+        this.sectorEconomicoOnChage({ value: sectorCompleto });
+
+        // Luego buscar la actividad económica completa
+        setTimeout(() => {
+          const actividadCompleta = this.actividadEconomicasList.find(a =>
+            a.id === this.detalleEconomico.negocio?.actividad_economica?.id
+          );
+
+          // Buscar el tiempo completo
+          const tiempoCompleto = this.tiemposList().find(t =>
+            t.id === this.detalleEconomico.negocio?.tiempo?.id
+          );
+
+          // Buscar la frecuencia completa
+          const frecuenciaCompleta = this.frecuenciaList.find(f =>
+            f.code === this.detalleEconomico.negocio?.registro_ventas?.frecuencia
+          );
+
+          console.log('Actividad encontrada:', actividadCompleta);
+          console.log('Tiempo encontrado:', tiempoCompleto);
+          console.log('Frecuencia encontrada:', frecuenciaCompleta);
+
+          // Actualizar el formulario con todos los datos
+          this.negocioForm.patchValue({
+            id: this.detalleEconomico.negocio?.id,
+            tiempo_valor: this.detalleEconomico.negocio?.tiempo_valor,
+            direccion: this.detalleEconomico.negocio?.direccion,
+            actividad_economica: actividadCompleta,
+            tiempo: tiempoCompleto,
+            registro_ventas: {
+              ventas_normales: this.detalleEconomico.negocio?.registro_ventas?.ventas_normales,
+              ventas_bajas: this.detalleEconomico.negocio?.registro_ventas?.ventas_bajas,
+              ventas_altas: this.detalleEconomico.negocio?.registro_ventas?.ventas_altas,
+              ventas_frecuencia: frecuenciaCompleta
+            }
+          });
+
+          // Cargar gastos operativos si existen
+          if (this.detalleEconomico.negocio?.gastos_operativos) {
+            this.gastosOperativosList = [...this.detalleEconomico.negocio.gastos_operativos];
+            console.log('Gastos operativos cargados:', this.gastosOperativosList);
+          }
+
+          console.log('✅ Formulario de negocio completamente actualizado');
+          console.log('✅ Panel de negocio debería estar abierto (tipoActividadSeleccionada = negocio)');
+        }, 100);
+      }
     }
 
     if (this.detalleEconomico.ingreso_dependiente) {
+      console.log('Cargando datos de ingreso dependiente:', this.detalleEconomico.ingreso_dependiente);
+
+      // Establecer el tipo de actividad y forzar detección de cambios
+      this.tipoActividadSeleccionada = 'dependiente';
+      console.log('Tipo de actividad establecido:', this.tipoActividadSeleccionada);
+
+      // Habilitar el formulario de ingreso dependiente
+      this.habilitarFormularioSeleccionado('dependiente');
+
+      // Forzar detección de cambios para actualizar la UI
+      this.cdr.detectChanges();
+
+      // Buscar objetos completos para los selects
+      const frecuenciaCompleta = this.frecuenciaListDependiente.find(f =>
+        f.code === this.detalleEconomico.ingreso_dependiente?.frecuencia
+      );
+
+      const tiempoCompleto = this.tiemposList().find(t =>
+        t.id === this.detalleEconomico.ingreso_dependiente?.tiempo?.id
+      );
+
+      console.log('Frecuencia encontrada:', frecuenciaCompleta);
+      console.log('Tiempo encontrado:', tiempoCompleto);
+
       this.ingresoDependienteForm.patchValue({
         ingreso_id: this.detalleEconomico.ingreso_dependiente.id,
-        ingreso_frecuencia: this.detalleEconomico.ingreso_dependiente.frecuencia,
+        ingreso_frecuencia: frecuenciaCompleta,
         ingreso_importe: this.detalleEconomico.ingreso_dependiente.importe,
         ingreso_actividad: this.detalleEconomico.ingreso_dependiente.actividad,
         ingreso_tiempo_valor: this.detalleEconomico.ingreso_dependiente.tiempo_valor,
-        ingreso_tiempo: this.detalleEconomico.ingreso_dependiente.tiempo?.descripcion
+        ingreso_tiempo: tiempoCompleto
       });
+
+      console.log('✅ Formulario de ingreso dependiente completamente actualizado');
+      console.log('✅ Panel de ingreso dependiente debería estar abierto (tipoActividadSeleccionada = dependiente)');
     }
+
+    // Si no hay datos de ningún tipo, establecer un valor por defecto
+    if (!this.detalleEconomico.negocio && !this.detalleEconomico.ingreso_dependiente) {
+      console.log('No hay datos de actividad económica, manteniendo estado actual');
+    }
+
+    console.log('=== ACTUALIZACIÓN DE FORMULARIO COMPLETADA ===');
   }
 
   /**
@@ -524,18 +622,57 @@ export class NegocioTabComponent implements OnInit, OnChanges, OnDestroy {
   getFormValues(): DetalleEconomico {
     this.formSubmitted = true;
 
+    console.log('=== OBTENIENDO VALORES DE ACTIVIDAD ECONÓMICA ===');
+    console.log('tipoActividadSeleccionada:', this.tipoActividadSeleccionada);
+    console.log('detalleEconomico actual:', this.detalleEconomico);
+
+    // Si no hay tipo seleccionado, intentar detectar automáticamente basándose en los datos cargados
     if (!this.tipoActividadSeleccionada) {
-      console.error('No se ha seleccionado un tipo de actividad económica');
-      return { negocio: null, ingreso_dependiente: null };
+      console.log('No hay tipo de actividad seleccionada, intentando detectar automáticamente...');
+
+      // Verificar si hay datos de negocio en detalleEconomico
+      if (this.detalleEconomico?.negocio) {
+        console.log('Detectado: Negocio (basado en detalleEconomico)');
+        this.tipoActividadSeleccionada = 'negocio';
+      }
+      // Verificar si hay datos de ingreso dependiente en detalleEconomico
+      else if (this.detalleEconomico?.ingreso_dependiente) {
+        console.log('Detectado: Ingreso Dependiente (basado en detalleEconomico)');
+        this.tipoActividadSeleccionada = 'dependiente';
+      }
+      // Verificar si el formulario de negocio tiene datos válidos
+      else if (this.negocioForm.get('actividad_economica')?.value) {
+        console.log('Detectado: Negocio (basado en formulario)');
+        this.tipoActividadSeleccionada = 'negocio';
+      }
+      // Verificar si el formulario de ingreso dependiente tiene datos válidos
+      else if (this.ingresoDependienteForm.get('ingreso_actividad')?.value) {
+        console.log('Detectado: Ingreso Dependiente (basado en formulario)');
+        this.tipoActividadSeleccionada = 'dependiente';
+      }
+      else {
+        console.error('No se pudo detectar el tipo de actividad económica');
+        return { negocio: null, ingreso_dependiente: null };
+      }
     }
 
     if (this.tipoActividadSeleccionada === 'negocio') {
-      return {
+      console.log('Obteniendo datos de negocio...');
+      console.log('Formulario de negocio:', this.negocioForm.value);
+      console.log('Gastos operativos:', this.gastosOperativosList);
+
+      const negocioData = {
         negocio: { ...this.negocioForm.value, gastos_operativos: this.gastosOperativosList },
         ingreso_dependiente: null
       };
+
+      console.log('Datos de negocio obtenidos:', negocioData);
+      return negocioData;
     } else if (this.tipoActividadSeleccionada === 'dependiente') {
-      return {
+      console.log('Obteniendo datos de ingreso dependiente...');
+      console.log('Formulario de ingreso dependiente:', this.ingresoDependienteForm.value);
+
+      const ingresoData = {
         negocio: null,
         ingreso_dependiente: {
           id: this.ingreso_id.value,
@@ -543,12 +680,17 @@ export class NegocioTabComponent implements OnInit, OnChanges, OnDestroy {
           importe: this.ingreso_importe.value,
           actividad: this.ingreso_actividad.value,
           tiempo_valor: this.ingreso_tiempo_valor.value,
-          tiempo: this.ingreso_tiempo.value.code === 'MES' ?
+          tiempo: this.ingreso_tiempo.value?.code === 'MES' ?
             this.tiemposList().find(item => item.id === 1)
             : this.tiemposList().find(item => item.id === 2),
         }
       };
+
+      console.log('Datos de ingreso dependiente obtenidos:', ingresoData);
+      return ingresoData;
     }
+
+    console.log('Retornando datos vacíos');
     return { negocio: null, ingreso_dependiente: null };
   }
 

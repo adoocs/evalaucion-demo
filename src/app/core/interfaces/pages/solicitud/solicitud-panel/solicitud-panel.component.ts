@@ -81,11 +81,13 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   activeIndex = 0;
   submitted = false;
   @Input() solicitud: Solicitud = this.createEmptySolicitud();
+  @Input() fichaTrabajo: FichaTrabajo | null = null;
+  @Input() modoEdicion: boolean = false;
 
   @Output() switchMessage = new EventEmitter<string>();
 
   solituds = signal<Solicitud[]>([]);
-  fichaTrabajo: FichaTrabajo = this.createEmptyFichaTrabajo();
+  fichaTrabajoInternal: FichaTrabajo = this.createEmptyFichaTrabajo();
 
   readonly tabs: TabConfig[] = [
     { label: 'Solicitud', icon: 'pi pi-file', component: SolicitudTabComponent, formProperty: 'id' },
@@ -138,18 +140,240 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     this.tipoViviendaService.loadInitialData();
     this.clienteService.loadInitialData();
 
-    // Mostrar mensaje de bienvenida a la versión demo
-    setTimeout(() => {
-      this.messageService.infoMessageToast(
-        'Versión Demo',
-        'Esta es una versión demo con datos locales. Puedes probar todas las funcionalidades sin conexión a base de datos.'
-      );
-    }, 1000);
+    // Inicializar la ficha de trabajo
+    if (this.fichaTrabajo) {
+      this.fichaTrabajoInternal = { ...this.fichaTrabajo };
+    } else {
+      this.fichaTrabajoInternal = this.createEmptyFichaTrabajo();
+    }
 
-    // Si tenemos una solicitud existente, cargar los datos
-    if (this.solicitud && this.solicitud.id) {
-      console.log('Cargando solicitud existente:', this.solicitud);
-      // Aquí se cargarían los datos de la ficha de trabajo asociada a la solicitud
+    // Mostrar mensaje de bienvenida solo si no estamos en modo edición
+    if (!this.modoEdicion) {
+      setTimeout(() => {
+        this.messageService.infoMessageToast(
+          'Versión Demo',
+          'Esta es una versión demo con datos locales. Puedes probar todas las funcionalidades sin conexión a base de datos.'
+        );
+      }, 1000);
+    }
+
+    // Si tenemos una solicitud existente y estamos en modo edición, cargar los datos
+    if (this.modoEdicion && this.solicitud && this.solicitud.id) {
+      console.log('Modo edición - Cargando solicitud existente:', this.solicitud);
+      console.log('Modo edición - Cargando ficha de trabajo:', this.fichaTrabajoInternal);
+
+      // Cargar los datos en los formularios después de que se inicialicen
+      setTimeout(() => {
+        this.cargarDatosEnFormularios();
+      }, 500);
+    }
+  }
+
+  /**
+   * Carga los datos de la ficha de trabajo en los formularios para modo edición
+   */
+  private cargarDatosEnFormularios(): void {
+    if (!this.modoEdicion || !this.fichaTrabajoInternal) {
+      return;
+    }
+
+    try {
+      // Cargar datos en el formulario de solicitud
+      if (this.solicitudTab && this.solicitud) {
+        this.solicitudTab.solicitud = { ...this.solicitud };
+        this.solicitudTab.updateFormValues();
+      }
+
+      console.log('Datos básicos cargados en los formularios para edición');
+      console.log('Ficha de trabajo disponible:', this.fichaTrabajoInternal);
+
+      // Cargar datos del tab actual (inicialmente tab 0 - solicitud)
+      this.cargarDatosEnTab(0);
+
+    } catch (error) {
+      console.error('Error al cargar datos en los formularios:', error);
+      this.messageService.errorMessageToast('Error', 'No se pudieron cargar todos los datos en los formularios');
+    }
+  }
+
+  /**
+   * Carga los datos específicos de un tab cuando el usuario navega a él
+   * @param tabIndex Índice del tab al que se navega
+   */
+  private cargarDatosEnTab(tabIndex: number): void {
+    if (!this.modoEdicion || !this.fichaTrabajoInternal) {
+      return;
+    }
+
+    console.log(`Cargando datos para tab ${tabIndex}`);
+
+    try {
+      switch (tabIndex) {
+        case 0: // Solicitud
+          if (this.solicitudTab && this.solicitud) {
+            this.solicitudTab.solicitud = { ...this.solicitud };
+            this.solicitudTab.updateFormValues();
+            console.log('Datos de solicitud cargados');
+          }
+          break;
+
+        case 1: // Cliente
+          if (this.clienteTab && this.fichaTrabajoInternal.cliente) {
+            // Usar setTimeout para asegurar que el componente esté completamente inicializado
+            setTimeout(() => {
+              this.clienteTab.updateFormValues(this.fichaTrabajoInternal.cliente!);
+              console.log('Datos de cliente cargados:', this.fichaTrabajoInternal.cliente);
+            }, 100);
+          }
+          break;
+
+        case 2: // Aval
+          if (this.avalTab && this.fichaTrabajoInternal.aval) {
+            setTimeout(() => {
+              this.avalTab.updateFormValues(this.fichaTrabajoInternal.aval!);
+
+              // Si el aval está omitido, aplicar la lógica de deshabilitación
+              if (this.fichaTrabajoInternal.aval!.omitido) {
+                this.aplicarEstadoOmisionAval();
+              }
+
+              console.log('Datos de aval cargados:', this.fichaTrabajoInternal.aval);
+            }, 100);
+          }
+          break;
+
+        case 3: // Cónyuge
+          if (this.conyugeTab && this.fichaTrabajoInternal.conyuge) {
+            setTimeout(() => {
+              this.conyugeTab.updateFormValues(this.fichaTrabajoInternal.conyuge!);
+
+              // Si el cónyuge está omitido, aplicar la lógica de deshabilitación
+              if (this.fichaTrabajoInternal.conyuge!.omitido) {
+                this.aplicarEstadoOmisionConyuge();
+              }
+
+              console.log('Datos de cónyuge cargados:', this.fichaTrabajoInternal.conyuge);
+            }, 100);
+          }
+          break;
+
+        case 4: // Crédito Anterior
+          if (this.creditoAnteriorTab) {
+            setTimeout(() => {
+              if (this.fichaTrabajoInternal.credito_anterior) {
+                this.creditoAnteriorTab.updateFormValues(this.fichaTrabajoInternal.credito_anterior!);
+                console.log('Datos de crédito anterior cargados:', this.fichaTrabajoInternal.credito_anterior);
+              } else {
+                // Si no hay crédito anterior, verificar si está omitido
+                this.creditoAnteriorTab.omitirCreditoAnterior = true;
+                this.creditoAnteriorTab.confirmarOmision();
+                console.log('Crédito anterior omitido');
+              }
+            }, 100);
+          }
+          break;
+
+        case 5: // Negocio
+          if (this.negocioTab && this.fichaTrabajoInternal.detalleEconomico) {
+            setTimeout(() => {
+              console.log('Cargando datos de actividad económica:', this.fichaTrabajoInternal.detalleEconomico);
+
+              // Para el negocio, necesitamos asignar el detalleEconomico completo
+              this.negocioTab.detalleEconomico = this.fichaTrabajoInternal.detalleEconomico!;
+              this.negocioTab.updateFormValues();
+
+              if (this.fichaTrabajoInternal.detalleEconomico?.negocio) {
+                console.log('Datos de negocio cargados:', this.fichaTrabajoInternal.detalleEconomico.negocio);
+              }
+
+              if (this.fichaTrabajoInternal.detalleEconomico?.ingreso_dependiente) {
+                console.log('Datos de ingreso dependiente cargados:', this.fichaTrabajoInternal.detalleEconomico.ingreso_dependiente);
+              }
+            }, 200); // Aumentar timeout para asegurar inicialización completa
+          } else {
+            console.log('No hay datos de actividad económica para cargar');
+          }
+          break;
+
+        case 6: // Ingreso Adicional
+          if (this.ingresoAdicionalTab) {
+            setTimeout(() => {
+              if (this.fichaTrabajoInternal.ingreso_adicional) {
+                this.ingresoAdicionalTab.updateFormValues(this.fichaTrabajoInternal.ingreso_adicional!);
+                console.log('Datos de ingreso adicional cargados:', this.fichaTrabajoInternal.ingreso_adicional);
+              } else {
+                // Si no hay ingreso adicional, marcarlo como omitido
+                console.log('Aplicando omisión para ingreso adicional');
+                this.ingresoAdicionalTab.omitirIngresoAdicional = true;
+                this.ingresoAdicionalTab.omitirAportesTerceros = true;
+
+                // Llamar a los métodos de confirmación de omisión
+                this.ingresoAdicionalTab.confirmarOmision();
+                this.ingresoAdicionalTab.confirmarOmisionAportesTerceros();
+
+                // Deshabilitar los formularios
+                this.ingresoAdicionalTab.ingresoAdicionalForm.disable();
+                // El formulario de aportes terceros se deshabilita automáticamente con la omisión
+
+                console.log('Ingreso adicional omitido y formularios deshabilitados');
+              }
+            }, 200); // Aumentar el timeout para asegurar que el componente esté completamente inicializado
+          }
+          break;
+
+        case 7: // Puntaje Sentinel
+          if (this.puntajeSentinelTab && this.fichaTrabajoInternal.puntaje_sentinel) {
+            setTimeout(() => {
+              // Para puntaje sentinel, usar la propiedad directamente
+              this.puntajeSentinelTab.puntajeSentinel = this.fichaTrabajoInternal.puntaje_sentinel!;
+              console.log('Datos de puntaje sentinel cargados:', this.fichaTrabajoInternal.puntaje_sentinel);
+            }, 100);
+          }
+          break;
+
+        case 8: // Gasto Financiero
+          if (this.gastoFinancieroTab) {
+            setTimeout(() => {
+              if (this.fichaTrabajoInternal.gasto_financieros && this.fichaTrabajoInternal.gasto_financieros.length > 0) {
+                // Para gastos financieros, usar el signal
+                this.gastoFinancieroTab.gastoFinancieros.set(this.fichaTrabajoInternal.gasto_financieros);
+                console.log('Datos de gastos financieros cargados:', this.fichaTrabajoInternal.gasto_financieros);
+              } else {
+                // Si no hay gastos financieros, marcarlo como omitido
+                console.log('Aplicando omisión para gastos financieros');
+                this.gastoFinancieroTab.omitirGastoFinanciero = true;
+                this.gastoFinancieroTab.confirmarOmision();
+
+                // Limpiar la lista de gastos
+                this.gastoFinancieroTab.gastoFinancieros.set([]);
+
+                console.log('Gastos financieros omitidos');
+              }
+            }, 200);
+          }
+          break;
+
+        case 9: // Referencia Familiar
+          if (this.referenciaFamiliarTab && this.fichaTrabajoInternal.referencia_familiar) {
+            setTimeout(() => {
+              this.referenciaFamiliarTab.referenciaFamiliar = this.fichaTrabajoInternal.referencia_familiar!;
+              this.referenciaFamiliarTab.updateFormValues();
+              console.log('Datos de referencia familiar cargados:', this.fichaTrabajoInternal.referencia_familiar);
+            }, 100);
+          }
+          break;
+
+        case 10: // Resumen
+          // El resumen se actualiza automáticamente
+          console.log('Tab de resumen - datos se actualizan automáticamente');
+          break;
+
+        default:
+          console.log(`Tab ${tabIndex} no reconocido`);
+          break;
+      }
+    } catch (error) {
+      console.error(`Error al cargar datos en tab ${tabIndex}:`, error);
     }
   }
 
@@ -583,15 +807,15 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   onTabChange(index: any): void {
     console.log('Pestaña cambiada a:', index);
 
+    // Si estamos en modo edición, cargar los datos correspondientes al tab
+    if (this.modoEdicion && this.fichaTrabajoInternal) {
+      this.cargarDatosEnTab(Number(index));
+    }
+
     // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo
     if (Number(index) === 10) {
       this.actualizarFichaTrabajo();
-
-      // Mostrar mensaje de éxito
-      this.messageService.successMessageToast(
-        'Resumen',
-        'Datos actualizados correctamente para el resumen'
-      );
+      console.log('Navegando al resumen - datos actualizados');
     }
   }
 
@@ -1010,6 +1234,8 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
    * para que el resumen tenga los datos actualizados
    */
   actualizarFichaTrabajo(): void {
+    console.log('=== ACTUALIZANDO FICHA DE TRABAJO ===');
+
     // Verificar si los componentes están inicializados
     if (!this.solicitudTab || !this.clienteTab) {
       console.log('Los componentes no están inicializados todavía, no se puede actualizar la ficha de trabajo');
@@ -1045,24 +1271,60 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         console.log('Solicitud actualizada:', this.solicitud);
       }
 
+      // Obtener datos de actividad económica específicamente
+      let detalleEconomico = null;
+      if (this.negocioTab) {
+        console.log('Obteniendo datos de actividad económica...');
+        detalleEconomico = this.negocioTab.getFormValues();
+        console.log('Detalle económico obtenido:', detalleEconomico);
+
+        if (detalleEconomico?.negocio) {
+          console.log('Datos de negocio encontrados:', detalleEconomico.negocio);
+          console.log('- Actividad económica:', detalleEconomico.negocio.actividad_economica);
+          console.log('- Sector económico:', detalleEconomico.negocio.actividad_economica?.sector_economico);
+          console.log('- Registro de ventas:', detalleEconomico.negocio.registro_ventas);
+          console.log('- Gastos operativos:', detalleEconomico.negocio.gastos_operativos);
+        }
+
+        if (detalleEconomico?.ingreso_dependiente) {
+          console.log('Datos de ingreso dependiente encontrados:', detalleEconomico.ingreso_dependiente);
+        }
+      } else {
+        console.log('⚠️ NegocioTab no está inicializado');
+      }
+
       // Actualizar la ficha de trabajo con los datos de cada componente usando los métodos getFormValues()
-      this.fichaTrabajo = {
-        ...this.fichaTrabajo,
+      this.fichaTrabajoInternal = {
+        ...this.fichaTrabajoInternal,
         cliente: this.clienteTab?.getFormValues(),
         aval: this.avalTab?.getFormValues(),
         conyuge: this.conyugeTab?.getFormValues(),
         credito_anterior: this.creditoAnteriorTab?.getFormValues(),
-        detalleEconomico: this.negocioTab?.getFormValues(),
+        detalleEconomico: detalleEconomico,
         ingreso_adicional: this.ingresoAdicionalTab?.getFormValues(),
         gasto_financieros: this.gastoFinancieroTab?.gastoFinancieros(),
         referencia_familiar: this.referenciaFamiliarTab?.getFormValues(),
         puntaje_sentinel: this.solicitud.puntaje_sentinel
       };
 
-      console.log('Ficha de trabajo actualizada (DEMO):', this.fichaTrabajo);
+      console.log('=== FICHA DE TRABAJO ACTUALIZADA ===');
+      console.log('Ficha completa:', this.fichaTrabajoInternal);
 
-      // Versión demo: Mostrar mensaje de éxito
-      this.messageService.infoMessageToast('Información', 'Datos actualizados correctamente (Versión Demo)');
+      // Verificar específicamente el detalle económico
+      if (this.fichaTrabajoInternal.detalleEconomico) {
+        console.log('✅ Detalle económico presente en ficha actualizada');
+        if (this.fichaTrabajoInternal.detalleEconomico.negocio) {
+          console.log('✅ Datos de negocio presentes');
+        }
+        if (this.fichaTrabajoInternal.detalleEconomico.ingreso_dependiente) {
+          console.log('✅ Datos de ingreso dependiente presentes');
+        }
+      } else {
+        console.log('❌ No hay detalle económico en la ficha actualizada');
+      }
+
+      // No mostrar mensaje de éxito aquí para evitar spam
+      console.log('=== ACTUALIZACIÓN COMPLETADA ===');
     } catch (error) {
       console.error('Error al actualizar la ficha de trabajo:', error);
       this.messageService.warnMessageToast('Advertencia', 'Error al actualizar los datos (Versión Demo)');
@@ -1384,21 +1646,32 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    this.fichaTrabajo = this.getAllData();
+    console.log('=== INICIANDO SUBMIT ===');
+    this.fichaTrabajoInternal = this.getAllData();
+    console.log('Ficha de trabajo obtenida:', this.fichaTrabajoInternal);
+
     let warnings = [];
     let errors = [];
 
     // Validar AVAL
+    console.log('Validando AVAL...');
+    console.log('clienteRequiresAval:', this.clienteRequiresAval);
+    console.log('montoRequiresAval:', this.montoRequiresAval);
+
     if (this.clienteRequiresAval || this.montoRequiresAval) {
       // Verificar si el formulario está marcado como omitido y tiene un motivo
-      const isAvalOmitido = this.avalTab.avalForm.get('omitido')?.value === true;
-      const hasAvalMotivo = !!this.avalTab.avalForm.get('motivo')?.value;
+      const isAvalOmitido = this.avalTab?.avalForm.get('omitido')?.value === true;
+      const hasAvalMotivo = !!this.avalTab?.avalForm.get('motivo')?.value;
+
+      console.log('isAvalOmitido:', isAvalOmitido);
+      console.log('hasAvalMotivo:', hasAvalMotivo);
+      console.log('avalTab.isFormComplete():', this.avalTab?.isFormComplete());
 
       if (isAvalOmitido && hasAvalMotivo) {
         // Si está omitido con motivo, permitir continuar
         console.log('Formulario de AVAL omitido con motivo: ' + this.avalTab.avalForm.get('motivo')?.value);
         warnings.push(`AVAL omitido: ${this.avalTab.avalForm.get('motivo')?.value}`);
-      } else if (!this.fichaTrabajo.aval || Object.keys(this.fichaTrabajo.aval).length === 0 || !this.avalTab.isFormComplete()) {
+      } else if (!this.fichaTrabajoInternal.aval || Object.keys(this.fichaTrabajoInternal.aval).length === 0 || !this.avalTab?.isFormComplete()) {
         // Si no está omitido y no está completo
         if (this.clienteRequiresAval) {
           // Si es requerido por cliente, mostrar error y no permitir continuar
@@ -1409,19 +1682,28 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
           warnings.push('El monto de la solicitud es mayor a 1500. Se recomienda incluir AVAL, pero puede continuar sin él.');
         }
       }
+    } else {
+      console.log('AVAL no es requerido');
     }
 
     // Validar Cónyuge
+    console.log('Validando Cónyuge...');
+    console.log('clienteRequiresConyuge:', this.clienteRequiresConyuge);
+
     if (this.clienteRequiresConyuge) {
       // Verificar si el formulario está marcado como omitido y tiene un motivo
-      const isConyugeOmitido = this.conyugeTab.conyugeForm.get('omitido')?.value === true;
-      const hasConyugeMotivo = !!this.conyugeTab.conyugeForm.get('motivo')?.value;
+      const isConyugeOmitido = this.conyugeTab?.conyugeForm.get('omitido')?.value === true;
+      const hasConyugeMotivo = !!this.conyugeTab?.conyugeForm.get('motivo')?.value;
+
+      console.log('isConyugeOmitido:', isConyugeOmitido);
+      console.log('hasConyugeMotivo:', hasConyugeMotivo);
+      console.log('conyugeTab.isFormComplete():', this.conyugeTab?.isFormComplete());
 
       if (isConyugeOmitido && hasConyugeMotivo) {
         // Si está omitido con motivo, permitir continuar
         console.log('Formulario de Cónyuge omitido con motivo: ' + this.conyugeTab.conyugeForm.get('motivo')?.value);
         warnings.push(`Cónyuge omitido: ${this.conyugeTab.conyugeForm.get('motivo')?.value}`);
-      } else if (!this.fichaTrabajo.conyuge || Object.keys(this.fichaTrabajo.conyuge).length === 0 || !this.conyugeTab.isFormComplete()) {
+      } else if (!this.fichaTrabajoInternal.conyuge || Object.keys(this.fichaTrabajoInternal.conyuge).length === 0 || !this.conyugeTab?.isFormComplete()) {
         // Si no está omitido y no está completo, mostrar error
         errors.push('Se requiere completar la información del Cónyuge o proporcionar un motivo para omitirlo: ' + this.conyugeRequiredReason);
 
@@ -1430,25 +1712,31 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
           this.activeIndex = 3; // Ir a la pestaña de Cónyuge
         }
       }
+    } else {
+      console.log('Cónyuge no es requerido');
     }
 
     // Si hay errores, mostrarlos y no continuar
+    console.log('Errores encontrados:', errors);
     if (errors.length > 0) {
+      console.log('=== SUBMIT CANCELADO POR ERRORES ===');
       this.messageService.warnMessageToast('Error', errors.join('\n'));
       return;
     }
 
     // Mostrar advertencias si hay
+    console.log('Advertencias encontradas:', warnings);
     if (warnings.length > 0) {
       this.messageService.infoMessageToast('Advertencias', warnings.join('\n'));
     }
 
+    console.log('=== SUBMIT EXITOSO - GUARDANDO ===');
     this.displayJson = true;
 
     // Usar el servicio local para crear la ficha de trabajo
-    console.log('Ficha de Trabajo (DEMO):', this.fichaTrabajo);
+    console.log('Ficha de Trabajo (DEMO):', this.fichaTrabajoInternal);
 
-    this.fichaTrabajoService.createFichaTrabajo(this.fichaTrabajo).subscribe({
+    this.fichaTrabajoService.createFichaTrabajo(this.fichaTrabajoInternal).subscribe({
       next: (response) => {
         console.log('Ficha de Trabajo creada:', response);
         this.messageService.successMessageToast('Éxito', 'Ficha de trabajo guardada correctamente (Versión Demo)');
@@ -1462,27 +1750,27 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
 
   createSolicitud(): void {
     // Obtener todos los datos de la ficha de trabajo
-    this.fichaTrabajo = this.getAllData();
+    this.fichaTrabajoInternal = this.getAllData();
 
     // Actualizar la solicitud con los datos de la ficha de trabajo
-    if (this.fichaTrabajo.cliente) {
-      this.solicitud.cliente = this.fichaTrabajo.cliente.apellidos + ' ' + this.fichaTrabajo.cliente.nombres;
+    if (this.fichaTrabajoInternal.cliente) {
+      this.solicitud.cliente = this.fichaTrabajoInternal.cliente.apellidos + ' ' + this.fichaTrabajoInternal.cliente.nombres;
     }
 
-    if (this.fichaTrabajo.aval) {
-      this.solicitud.aval = this.fichaTrabajo.aval.apellidos + ' ' + this.fichaTrabajo.aval.nombres;
+    if (this.fichaTrabajoInternal.aval) {
+      this.solicitud.aval = this.fichaTrabajoInternal.aval.apellidos + ' ' + this.fichaTrabajoInternal.aval.nombres;
     }
 
-    if (this.fichaTrabajo.conyuge) {
-      this.solicitud.conyugue = this.fichaTrabajo.conyuge.apellidos + ' ' + this.fichaTrabajo.conyuge.nombres;
+    if (this.fichaTrabajoInternal.conyuge) {
+      this.solicitud.conyugue = this.fichaTrabajoInternal.conyuge.apellidos + ' ' + this.fichaTrabajoInternal.conyuge.nombres;
     }
 
     // Asignar otros campos de la solicitud
-    this.solicitud.credito_anterior = this.fichaTrabajo.credito_anterior || undefined;
-    this.solicitud.gasto_financiero = this.fichaTrabajo.gasto_financieros?.[0] || undefined;
-    this.solicitud.referencia_familiar = this.fichaTrabajo.referencia_familiar || undefined;
-    this.solicitud.ingreso_adicional = this.fichaTrabajo.ingreso_adicional || undefined;
-    this.solicitud.negocio = this.fichaTrabajo.detalleEconomico?.negocio || undefined;
+    this.solicitud.credito_anterior = this.fichaTrabajoInternal.credito_anterior || undefined;
+    this.solicitud.gasto_financiero = this.fichaTrabajoInternal.gasto_financieros?.[0] || undefined;
+    this.solicitud.referencia_familiar = this.fichaTrabajoInternal.referencia_familiar || undefined;
+    this.solicitud.ingreso_adicional = this.fichaTrabajoInternal.ingreso_adicional || undefined;
+    this.solicitud.negocio = this.fichaTrabajoInternal.detalleEconomico?.negocio || undefined;
 
     // Asignar fecha actual si no tiene
     if (!this.solicitud.fecha) {
@@ -1500,18 +1788,39 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   }
 
   editSolicitud(): void {
-    // Versión demo: Simular la edición de la solicitud sin conectarse al backend
+    // Obtener todos los datos de la ficha de trabajo
+    this.fichaTrabajoInternal = this.getAllData();
+
+    // Actualizar la solicitud con los datos de la ficha de trabajo
+    if (this.fichaTrabajoInternal.cliente) {
+      this.solicitud.cliente = this.fichaTrabajoInternal.cliente.apellidos + ' ' + this.fichaTrabajoInternal.cliente.nombres;
+    }
+
+    if (this.fichaTrabajoInternal.aval) {
+      this.solicitud.aval = this.fichaTrabajoInternal.aval.apellidos + ' ' + this.fichaTrabajoInternal.aval.nombres;
+    }
+
+    if (this.fichaTrabajoInternal.conyuge) {
+      this.solicitud.conyugue = this.fichaTrabajoInternal.conyuge.apellidos + ' ' + this.fichaTrabajoInternal.conyuge.nombres;
+    }
+
+    // Asignar otros campos de la solicitud
+    this.solicitud.credito_anterior = this.fichaTrabajoInternal.credito_anterior || undefined;
+    this.solicitud.gasto_financiero = this.fichaTrabajoInternal.gasto_financieros?.[0] || undefined;
+    this.solicitud.referencia_familiar = this.fichaTrabajoInternal.referencia_familiar || undefined;
+    this.solicitud.ingreso_adicional = this.fichaTrabajoInternal.ingreso_adicional || undefined;
+    this.solicitud.negocio = this.fichaTrabajoInternal.detalleEconomico?.negocio || undefined;
+
+    // Mantener la fecha existente o asignar fecha actual si no tiene
+    if (!this.solicitud.fecha) {
+      this.solicitud.fecha = new Date().toISOString().split('T')[0];
+    }
+
     console.log('Editando solicitud (DEMO):', this.solicitud);
+    console.log('Ficha de trabajo actualizada (DEMO):', this.fichaTrabajoInternal);
+
     this.messageService.successMessageToast('Éxito', 'Solicitud actualizada correctamente (Versión Demo)');
     this.switchMessageHandler('edit');
-
-    // Comentamos la llamada al servicio real para evitar errores de conexión
-    /*
-    this.solicitudService.update(this.solicitud.id, this.solicitud).subscribe({
-      next: () => this.switchMessageHandler('edit'),
-      error: () => this.switchMessageHandler('error')
-    });
-    */
   }
 
   switchMessageHandler(message: string): void {
@@ -1520,7 +1829,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
 
   getAllData(): FichaTrabajo {
     return {
-      id: this.fichaTrabajo.id,
+      id: this.fichaTrabajoInternal.id,
       cliente: this.clienteTab?.getFormValues(),
       aval: this.avalTab?.getFormValues(),
       conyuge: this.conyugeTab?.getFormValues(),
@@ -1535,7 +1844,62 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
 
   visibleJsonChange(event: boolean) {
     console.log('FICHA TRABAJO:', this.getAllData());
-    this.fichaTrabajo = this.getAllData();
+    this.fichaTrabajoInternal = this.getAllData();
     this.displayJson = event;
+  }
+
+  /**
+   * Aplica el estado de omisión al formulario de Aval
+   */
+  private aplicarEstadoOmisionAval(): void {
+    if (!this.avalTab || !this.avalTab.avalForm) {
+      return;
+    }
+
+    console.log('Aplicando estado de omisión para Aval');
+
+    // Deshabilitar los campos requeridos
+    const requiredFields = [
+      'apellidos', 'nombres', 'dni', 'direccion',
+      'celular', 'n_referencial', 'actividad', 'parentesco', 'tipo_vivienda'
+    ];
+
+    requiredFields.forEach(field => {
+      const control = this.avalTab.avalForm.get(field);
+      if (control) {
+        control.setErrors(null);
+        control.markAsUntouched();
+        control.disable();
+      }
+    });
+
+    console.log('Estado de omisión aplicado para Aval');
+  }
+
+  /**
+   * Aplica el estado de omisión al formulario de Cónyuge
+   */
+  private aplicarEstadoOmisionConyuge(): void {
+    if (!this.conyugeTab || !this.conyugeTab.conyugeForm) {
+      return;
+    }
+
+    console.log('Aplicando estado de omisión para Cónyuge');
+
+    // Deshabilitar los campos requeridos
+    const requiredFields = [
+      'apellidos', 'nombres', 'dni', 'celular', 'actividad'
+    ];
+
+    requiredFields.forEach(field => {
+      const control = this.conyugeTab.conyugeForm.get(field);
+      if (control) {
+        control.setErrors(null);
+        control.markAsUntouched();
+        control.disable();
+      }
+    });
+
+    console.log('Estado de omisión aplicado para Cónyuge');
   }
 }
