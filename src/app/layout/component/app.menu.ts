@@ -47,6 +47,12 @@ export class AppMenu {
                     }
                 ]
             },
+            {
+                label: 'Administración',
+                items: [
+                    { label: 'Usuarios', icon: 'pi pi-users', routerLink: ['/usuarios'] }
+                ]
+            },
 
         ];
     }

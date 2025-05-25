@@ -1,0 +1,126 @@
+<p-dialog 
+    [visible]="visible"
+    (visibleChange)="onHide()"
+    [style]="{width: '450px'}" 
+    [header]="dialogHeader" 
+    [modal]="true" 
+    class="p-fluid">
+    
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="nombre">Nombre *</label>
+            <input 
+                type="text" 
+                pInputText 
+                id="nombre" 
+                [(ngModel)]="formUsuario.nombre" 
+                required 
+                autofocus 
+                [ngClass]="{'ng-invalid ng-dirty' : submitted && !formUsuario.nombre}" />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !formUsuario.nombre">
+                El nombre es requerido.
+            </small>
+        </div>
+
+        <div class="field">
+            <label for="apellidos">Apellidos *</label>
+            <input 
+                type="text" 
+                pInputText 
+                id="apellidos" 
+                [(ngModel)]="formUsuario.apellidos" 
+                required 
+                [ngClass]="{'ng-invalid ng-dirty' : submitted && !formUsuario.apellidos}" />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !formUsuario.apellidos">
+                Los apellidos son requeridos.
+            </small>
+        </div>
+
+        <div class="field">
+            <label for="email">Email *</label>
+            <input 
+                type="email" 
+                pInputText 
+                id="email" 
+                [(ngModel)]="formUsuario.email" 
+                required 
+                [ngClass]="{'ng-invalid ng-dirty' : submitted && !formUsuario.email}" />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !formUsuario.email">
+                El email es requerido.
+            </small>
+        </div>
+
+        <div class="field">
+            <label for="username">Usuario *</label>
+            <input 
+                type="text" 
+                pInputText 
+                id="username" 
+                [(ngModel)]="formUsuario.username" 
+                required 
+                [ngClass]="{'ng-invalid ng-dirty' : submitted && !formUsuario.username}" />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !formUsuario.username">
+                El nombre de usuario es requerido.
+            </small>
+        </div>
+
+        <div class="field">
+            <label for="rol">Rol *</label>
+            <p-dropdown 
+                [options]="roles" 
+                [(ngModel)]="formUsuario.rol" 
+                optionLabel="label" 
+                optionValue="value" 
+                placeholder="Seleccione un rol"
+                [ngClass]="{'ng-invalid ng-dirty' : submitted && !formUsuario.rol}">
+            </p-dropdown>
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !formUsuario.rol">
+                El rol es requerido.
+            </small>
+        </div>
+
+        <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input 
+                type="text" 
+                pInputText 
+                id="telefono" 
+                [(ngModel)]="formUsuario.telefono" 
+                placeholder="Ingrese el teléfono" />
+        </div>
+
+        <div class="field">
+            <label for="dni">DNI</label>
+            <input 
+                type="text" 
+                pInputText 
+                id="dni" 
+                [(ngModel)]="formUsuario.dni" 
+                placeholder="Ingrese el DNI" />
+        </div>
+
+        <div class="field">
+            <label for="activo">Estado</label>
+            <p-toggleButton 
+                [(ngModel)]="formUsuario.activo" 
+                onLabel="Activo" 
+                offLabel="Inactivo" 
+                onIcon="pi pi-check" 
+                offIcon="pi pi-times">
+            </p-toggleButton>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <p-button 
+            label="Cancelar" 
+            icon="pi pi-times" 
+            [text]="true" 
+            (click)="onCancel()" />
+        <p-button 
+            [label]="saveButtonLabel" 
+            icon="pi pi-check" 
+            [text]="true" 
+            (click)="onSave()" />
+    </ng-template>
+</p-dialog>

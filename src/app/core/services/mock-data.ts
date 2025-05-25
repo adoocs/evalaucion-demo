@@ -18,6 +18,7 @@ import { ReferenciaFamiliar } from "../domain/referencia-familiar.model";
 import { RegistroVentas } from "../domain/registro-ventas.model";
 import { Solicitud } from "../domain/solicitud.model";
 import { Aportante } from "../domain/aportante.model";
+import { Usuario } from "../domain/usuario.model";
 import { FamiliaMiembros } from "../domain/familia-miembros.model";
 
 // Datos de ejemplo para TipoVivienda
@@ -437,4 +438,58 @@ export const SOLICITUDES: Solicitud[] = [
   }
 ];
 
-
+// Datos de ejemplo para Usuario
+export const USUARIOS: Usuario[] = [
+  {
+    id: 1,
+    nombre: 'Juan Carlos',
+    apellidos: 'Pérez López',
+    email: 'admin@empresa.com',
+    username: 'admin',
+    rol: 'admin',
+    activo: true,
+    fecha_creacion: '2023-01-15',
+    ultimo_acceso: '2024-01-15',
+    telefono: '987654321',
+    dni: '12345678'
+  },
+  {
+    id: 2,
+    nombre: 'María Elena',
+    apellidos: 'Gómez Rodríguez',
+    email: 'supervisor@empresa.com',
+    username: 'supervisor',
+    rol: 'supervisor',
+    activo: true,
+    fecha_creacion: '2023-02-20',
+    ultimo_acceso: '2024-01-14',
+    telefono: '912345678',
+    dni: '87654321'
+  },
+  {
+    id: 3,
+    nombre: 'Roberto',
+    apellidos: 'Martínez Sánchez',
+    email: 'usuario@empresa.com',
+    username: 'usuario',
+    rol: 'usuario',
+    activo: true,
+    fecha_creacion: '2023-03-10',
+    ultimo_acceso: '2024-01-13',
+    telefono: '945678123',
+    dni: '23456789'
+  },
+  {
+    id: 4,
+    nombre: 'Ana María',
+    apellidos: 'Torres Vega',
+    email: 'ana.torres@empresa.com',
+    username: 'atorres',
+    rol: 'usuario',
+    activo: false,
+    fecha_creacion: '2023-04-05',
+    ultimo_acceso: '2023-12-20',
+    telefono: '956781234',
+    dni: '34567890'
+  }
+];

@@ -21,6 +21,7 @@ import { Negocio } from '../domain/negocio.model';
 import { ReferenciaFamiliar } from '../domain/referencia-familiar.model';
 import { RegistroVentas } from '../domain/registro-ventas.model';
 import { Solicitud } from '../domain/solicitud.model';
+import { Usuario } from '../domain/usuario.model';
 
 import {
   TIPO_VIVIENDAS,
@@ -43,7 +44,8 @@ import {
   REGISTROS_VENTAS,
   SOLICITUDES,
   APORTANTES,
-  FAMILIA_MIEMBROS
+  FAMILIA_MIEMBROS,
+  USUARIOS
 } from './mock-data';
 
 @Injectable({ providedIn: 'root' })
@@ -190,5 +192,12 @@ export class LocalRegistroVentasService extends LocalDataService<RegistroVentas>
 export class LocalSolicitudService extends LocalDataService<Solicitud> {
   protected override getInitialData(): Solicitud[] {
     return SOLICITUDES;
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class LocalUsuarioService extends LocalDataService<Usuario> {
+  protected override getInitialData(): Usuario[] {
+    return USUARIOS;
   }
 }

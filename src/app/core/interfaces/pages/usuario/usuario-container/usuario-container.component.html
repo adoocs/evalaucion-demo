@@ -1,0 +1,32 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+
+            <!-- Componente de lista de usuarios -->
+            <app-usuario-list
+                [usuarios]="usuarios()"
+                [selectedUsuarios]="selectedUsuarios"
+                [globalFilter]="globalFilter"
+                (selectedUsuariosChange)="onSelectedUsuariosChange($event)"
+                (newUsuario)="onNewUsuario()"
+                (editUsuario)="onEditUsuario($event)"
+                (deleteUsuario)="onDeleteUsuario($event)"
+                (deleteSelectedUsuarios)="onDeleteSelectedUsuarios()"
+                (globalFilterChange)="onGlobalFilterChange($event)">
+            </app-usuario-list>
+
+            <!-- Componente de formulario de usuario -->
+            <app-usuario-form
+                [visible]="usuarioDialog"
+                [usuario]="selectedUsuario"
+                [isEdit]="isEdit"
+                (visibleChange)="onDialogHide()"
+                (save)="onSaveUsuario($event)"
+                (cancel)="onCancelForm()">
+            </app-usuario-form>
+        </div>
+
+        <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+    </div>
+</div>

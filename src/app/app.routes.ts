@@ -10,6 +10,7 @@ import { ActividadEconomicaListComponent } from './core/interfaces/pages/activid
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { SolicitudContainerComponent } from './core/interfaces/pages/solicitud/solicitud-container/solicitud-container.component';
 import { SolicitudCrearComponent } from './core/interfaces/pages/solicitud/solicitud-crear/solicitud-crear.component';
+import { UsuarioContainerComponent } from './core/interfaces/pages/usuario/usuario-container/usuario-container.component';
 
 export const routes: Routes = [
   {
@@ -31,6 +32,7 @@ export const routes: Routes = [
       { path: 'periodos', component: PeriodoListComponent },
       { path: 'solicitudes', component: SolicitudContainerComponent },
       { path: 'solicitudes/crear', component: SolicitudCrearComponent },
+      { path: 'usuarios', component: UsuarioContainerComponent },
       { path: 'account', loadChildren: () => import('./auth/account/account.routes') } ,
     ]
   },

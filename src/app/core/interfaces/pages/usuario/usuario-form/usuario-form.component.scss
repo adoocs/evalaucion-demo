@@ -1,0 +1,38 @@
+:host ::ng-deep .p-dialog .p-dialog-header {
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+    padding: 2rem;
+}
+
+.field {
+    margin-bottom: 1rem;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.ng-invalid.ng-dirty {
+    border-color: var(--red-500) !important;
+}
+
+small.ng-dirty.ng-invalid {
+    color: var(--red-500);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+:host ::ng-deep .p-togglebutton {
+    width: 100%;
+}
+
+:host ::ng-deep .p-dropdown {
+    width: 100%;
+}
