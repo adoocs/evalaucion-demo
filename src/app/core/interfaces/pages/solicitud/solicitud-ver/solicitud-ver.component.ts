@@ -97,6 +97,8 @@ export class SolicitudVerComponent implements OnInit {
    */
   getEstadoIcon(estado: string): string {
     switch (estado) {
+      case 'pendiente':
+        return 'pi pi-clock';
       case 'aprobado':
         return 'pi pi-check-circle';
       case 'observado':
@@ -115,6 +117,8 @@ export class SolicitudVerComponent implements OnInit {
    */
   getEstadoColor(estado: string): string {
     switch (estado) {
+      case 'pendiente':
+        return '#3b82f6'; // Azul
       case 'aprobado':
         return '#22c55e'; // Verde
       case 'observado':
@@ -133,6 +137,8 @@ export class SolicitudVerComponent implements OnInit {
    */
   getEstadoLabel(estado: string): string {
     switch (estado) {
+      case 'pendiente':
+        return 'Pendiente';
       case 'aprobado':
         return 'Aprobado';
       case 'observado':

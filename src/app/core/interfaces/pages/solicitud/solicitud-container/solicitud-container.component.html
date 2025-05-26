@@ -53,25 +53,24 @@
             <td>{{solicitud.monto | currency:'S/ '}}</td>
             <td>{{solicitud.plazo}}</td>
             <td>
-                <div class="flex items-center gap-2">
-                    <!-- Badge actual del estado -->
-                    <div
+                <div class="flex align-items-center gap-2">
+                    <!-- Tag de PrimeNG para el estado -->
+                    <p-tag
                         *ngIf="solicitud.v_gerencia"
-                        class="estado-badge"
-                        [ngClass]="getEstadoBadgeClass(solicitud.v_gerencia)"
-                    >
-                        <i [class]="getEstadoIcon(solicitud.v_gerencia)" class="mr-1"></i>
-                        {{ getEstadoLabel(solicitud.v_gerencia) }}
-                    </div>
+                        [value]="getEstadoLabel(solicitud.v_gerencia)"
+                        [severity]="getEstadoSeverity(solicitud.v_gerencia)"
+                        [icon]="getEstadoIcon(solicitud.v_gerencia)"
+                        [rounded]="true"
+                    />
 
-                    <!-- Badge sin estado -->
-                    <div
+                    <!-- Tag sin estado -->
+                    <p-tag
                         *ngIf="!solicitud.v_gerencia"
-                        class="estado-badge estado-sin-estado"
-                    >
-                        <i class="pi pi-question-circle mr-1"></i>
-                        Sin estado
-                    </div>
+                        value="Sin estado"
+                        severity="secondary"
+                        icon="pi pi-question-circle"
+                        [rounded]="true"
+                    />
 
                     <!-- Botón para cambiar estado -->
                     <p-button

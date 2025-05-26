@@ -18,6 +18,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
 import { LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { Solicitud } from '../../../../domain/solicitud.model';
@@ -42,6 +43,7 @@ import { Solicitud } from '../../../../domain/solicitud.model';
     ToggleSwitchModule,
     OverlayPanelModule,
     TooltipModule,
+    TagModule,
     SolicitudPanelComponent
   ],
   providers: [MessageService, MessageToastService, ConfirmationService],
@@ -57,6 +59,7 @@ export class SolicitudContainerComponent implements OnInit {
 
   // Estados para V° Gerencia
   estadosVBGerencia = [
+    { label: 'Pendiente', value: 'pendiente' },
     { label: 'Aprobado', value: 'aprobado' },
     { label: 'Observado', value: 'observado' },
     { label: 'Denegado', value: 'denegado' }
@@ -177,6 +180,8 @@ export class SolicitudContainerComponent implements OnInit {
    */
   getEstadoIcon(estado: string): string {
     switch (estado) {
+      case 'pendiente':
+        return 'pi pi-clock';
       case 'aprobado':
         return 'pi pi-check-circle';
       case 'observado':
@@ -195,6 +200,8 @@ export class SolicitudContainerComponent implements OnInit {
    */
   getEstadoColor(estado: string): string {
     switch (estado) {
+      case 'pendiente':
+        return '#3b82f6'; // Azul
       case 'aprobado':
         return '#22c55e'; // Verde
       case 'observado':
@@ -217,20 +224,22 @@ export class SolicitudContainerComponent implements OnInit {
   }
 
   /**
-   * Obtiene la clase CSS para el badge del estado
+   * Obtiene la severidad de PrimeNG para el estado
    * @param estado El estado de V° Gerencia
-   * @returns La clase CSS del badge
+   * @returns La severidad para p-tag
    */
-  getEstadoBadgeClass(estado: string): string {
+  getEstadoSeverity(estado: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
     switch (estado) {
+      case 'pendiente':
+        return 'info';      // Azul
       case 'aprobado':
-        return 'estado-aprobado';
+        return 'success';   // Verde
       case 'observado':
-        return 'estado-observado';
+        return 'warn';      // Amarillo
       case 'denegado':
-        return 'estado-denegado';
+        return 'danger';    // Rojo
       default:
-        return 'estado-sin-estado';
+        return 'secondary'; // Gris
     }
   }
 

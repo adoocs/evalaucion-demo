@@ -455,6 +455,17 @@ export const SOLICITUDES: Solicitud[] = [
     puntaje_sentinel: 450,
     cliente: 'Roberto Martínez Sánchez',
     periodo: PERIODOS[0]
+  },
+  {
+    id: 4,
+    n_credito: 10004,
+    fecha: '2023-12-15',
+    monto: 7500,
+    plazo: '18 meses',
+    v_gerencia: 'pendiente', // Estado pendiente
+    puntaje_sentinel: 680,
+    cliente: 'Ana María Torres Vega',
+    periodo: PERIODOS[1]
   }
 ];
 
