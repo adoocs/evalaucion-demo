@@ -16,6 +16,8 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TooltipModule } from 'primeng/tooltip';
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
 import { LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { Solicitud } from '../../../../domain/solicitud.model';
@@ -38,6 +40,8 @@ import { Solicitud } from '../../../../domain/solicitud.model';
     IconFieldModule,
     ConfirmDialogModule,
     ToggleSwitchModule,
+    OverlayPanelModule,
+    TooltipModule,
     SolicitudPanelComponent
   ],
   providers: [MessageService, MessageToastService, ConfirmationService],
@@ -50,6 +54,18 @@ export class SolicitudContainerComponent implements OnInit {
   selectedSolicitud: Solicitud | null = null;
   displaySolicitudDialog: boolean = false;
   loading: boolean = true;
+
+  // Estados para V° Gerencia
+  estadosVBGerencia = [
+    { label: 'Aprobado', value: 'aprobado' },
+    { label: 'Observado', value: 'observado' },
+    { label: 'Denegado', value: 'denegado' }
+  ];
+
+  // Propiedades para el diálogo de evaluación
+  mostrarDialogoEvaluacion: boolean = false;
+  solicitudSeleccionadaEvaluacion: Solicitud | null = null;
+  tipoEvaluacionSeleccionado: string | null = null;
 
   constructor(
     private solicitudService: LocalSolicitudService,
@@ -101,12 +117,12 @@ export class SolicitudContainerComponent implements OnInit {
   }
 
   /**
-   * Muestra los detalles de una solicitud
+   * Muestra los detalles de una solicitud en modo solo lectura
    * @param solicitud La solicitud a mostrar
    */
   viewSolicitud(solicitud: Solicitud): void {
-    this.selectedSolicitud = { ...solicitud };
-    this.displaySolicitudDialog = true;
+    // Navegar al componente de visualización en lugar de abrir un diálogo
+    this.router.navigate(['/solicitudes/ver', solicitud.id]);
   }
 
   hideDialog(): void {
@@ -137,5 +153,194 @@ export class SolicitudContainerComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  /**
+   * Maneja el cambio de estado de V° Gerencia
+   * @param solicitud La solicitud que se está modificando
+   * @param event El evento del cambio
+   */
+  onVBGerenciaChange(solicitud: Solicitud, event: any): void {
+    console.log('Cambio de V° Gerencia:', solicitud.n_credito, 'Nuevo estado:', event.value);
+
+    // Aquí podrías agregar lógica para guardar el cambio en la base de datos
+    this.messageService.infoMessageToast(
+      'Estado actualizado',
+      `V° Gerencia de la solicitud ${solicitud.n_credito} cambió a: ${this.getEstadoLabel(event.value)}`
+    );
+  }
+
+  /**
+   * Obtiene el icono correspondiente al estado
+   * @param estado El estado de V° Gerencia
+   * @returns La clase del icono
+   */
+  getEstadoIcon(estado: string): string {
+    switch (estado) {
+      case 'aprobado':
+        return 'pi pi-check-circle';
+      case 'observado':
+        return 'pi pi-exclamation-triangle';
+      case 'denegado':
+        return 'pi pi-times-circle';
+      default:
+        return 'pi pi-question-circle';
+    }
+  }
+
+  /**
+   * Obtiene el color correspondiente al estado
+   * @param estado El estado de V° Gerencia
+   * @returns El color en formato CSS
+   */
+  getEstadoColor(estado: string): string {
+    switch (estado) {
+      case 'aprobado':
+        return '#22c55e'; // Verde
+      case 'observado':
+        return '#f59e0b'; // Amarillo/Naranja
+      case 'denegado':
+        return '#ef4444'; // Rojo
+      default:
+        return '#6b7280'; // Gris
+    }
+  }
+
+  /**
+   * Obtiene la etiqueta correspondiente al estado
+   * @param estado El estado de V° Gerencia
+   * @returns La etiqueta del estado
+   */
+  getEstadoLabel(estado: string): string {
+    const estadoObj = this.estadosVBGerencia.find(e => e.value === estado);
+    return estadoObj ? estadoObj.label : 'Desconocido';
+  }
+
+  /**
+   * Obtiene la clase CSS para el badge del estado
+   * @param estado El estado de V° Gerencia
+   * @returns La clase CSS del badge
+   */
+  getEstadoBadgeClass(estado: string): string {
+    switch (estado) {
+      case 'aprobado':
+        return 'estado-aprobado';
+      case 'observado':
+        return 'estado-observado';
+      case 'denegado':
+        return 'estado-denegado';
+      default:
+        return 'estado-sin-estado';
+    }
+  }
+
+  /**
+   * Variable para controlar qué solicitud tiene el menú abierto
+   */
+  solicitudMenuAbierto: Solicitud | null = null;
+
+  /**
+   * Cambia el estado de una solicitud
+   * @param solicitud La solicitud a modificar
+   * @param nuevoEstado El nuevo estado
+   * @param overlayPanel El panel overlay a cerrar
+   */
+  cambiarEstado(solicitud: Solicitud, nuevoEstado: string, overlayPanel: any): void {
+    if (!solicitud) {
+      console.error('No hay solicitud seleccionada');
+      return;
+    }
+
+    const estadoAnterior = solicitud.v_gerencia || 'sin estado';
+    solicitud.v_gerencia = nuevoEstado;
+
+    // Cerrar el overlay panel
+    overlayPanel.hide();
+    this.solicitudMenuAbierto = null;
+
+    // Mostrar notificación
+    const estadoAnteriorLabel = estadoAnterior === 'sin estado' ? 'Sin estado' : this.getEstadoLabel(estadoAnterior);
+    const nuevoEstadoLabel = this.getEstadoLabel(nuevoEstado);
+
+    this.messageService.successMessageToast(
+      'Estado actualizado',
+      `V° Gerencia de la solicitud ${solicitud.n_credito} cambió de "${estadoAnteriorLabel}" a "${nuevoEstadoLabel}"`
+    );
+
+    console.log('Estado cambiado:', {
+      solicitud: solicitud.n_credito,
+      estadoAnterior,
+      nuevoEstado
+    });
+  }
+
+  /**
+   * Abre el diálogo para seleccionar tipo de evaluación
+   * @param solicitud La solicitud para la cual aplicar evaluación
+   */
+  abrirDialogoEvaluacion(solicitud: Solicitud): void {
+    this.solicitudSeleccionadaEvaluacion = solicitud;
+    this.tipoEvaluacionSeleccionado = null; // Resetear selección
+    this.mostrarDialogoEvaluacion = true;
+
+    console.log('Abriendo diálogo de evaluación para solicitud:', solicitud.n_credito);
+  }
+
+  /**
+   * Cierra el diálogo de evaluación
+   */
+  cerrarDialogoEvaluacion(): void {
+    this.mostrarDialogoEvaluacion = false;
+    this.solicitudSeleccionadaEvaluacion = null;
+    this.tipoEvaluacionSeleccionado = null;
+
+    console.log('Diálogo de evaluación cerrado');
+  }
+
+  /**
+   * Selecciona un tipo de evaluación
+   * @param tipo El tipo de evaluación seleccionado
+   */
+  seleccionarTipoEvaluacion(tipo: string): void {
+    this.tipoEvaluacionSeleccionado = tipo;
+
+    console.log('Tipo de evaluación seleccionado:', tipo);
+  }
+
+  /**
+   * Aplica la evaluación seleccionada
+   */
+  aplicarEvaluacion(): void {
+    if (!this.solicitudSeleccionadaEvaluacion || !this.tipoEvaluacionSeleccionado) {
+      this.messageService.warnMessageToast('Advertencia', 'Debe seleccionar un tipo de evaluación');
+      return;
+    }
+
+    const solicitud = this.solicitudSeleccionadaEvaluacion;
+    const tipoEvaluacion = this.tipoEvaluacionSeleccionado;
+
+    // Cerrar el diálogo
+    this.cerrarDialogoEvaluacion();
+
+    // Mostrar mensaje de confirmación
+    const tipoLabel = tipoEvaluacion === 'consumo' ? 'Evaluación Consumo' : 'Evaluación Micro';
+    this.messageService.successMessageToast(
+      'Evaluación Iniciada',
+      `Se ha iniciado la ${tipoLabel} para la solicitud ${solicitud.n_credito}`
+    );
+
+    // Simular navegación a la pestaña de evaluación (por ahora solo log)
+    console.log(`Navegando a ${tipoLabel} para solicitud ${solicitud.n_credito}`);
+
+    // TODO: Aquí se implementará la navegación a la pestaña correspondiente
+    // Ejemplo: this.router.navigate(['/evaluacion', tipoEvaluacion, solicitud.id]);
+
+    // Por ahora, mostrar un mensaje informativo
+    setTimeout(() => {
+      this.messageService.infoMessageToast(
+        'Próximamente',
+        `La pestaña de ${tipoLabel} estará disponible próximamente`
+      );
+    }, 1500);
   }
 }

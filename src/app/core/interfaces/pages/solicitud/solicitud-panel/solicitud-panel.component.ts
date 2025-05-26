@@ -83,6 +83,8 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   @Input() solicitud: Solicitud = this.createEmptySolicitud();
   @Input() fichaTrabajo: FichaTrabajo | null = null;
   @Input() modoEdicion: boolean = false;
+  @Input() modoVisualizacion: boolean = false; // Nuevo: modo solo lectura
+  @Input() iniciarEnResumen: boolean = false; // Nuevo: iniciar en tab de resumen
 
   @Output() switchMessage = new EventEmitter<string>();
 
@@ -147,8 +149,14 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       this.fichaTrabajoInternal = this.createEmptyFichaTrabajo();
     }
 
-    // Mostrar mensaje de bienvenida solo si no estamos en modo edición
-    if (!this.modoEdicion) {
+    // Si estamos en modo visualización, iniciar en el tab de resumen
+    if (this.modoVisualizacion && this.iniciarEnResumen) {
+      this.activeIndex = 10; // Tab de resumen (índice 10)
+      console.log('Modo visualización - Iniciando en tab de resumen');
+    }
+
+    // Mostrar mensaje de bienvenida solo si no estamos en modo edición ni visualización
+    if (!this.modoEdicion && !this.modoVisualizacion) {
       setTimeout(() => {
         this.messageService.infoMessageToast(
           'Versión Demo',
@@ -157,10 +165,10 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       }, 1000);
     }
 
-    // Si tenemos una solicitud existente y estamos en modo edición, cargar los datos
-    if (this.modoEdicion && this.solicitud && this.solicitud.id) {
-      console.log('Modo edición - Cargando solicitud existente:', this.solicitud);
-      console.log('Modo edición - Cargando ficha de trabajo:', this.fichaTrabajoInternal);
+    // Si tenemos una solicitud existente y estamos en modo edición o visualización, cargar los datos
+    if ((this.modoEdicion || this.modoVisualizacion) && this.solicitud && this.solicitud.id) {
+      console.log('Modo edición/visualización - Cargando solicitud existente:', this.solicitud);
+      console.log('Modo edición/visualización - Cargando ficha de trabajo:', this.fichaTrabajoInternal);
 
       // Cargar los datos en los formularios después de que se inicialicen
       setTimeout(() => {
@@ -201,11 +209,12 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
    * @param tabIndex Índice del tab al que se navega
    */
   private cargarDatosEnTab(tabIndex: number): void {
-    if (!this.modoEdicion || !this.fichaTrabajoInternal) {
+    // Funcionar tanto en modo edición como visualización
+    if ((!this.modoEdicion && !this.modoVisualizacion) || !this.fichaTrabajoInternal) {
       return;
     }
 
-    console.log(`Cargando datos para tab ${tabIndex}`);
+    console.log(`Cargando datos para tab ${tabIndex} (modo: ${this.modoEdicion ? 'edición' : 'visualización'})`);
 
     try {
       switch (tabIndex) {
@@ -776,7 +785,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       fecha: '',
       monto: 0,
       plazo: '',
-      v_gerencia: false,
+      v_gerencia: '', // Cambiar de false a string vacío
       puntaje_sentinel: 0,
     };
   }
@@ -806,15 +815,21 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
    */
   onTabChange(index: any): void {
     console.log('Pestaña cambiada a:', index);
+    this.activeIndex = Number(index);
 
-    // Si estamos en modo edición, cargar los datos correspondientes al tab
-    if (this.modoEdicion && this.fichaTrabajoInternal) {
-      this.cargarDatosEnTab(Number(index));
+    // Si estamos en modo edición o visualización, cargar los datos correspondientes al tab
+    if ((this.modoEdicion || this.modoVisualizacion) && this.fichaTrabajoInternal) {
+      // Usar un timeout para asegurar que el componente esté renderizado
+      setTimeout(() => {
+        this.cargarDatosEnTab(Number(index));
+      }, 100);
     }
 
     // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo
     if (Number(index) === 10) {
-      this.actualizarFichaTrabajo();
+      if (!this.modoVisualizacion) {
+        this.actualizarFichaTrabajo();
+      }
       console.log('Navegando al resumen - datos actualizados');
     }
   }

@@ -11,6 +11,7 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 import { SolicitudContainerComponent } from './core/interfaces/pages/solicitud/solicitud-container/solicitud-container.component';
 import { SolicitudCrearComponent } from './core/interfaces/pages/solicitud/solicitud-crear/solicitud-crear.component';
 import { SolicitudEditarComponent } from './core/interfaces/pages/solicitud/solicitud-editar/solicitud-editar.component';
+import { SolicitudVerComponent } from './core/interfaces/pages/solicitud/solicitud-ver/solicitud-ver.component';
 import { UsuarioContainerComponent } from './core/interfaces/pages/usuario/usuario-container/usuario-container.component';
 
 export const routes: Routes = [
@@ -34,6 +35,7 @@ export const routes: Routes = [
       { path: 'solicitudes', component: SolicitudContainerComponent },
       { path: 'solicitudes/crear', component: SolicitudCrearComponent },
       { path: 'solicitudes/editar/:id', component: SolicitudEditarComponent },
+      { path: 'solicitudes/ver/:id', component: SolicitudVerComponent },
       { path: 'usuarios', component: UsuarioContainerComponent },
       { path: 'account', loadChildren: () => import('./auth/account/account.routes') } ,
     ]

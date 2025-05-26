@@ -59,7 +59,7 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   @Input() display: boolean = false;
   @Output() closedDialog = new EventEmitter<boolean>();
   @Output() montoChange = new EventEmitter<number>();
-  @Input() solicitud: Solicitud = { id: 0, n_credito: 0, fecha: '', monto: 0, plazo: '', v_gerencia: false, puntaje_sentinel: 0 };
+  @Input() solicitud: Solicitud = { id: 0, n_credito: 0, fecha: '', monto: 0, plazo: '', v_gerencia: '', puntaje_sentinel: 0 };
   @Input() title = '';
   @Input() editabled: boolean = false;
 
@@ -106,7 +106,20 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   }
 
   updateFormValues() {
+    console.log('=== ACTUALIZANDO FORMULARIO DE SOLICITUD ===');
+    console.log('Solicitud recibida:', this.solicitud);
+
     if (this.solicitud) {
+      // Buscar el periodo completo si existe
+      let periodoCompleto = null;
+      if (this.solicitud.periodo) {
+        periodoCompleto = this.periodosList().find(p =>
+          p.id === this.solicitud.periodo?.id ||
+          p.descripcion === this.solicitud.periodo?.descripcion
+        );
+        console.log('Periodo encontrado:', periodoCompleto);
+      }
+
       this.solicitudForm.patchValue({
         id: this.solicitud.id,
         n_credito: this.solicitud.n_credito,
@@ -118,12 +131,17 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
         cliente: this.solicitud.cliente,
         aval: this.solicitud.aval,
         conyugue: this.solicitud.conyugue,
+        periodo: periodoCompleto, // Usar el objeto completo del periodo
         gasto_financiero: this.solicitud.gasto_financiero?.id,
         credito_anterior: this.solicitud.credito_anterior?.id,
         referencia_familiar: this.solicitud.referencia_familiar?.id,
         ingreso_adicional: this.solicitud.ingreso_adicional?.id,
         negocio: this.solicitud.negocio?.id,
       });
+
+      console.log('✅ Formulario de solicitud actualizado');
+      console.log('Fecha cargada:', this.solicitud.fecha);
+      console.log('Periodo cargado:', periodoCompleto);
     }
   }
 

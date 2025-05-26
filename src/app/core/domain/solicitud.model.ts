@@ -11,7 +11,7 @@ export interface Solicitud {
     fecha: string,
     monto: number,
     plazo: string,
-    v_gerencia: boolean,
+    v_gerencia: string, // Cambiar de boolean a string para soportar: 'aprobado', 'observado', 'denegado'
     puntaje_sentinel: number,
     cliente?: string,
     aval?: string,

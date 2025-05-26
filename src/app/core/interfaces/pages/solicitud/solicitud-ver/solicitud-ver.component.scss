@@ -1,0 +1,69 @@
+/* Estilos para el componente de visualización de solicitud */
+
+.solicitud-ver-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Estilos para el header */
+.header-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+/* Estilos para la información básica */
+.info-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Estilos para el modo solo lectura */
+:host ::ng-deep {
+  /* Deshabilitar todos los inputs en modo visualización */
+  .p-inputtext:disabled,
+  .p-select:disabled,
+  .p-inputnumber:disabled,
+  .p-calendar:disabled {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+  }
+  
+  /* Ocultar botones de acción en modo visualización */
+  .modo-visualizacion {
+    .p-button:not(.nav-button) {
+      display: none !important;
+    }
+    
+    .p-tabview-nav-link {
+      pointer-events: none;
+    }
+  }
+  
+  /* Estilos para el resumen en modo visualización */
+  .resumen-visualizacion {
+    .p-panel-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .p-panel-content {
+      padding: 1rem;
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .solicitud-ver-container {
+    padding: 0.5rem;
+  }
+  
+  .header-section {
+    padding: 1rem;
+  }
+}

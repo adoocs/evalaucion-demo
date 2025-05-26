@@ -53,15 +53,96 @@
             <td>{{solicitud.monto | currency:'S/ '}}</td>
             <td>{{solicitud.plazo}}</td>
             <td>
-                <p-toggleswitch [(ngModel)]="solicitud.v_gerencia">
-                    <ng-template pTemplate="handle" let-checked="checked">
-                        <i [ngClass]="['!text-xs', 'pi', checked ? 'pi-check' : 'pi-times']"></i>
-                    </ng-template>
-                </p-toggleswitch>
+                <div class="flex items-center gap-2">
+                    <!-- Badge actual del estado -->
+                    <div
+                        *ngIf="solicitud.v_gerencia"
+                        class="estado-badge"
+                        [ngClass]="getEstadoBadgeClass(solicitud.v_gerencia)"
+                    >
+                        <i [class]="getEstadoIcon(solicitud.v_gerencia)" class="mr-1"></i>
+                        {{ getEstadoLabel(solicitud.v_gerencia) }}
+                    </div>
+
+                    <!-- Badge sin estado -->
+                    <div
+                        *ngIf="!solicitud.v_gerencia"
+                        class="estado-badge estado-sin-estado"
+                    >
+                        <i class="pi pi-question-circle mr-1"></i>
+                        Sin estado
+                    </div>
+
+                    <!-- Botón para cambiar estado -->
+                    <p-button
+                        #estadoButton
+                        icon="pi pi-pencil"
+                        [rounded]="true"
+                        [text]="true"
+                        size="small"
+                        severity="secondary"
+                        (click)="estadoPanel.toggle($event, estadoButton.el.nativeElement); solicitudMenuAbierto = solicitud"
+                        pTooltip="Cambiar estado"
+                        tooltipPosition="top"
+                    />
+                </div>
+
+                <!-- Menu overlay para cambiar estado -->
+                <p-overlayPanel
+                    #estadoPanel
+                    [style]="{'width': '200px'}"
+                >
+                    <div class="estado-menu">
+                        <div class="estado-menu-header">
+                            <h6 class="m-0 font-semibold text-900">Cambiar V° Gerencia</h6>
+                            <p class="m-0 text-sm text-600" *ngIf="solicitudMenuAbierto">
+                                Solicitud N° {{ solicitudMenuAbierto.n_credito }}
+                            </p>
+                        </div>
+                        <div class="estado-opciones">
+                            <div
+                                *ngFor="let estado of estadosVBGerencia"
+                                class="estado-opcion"
+                                [ngClass]="{'selected': solicitudMenuAbierto?.v_gerencia === estado.value}"
+                                (click)="cambiarEstado(solicitudMenuAbierto!, estado.value, estadoPanel)"
+                            >
+                                <i [class]="getEstadoIcon(estado.value)" [style.color]="getEstadoColor(estado.value)"></i>
+                                <span>{{ estado.label }}</span>
+                                <i *ngIf="solicitudMenuAbierto?.v_gerencia === estado.value" class="pi pi-check ml-auto text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </p-overlayPanel>
             </td>
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editSolicitud(solicitud)" />
-                <p-button icon="pi pi-eye" severity="info" [rounded]="true" [outlined]="true" (click)="viewSolicitud(solicitud)" />
+                <div class="flex gap-2">
+                    <p-button
+                        icon="pi pi-pencil"
+                        [rounded]="true"
+                        [outlined]="true"
+                        (click)="editSolicitud(solicitud)"
+                        pTooltip="Editar solicitud"
+                        tooltipPosition="top"
+                    />
+                    <p-button
+                        icon="pi pi-eye"
+                        severity="info"
+                        [rounded]="true"
+                        [outlined]="true"
+                        (click)="viewSolicitud(solicitud)"
+                        pTooltip="Ver solicitud"
+                        tooltipPosition="top"
+                    />
+                    <p-button
+                        icon="pi pi-chart-line"
+                        severity="success"
+                        [rounded]="true"
+                        [outlined]="true"
+                        (click)="abrirDialogoEvaluacion(solicitud)"
+                        pTooltip="Aplicar evaluación"
+                        tooltipPosition="top"
+                    />
+                </div>
             </td>
         </tr>
     </ng-template>
@@ -89,4 +170,108 @@
         (switchMessage)="handleSwitchMessage($event)"
     />
 </p-dialog>
+
+<!-- Diálogo para seleccionar tipo de evaluación -->
+<p-dialog
+    header="Aplicar Evaluación"
+    [(visible)]="mostrarDialogoEvaluacion"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    (onHide)="cerrarDialogoEvaluacion()"
+>
+    <div class="evaluacion-dialog">
+        <!-- Header con información de la solicitud -->
+        <div class="solicitud-info mb-4" *ngIf="solicitudSeleccionadaEvaluacion">
+            <div class="bg-primary-50 p-3 border-round">
+                <h5 class="text-primary m-0 mb-2">
+                    <i class="pi pi-file-edit mr-2"></i>
+                    Solicitud N° {{ solicitudSeleccionadaEvaluacion.n_credito }}
+                </h5>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <span class="text-600">Cliente:</span>
+                        <div class="font-semibold">{{ solicitudSeleccionadaEvaluacion.cliente }}</div>
+                    </div>
+                    <div>
+                        <span class="text-600">Monto:</span>
+                        <div class="font-semibold">{{ solicitudSeleccionadaEvaluacion.monto | currency:'S/ ' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Título de selección -->
+        <h6 class="text-900 mb-3">Seleccione el tipo de evaluación a aplicar:</h6>
+
+        <!-- Opciones de evaluación -->
+        <div class="evaluacion-opciones">
+            <!-- Evaluación Consumo -->
+            <div
+                class="evaluacion-opcion evaluacion-consumo"
+                [ngClass]="{'selected': tipoEvaluacionSeleccionado === 'consumo'}"
+                (click)="seleccionarTipoEvaluacion('consumo')"
+            >
+                <div class="evaluacion-header">
+                    <i class="pi pi-shopping-cart text-2xl"></i>
+                    <div class="evaluacion-info">
+                        <h6 class="m-0 font-bold">Evaluación Consumo</h6>
+                        <p class="m-0 text-sm text-600">Para créditos de consumo personal</p>
+                    </div>
+                    <i *ngIf="tipoEvaluacionSeleccionado === 'consumo'" class="pi pi-check-circle text-xl text-primary"></i>
+                </div>
+                <div class="evaluacion-descripcion">
+                    <ul class="text-sm text-700 m-0 pl-4">
+                        <li>Análisis de capacidad de pago</li>
+                        <li>Evaluación de ingresos familiares</li>
+                        <li>Historial crediticio personal</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Evaluación Micro -->
+            <div
+                class="evaluacion-opcion evaluacion-micro"
+                [ngClass]="{'selected': tipoEvaluacionSeleccionado === 'micro'}"
+                (click)="seleccionarTipoEvaluacion('micro')"
+            >
+                <div class="evaluacion-header">
+                    <i class="pi pi-building text-2xl"></i>
+                    <div class="evaluacion-info">
+                        <h6 class="m-0 font-bold">Evaluación Micro</h6>
+                        <p class="m-0 text-sm text-600">Para microempresas y negocios</p>
+                    </div>
+                    <i *ngIf="tipoEvaluacionSeleccionado === 'micro'" class="pi pi-check-circle text-xl text-primary"></i>
+                </div>
+                <div class="evaluacion-descripcion">
+                    <ul class="text-sm text-700 m-0 pl-4">
+                        <li>Análisis del flujo de caja del negocio</li>
+                        <li>Evaluación de la actividad económica</li>
+                        <li>Capacidad de generación de ingresos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex justify-end gap-3 mt-4">
+            <p-button
+                label="Cancelar"
+                severity="secondary"
+                [outlined]="true"
+                (click)="cerrarDialogoEvaluacion()"
+            />
+            <p-button
+                label="Aplicar Evaluación"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                [disabled]="!tipoEvaluacionSeleccionado"
+                (click)="aplicarEvaluacion()"
+            />
+        </div>
+    </div>
+</p-dialog>
+
 <p-confirmdialog [style]="{ width: '450px' }" />

@@ -148,13 +148,13 @@ export const CLIENTES: Cliente[] = [
     nombres: 'Juan Carlos',
     dni: '12345678',
     fecha_born: '1985-05-15',
-    estado_civil: 'Casado',
+    estado_civil: 'casado', // Usar código que coincida con el componente
     edad: 38,
     genero: 'M',
     direccion: 'Av. Principal 123',
     celular: 987654321,
     n_referencial: 123456,
-    grado_instruccion: 'Superior',
+    grado_instruccion: 'universitaria', // Usar código que coincida con el componente
     email: 'juan@example.com',
     tipo_vivienda: TIPO_VIVIENDAS[0]
   },
@@ -164,13 +164,13 @@ export const CLIENTES: Cliente[] = [
     nombres: 'María Elena',
     dni: '87654321',
     fecha_born: '1990-10-20',
-    estado_civil: 'Soltera',
+    estado_civil: 'soltero', // Usar código que coincida con el componente
     edad: 33,
     genero: 'F',
     direccion: 'Jr. Secundaria 456',
     celular: 912345678,
     n_referencial: 654321,
-    grado_instruccion: 'Técnico',
+    grado_instruccion: 'tecnica', // Usar código que coincida con el componente
     email: 'maria@example.com',
     tipo_vivienda: TIPO_VIVIENDAS[1]
   }
@@ -336,11 +336,11 @@ export const INGRESOS_ADICIONALES: IngresoAdicional[] = [
 export const INGRESOS_DEPENDIENTES: IngresoDependiente[] = [
   {
     id: 1,
-    frecuencia: 'Mensual',
+    frecuencia: 'mensual', // Usar código que coincida con el componente
     importe: 2500,
     tiempo_valor: 3,
-    actividad: 'Contador',
-    tiempo: TIEMPOS[0]
+    actividad: 'Empleado público',
+    tiempo: TIEMPOS[1] // Usar años en lugar de meses
   }
 ];
 
@@ -351,7 +351,7 @@ export const REGISTROS_VENTAS: RegistroVentas[] = [
     ventas_normales: 5000,
     ventas_bajas: 3500,
     ventas_altas: 7000,
-    frecuencia: 'Mensual'
+    frecuencia: 'semanal' // Usar código que coincida con el componente
   }
 ];
 
@@ -422,7 +422,7 @@ export const SOLICITUDES: Solicitud[] = [
     fecha: '2023-10-15',
     monto: 10000,
     plazo: '12 meses',
-    v_gerencia: false,
+    v_gerencia: 'aprobado', // Estado aprobado
     puntaje_sentinel: 750,
     cliente: 'Juan Carlos Pérez López',
     aval: 'Roberto Martínez Sánchez',
@@ -440,10 +440,21 @@ export const SOLICITUDES: Solicitud[] = [
     fecha: '2023-11-20',
     monto: 5000,
     plazo: '6 meses',
-    v_gerencia: true,
+    v_gerencia: 'observado', // Estado observado
     puntaje_sentinel: 820,
     cliente: 'María Elena Gómez Rodríguez',
     periodo: PERIODOS[1]
+  },
+  {
+    id: 3,
+    n_credito: 10003,
+    fecha: '2023-12-05',
+    monto: 15000,
+    plazo: '24 meses',
+    v_gerencia: 'denegado', // Estado denegado
+    puntaje_sentinel: 450,
+    cliente: 'Roberto Martínez Sánchez',
+    periodo: PERIODOS[0]
   }
 ];
 

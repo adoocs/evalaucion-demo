@@ -1,5 +1,5 @@
-<div class="card">
-  <div class="flex justify-between w-full">
+<div class="card" [ngClass]="{'modo-visualizacion': modoVisualizacion}">
+  <div class="flex justify-between w-full" *ngIf="!modoVisualizacion">
     <div class="flex gap-4">
       <p-button *ngIf="activeIndex === tabs.length - 1 && !modoEdicion" label="Guardar Solicitud" icon="pi pi-save" severity="success" (click)="createSolicitud()" />
       <p-button *ngIf="activeIndex === tabs.length - 1 && modoEdicion" label="Actualizar Solicitud" icon="pi pi-save" severity="success" (click)="editSolicitud()" />
@@ -10,6 +10,17 @@
       <p-button *ngFor="let tab of tabs; let i = index" (onClick)="canChangeTab(i) ? activeIndex = i : null"
         rounded="true" styleClass="w-8 h-8 p-0" [outlined]="activeIndex !== i" [label]="(i + 1) + ''" />
     </p-iconfield>
+  </div>
+
+  <!-- Header para modo visualización -->
+  <div class="flex justify-between w-full mb-4" *ngIf="modoVisualizacion">
+    <div class="flex items-center">
+      <i class="pi pi-eye text-primary text-2xl mr-3"></i>
+      <h3 class="text-xl font-bold text-900 m-0">Modo Solo Lectura</h3>
+    </div>
+    <div class="flex gap-2">
+      <p-button label="Ver JSON" icon="pi pi-code" severity="info" [outlined]="true" (click)="displayJson = !displayJson" />
+    </div>
   </div>
 
   <p-tabs [(value)]="activeIndex" (valueChange)="onTabChange($event)" class="mt-12" scrollable>
@@ -82,7 +93,7 @@
 
     </p-tabpanels>
   </p-tabs>
-  <div class="flex mt-4 gap-4 justify-between">
+  <div class="flex mt-4 gap-4 justify-between" *ngIf="!modoVisualizacion">
     <p-button label="Atrás" icon="pi pi-arrow-left" text (onClick)="prevTab()" [disabled]="activeIndex === 0" />
     <p-button label="Siguiente" icon="pi pi-arrow-right" text iconPos="right" (onClick)="nextTab()"
       [disabled]="activeIndex === tabs.length - 1" />
