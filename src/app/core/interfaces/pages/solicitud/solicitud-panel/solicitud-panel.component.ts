@@ -805,35 +805,680 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     };
   }
 
+  // MÉTODO DEPRECADO - Ya no se utiliza con la nueva validación automática
+  /*
   prevTab(): void {
     this.activeIndex = Math.max(0, this.activeIndex - 1);
   }
+  */
 
   /**
-   * Maneja el cambio de pestaña
+   * Maneja el cambio de pestaña con validación automática
    * @param index El índice de la pestaña seleccionada
    */
   onTabChange(index: any): void {
-    console.log('Pestaña cambiada a:', index);
-    this.activeIndex = Number(index);
+    const newIndex = Number(index);
+    console.log('🚨🚨🚨 onTabChange EJECUTADO 🚨🚨🚨');
+    console.log('🔄 onTabChange llamado - Intentando cambiar de pestaña a:', newIndex, 'desde:', this.activeIndex);
+    console.log('🔄 Modo visualización:', this.modoVisualizacion);
+    console.log('🔄 Tipo de index recibido:', typeof index, 'valor:', index);
 
-    // Si estamos en modo edición o visualización, cargar los datos correspondientes al tab
-    if ((this.modoEdicion || this.modoVisualizacion) && this.fichaTrabajoInternal) {
-      // Usar un timeout para asegurar que el componente esté renderizado
-      setTimeout(() => {
-        this.cargarDatosEnTab(Number(index));
-      }, 100);
+    // Si estamos en modo visualización, permitir cambio sin validación
+    if (this.modoVisualizacion) {
+      console.log('✅ Modo visualización - permitiendo cambio sin validación');
+      this.activeIndex = newIndex;
+      this.cargarDatosEnTabSiEsNecesario(newIndex);
+      return;
     }
 
-    // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo
-    if (Number(index) === 10) {
-      if (!this.modoVisualizacion) {
-        this.actualizarFichaTrabajo();
+    // Si estamos intentando ir hacia atrás, permitir sin validación
+    if (newIndex < this.activeIndex) {
+      console.log('⬅️ Navegando hacia atrás, permitiendo sin validación');
+      this.activeIndex = newIndex;
+      this.cargarDatosEnTabSiEsNecesario(newIndex);
+      return;
+    }
+
+    // Si estamos intentando ir hacia adelante, validar el tab actual
+    if (newIndex > this.activeIndex) {
+      console.log('➡️ Navegando hacia adelante, validando tab actual:', this.activeIndex);
+
+      // Validar el tab actual antes de permitir el cambio
+      const isValid = this.validateCurrentTab();
+      console.log('🔍 Resultado de validación:', isValid);
+
+      if (isValid) {
+        console.log('✅ Validación exitosa, permitiendo cambio de tab');
+        this.activeIndex = newIndex;
+        this.cargarDatosEnTabSiEsNecesario(newIndex);
+
+        // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo
+        if (newIndex === 10) {
+          this.actualizarFichaTrabajo();
+          console.log('📊 Navegando al resumen - datos actualizados');
+        }
+      } else {
+        console.log('❌ Validación fallida, no se permite el cambio de tab');
+        // No cambiar el activeIndex, mantener en el tab actual
+        // Forzar la actualización del componente p-tabs
+        setTimeout(() => {
+          // Esto forzará que el componente p-tabs se sincronice con el activeIndex actual
+          console.log('🔄 Forzando sincronización del tab actual:', this.activeIndex);
+        }, 0);
       }
-      console.log('Navegando al resumen - datos actualizados');
+    } else {
+      // Si es el mismo tab, no hacer nada
+      console.log('🔄 Mismo tab seleccionado, no se requiere acción');
     }
   }
 
+  /**
+   * Carga datos en el tab si estamos en modo edición o visualización
+   * @param tabIndex Índice del tab
+   */
+  private cargarDatosEnTabSiEsNecesario(tabIndex: number): void {
+    if ((this.modoEdicion || this.modoVisualizacion) && this.fichaTrabajoInternal) {
+      setTimeout(() => {
+        this.cargarDatosEnTab(tabIndex);
+      }, 100);
+    }
+  }
+
+  /**
+   * Valida el tab actual antes de permitir el cambio a otro tab
+   * @returns true si el tab actual es válido, false en caso contrario
+   */
+  private validateCurrentTab(): boolean {
+    console.log('🔍 validateCurrentTab iniciado para tab:', this.activeIndex);
+
+    // Actualizar la ficha de trabajo antes de validar
+    this.actualizarFichaTrabajo();
+
+    let result = false;
+
+    switch (this.activeIndex) {
+      case 0: // Pestaña de Solicitud
+        console.log('🔍 Validando tab de Solicitud (0)');
+        result = this.validateSolicitudTab();
+        break;
+
+      case 1: // Pestaña de Cliente
+        console.log('🔍 Validando tab de Cliente (1)');
+        result = this.validateClienteTab();
+        break;
+
+      case 2: // Pestaña de Aval
+        console.log('🔍 Validando tab de Aval (2)');
+        result = this.validateAvalTab();
+        break;
+
+      case 3: // Pestaña de Cónyuge
+        console.log('🔍 Validando tab de Cónyuge (3)');
+        result = this.validateConyugeTab();
+        break;
+
+      case 4: // Pestaña de Crédito Anterior
+        console.log('🔍 Validando tab de Crédito Anterior (4)');
+        result = this.validateCreditoAnteriorTab();
+        break;
+
+      case 5: // Pestaña de Negocio
+        console.log('🔍 Validando tab de Negocio (5)');
+        result = this.validateNegocioTab();
+        break;
+
+      case 6: // Pestaña de Ingreso Adicional
+        console.log('🔍 Validando tab de Ingreso Adicional (6)');
+        result = this.validateIngresoAdicionalTab();
+        break;
+
+      case 7: // Pestaña de Puntaje Sentinel
+        console.log('🔍 Validando tab de Puntaje Sentinel (7)');
+        result = this.validatePuntajeSentinelTab();
+        break;
+
+      case 8: // Pestaña de Gasto Financiero
+        console.log('🔍 Validando tab de Gasto Financiero (8)');
+        result = this.validateGastoFinancieroTab();
+        break;
+
+      case 9: // Pestaña de Referencia Familiar
+        console.log('🔍 Validando tab de Referencia Familiar (9)');
+        result = this.validateReferenciaFamiliarTab();
+        break;
+
+      case 10: // Pestaña de Resumen
+        console.log('🔍 Tab de Resumen (10) - no requiere validación');
+        result = true; // El resumen no requiere validación
+        break;
+
+      default:
+        console.log('⚠️ Tab no reconocido:', this.activeIndex);
+        result = true;
+        break;
+    }
+
+    console.log('🔍 validateCurrentTab resultado final:', result);
+    return result;
+  }
+
+  /**
+   * Valida el tab de Solicitud
+   */
+  private validateSolicitudTab(): boolean {
+    console.log('📝 validateSolicitudTab iniciado');
+    console.log('📝 solicitudTab existe:', !!this.solicitudTab);
+    console.log('📝 solicitudForm existe:', !!this.solicitudTab?.solicitudForm);
+
+    if (this.solicitudTab?.solicitudForm) {
+      console.log('📝 Validando formulario de Solicitud:', this.solicitudTab.solicitudForm);
+
+      // Lista de campos requeridos
+      const requiredFields = ['monto', 'plazo', 'fecha', 'periodo'];
+      const emptyFields: string[] = [];
+
+      // Verificar que cada campo requerido tenga valor
+      requiredFields.forEach(field => {
+        const control = this.solicitudTab.solicitudForm.get(field);
+        const value = control?.value;
+        console.log(`📝 - ${field}: valor="${value}" (tipo: ${typeof value})`);
+
+        // Verificar si el campo está vacío
+        if (value === null || value === undefined || value === '') {
+          emptyFields.push(field);
+          console.log(`❌ Campo ${field} está vacío`);
+        } else {
+          console.log(`✅ Campo ${field} tiene valor`);
+        }
+      });
+
+      console.log('📝 Campos vacíos encontrados:', emptyFields);
+
+      // Si hay campos vacíos, mostrar mensaje y no permitir avanzar
+      if (emptyFields.length > 0) {
+        console.log('❌ Validación fallida - campos vacíos:', emptyFields);
+        this.messageService.warnMessageToast('Atención', `Complete los siguientes campos en la pestaña de Solicitud: ${emptyFields.join(', ')}`);
+        // Marcar todos los campos como touched para mostrar los errores
+        this.markFormGroupTouched(this.solicitudTab.solicitudForm);
+        return false;
+      }
+
+      // Si todos los campos tienen valor, permitir avanzar
+      console.log('✅ Todos los campos requeridos tienen valor, permitiendo avanzar');
+      return true;
+    } else {
+      console.log('❌ El formulario de Solicitud no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Cliente
+   */
+  private validateClienteTab(): boolean {
+    if (this.clienteTab?.clienteForm) {
+      console.log('Validando formulario de Cliente:', this.clienteTab.clienteForm);
+      console.log('Formulario válido:', this.clienteTab.clienteForm.valid);
+
+      // Mostrar el estado de cada control
+      Object.keys(this.clienteTab.clienteForm.controls).forEach(key => {
+        const control = this.clienteTab.clienteForm.get(key);
+        console.log(`- ${key}: válido=${control?.valid}, valor=${control?.value}, errores=`, control?.errors);
+      });
+
+      // Verificar si el formulario es válido
+      if (!this.clienteTab.clienteForm.valid) {
+        console.log('Verificando si el formulario está realmente completo...');
+        const isReallyComplete = this.isFormReallyComplete(this.clienteTab.clienteForm);
+        console.log('¿El formulario está realmente completo?', isReallyComplete);
+
+        if (!isReallyComplete) {
+          this.messageService.warnMessageToast('Atención', 'Complete todos los campos requeridos en la pestaña de Cliente antes de continuar.');
+          // Marcar todos los campos como touched para mostrar los errores
+          this.markFormGroupTouched(this.clienteTab.clienteForm);
+          return false;
+        } else {
+          console.log('El formulario está realmente completo, permitiendo avanzar a pesar de que Angular lo considera inválido');
+          return true;
+        }
+      }
+
+      // Si el formulario es válido, permitir avanzar
+      console.log('Formulario de Cliente válido, permitiendo avanzar');
+      return true;
+    } else {
+      console.log('El formulario de Cliente no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Aval con lógica de negocio completa
+   */
+  private validateAvalTab(): boolean {
+    console.log('📝 validateAvalTab iniciado');
+
+    // Verificar si el formulario está marcado como omitido y tiene un motivo
+    const isOmitido = this.avalTab?.avalForm.get('omitido')?.value === true;
+    const hasMotivo = !!this.avalTab?.avalForm.get('motivo')?.value;
+    const isFormComplete = this.avalTab?.isFormComplete();
+    const isFormValid = this.avalTab?.avalForm.valid;
+
+    console.log('📝 Estado del formulario de AVAL:');
+    console.log('- isOmitido:', isOmitido);
+    console.log('- hasMotivo:', hasMotivo);
+    console.log('- isFormComplete:', isFormComplete);
+    console.log('- isFormValid:', isFormValid);
+    console.log('- clienteRequiresAval:', this.clienteRequiresAval);
+    console.log('- montoRequiresAval:', this.montoRequiresAval);
+    console.log('- avalRequiredReason:', this.avalRequiredReason);
+
+    // Si el formulario está omitido con motivo, permitir avanzar
+    if (isOmitido && hasMotivo) {
+      console.log('✅ Formulario de AVAL omitido con motivo, permitiendo avanzar');
+      return true;
+    }
+
+    // Si el formulario está completo y válido, permitir avanzar
+    if (isFormComplete && isFormValid) {
+      console.log('✅ Formulario de AVAL completo y válido, permitiendo avanzar');
+      return true;
+    }
+
+    // Si se requiere AVAL por reglas de cliente (obligatorio), no permitir avanzar sin completar
+    if (this.clienteRequiresAval) {
+      if (!isOmitido && (!isFormComplete || !isFormValid)) {
+        console.log('❌ AVAL requerido por reglas de cliente pero no está completo');
+        this.messageService.warnMessageToast('Atención', 'Se requiere completar todos los campos del AVAL o proporcionar un motivo para omitirlo: ' + this.avalRequiredReason);
+        // Marcar todos los campos como touched para mostrar los errores
+        if (this.avalTab?.avalForm) {
+          this.markFormGroupTouched(this.avalTab.avalForm);
+        }
+        return false;
+      }
+    }
+
+    // Si el formulario no está omitido y no está completo o no es válido, verificar si es requerido
+    if (!isOmitido && (!isFormComplete || !isFormValid)) {
+      // Si no es requerido por cliente ni por monto, permitir avanzar
+      if (!this.clienteRequiresAval && !this.montoRequiresAval) {
+        console.log('✅ AVAL no es requerido, permitiendo avanzar sin completar');
+        return true;
+      }
+
+      console.log('❌ AVAL no está completo y es requerido');
+      this.messageService.warnMessageToast('Atención', 'Se requiere completar todos los campos del AVAL o proporcionar un motivo para omitirlo.');
+      // Marcar todos los campos como touched para mostrar los errores
+      if (this.avalTab?.avalForm) {
+        this.markFormGroupTouched(this.avalTab.avalForm);
+      }
+      return false;
+    }
+
+    // Si el monto es mayor a 1500, permitir avanzar pero mostrar advertencia
+    if (this.montoRequiresAval && !this.clienteRequiresAval) {
+      console.log('ℹ️ Monto mayor a 1500, mostrando advertencia pero permitiendo avanzar');
+      this.messageService.infoMessageToast('Información', 'El monto de la solicitud es mayor a 1500. Se recomienda incluir AVAL, pero puede continuar sin él.');
+      return true;
+    }
+
+    // Si no se requiere AVAL, permitir avanzar
+    if (!this.clienteRequiresAval && !this.montoRequiresAval) {
+      console.log('✅ AVAL no es requerido, permitiendo avanzar');
+      return true;
+    }
+
+    // Si llegamos aquí, permitir avanzar (caso por defecto)
+    console.log('✅ Validación de AVAL completada, permitiendo avanzar');
+    return true;
+  }
+
+  /**
+   * Valida el tab de Cónyuge con lógica de negocio completa
+   */
+  private validateConyugeTab(): boolean {
+    console.log('📝 validateConyugeTab iniciado');
+
+    // Verificar si el formulario está marcado como omitido y tiene un motivo
+    const isOmitido = this.conyugeTab?.conyugeForm.get('omitido')?.value === true;
+    const hasMotivo = !!this.conyugeTab?.conyugeForm.get('motivo')?.value;
+    const isFormComplete = this.conyugeTab?.isFormComplete();
+    const isFormValid = this.conyugeTab?.conyugeForm.valid;
+
+    console.log('📝 Estado del formulario de Cónyuge:');
+    console.log('- isOmitido:', isOmitido);
+    console.log('- hasMotivo:', hasMotivo);
+    console.log('- isFormComplete:', isFormComplete);
+    console.log('- isFormValid:', isFormValid);
+    console.log('- clienteRequiresConyuge:', this.clienteRequiresConyuge);
+    console.log('- conyugeRequiredReason:', this.conyugeRequiredReason);
+
+    // Si el formulario está omitido con motivo, permitir avanzar
+    if (isOmitido && hasMotivo) {
+      console.log('✅ Formulario de Cónyuge omitido con motivo, permitiendo avanzar');
+      return true;
+    }
+
+    // Si el formulario está completo y válido, permitir avanzar
+    if (isFormComplete && isFormValid) {
+      console.log('✅ Formulario de Cónyuge completo y válido, permitiendo avanzar');
+      return true;
+    }
+
+    // Si se requiere Cónyuge por reglas de cliente (obligatorio), no permitir avanzar sin completar
+    if (this.clienteRequiresConyuge) {
+      if (!isOmitido && (!isFormComplete || !isFormValid)) {
+        console.log('❌ Cónyuge requerido por reglas de cliente pero no está completo');
+        this.messageService.warnMessageToast('Atención', 'Se requiere completar todos los campos del Cónyuge o proporcionar un motivo para omitirlo: ' + this.conyugeRequiredReason);
+        // Marcar todos los campos como touched para mostrar los errores
+        if (this.conyugeTab?.conyugeForm) {
+          this.markFormGroupTouched(this.conyugeTab.conyugeForm);
+        }
+        return false;
+      }
+    }
+
+    // Si el formulario no está omitido y no está completo o no es válido, verificar si es requerido
+    if (!isOmitido && (!isFormComplete || !isFormValid)) {
+      // Si no es requerido por cliente, permitir avanzar
+      if (!this.clienteRequiresConyuge) {
+        console.log('✅ Cónyuge no es requerido, permitiendo avanzar sin completar');
+        return true;
+      }
+
+      console.log('❌ Cónyuge no está completo y es requerido');
+      this.messageService.warnMessageToast('Atención', 'Se requiere completar todos los campos del Cónyuge o proporcionar un motivo para omitirlo.');
+      // Marcar todos los campos como touched para mostrar los errores
+      if (this.conyugeTab?.conyugeForm) {
+        this.markFormGroupTouched(this.conyugeTab.conyugeForm);
+      }
+      return false;
+    }
+
+    // Si no se requiere Cónyuge, permitir avanzar
+    if (!this.clienteRequiresConyuge) {
+      console.log('✅ Cónyuge no es requerido, permitiendo avanzar');
+      return true;
+    }
+
+    // Si llegamos aquí, permitir avanzar (caso por defecto)
+    console.log('✅ Validación de Cónyuge completada, permitiendo avanzar');
+    return true;
+  }
+
+  /**
+   * Valida el tab de Crédito Anterior con lógica de negocio completa
+   */
+  private validateCreditoAnteriorTab(): boolean {
+    console.log('📝 validateCreditoAnteriorTab iniciado');
+
+    // Verificar si el componente está inicializado
+    if (this.creditoAnteriorTab) {
+      console.log('📝 Componente de Crédito Anterior inicializado');
+
+      // Si se ha marcado la opción de omitir, permitir avanzar sin validar el formulario
+      if (this.creditoAnteriorTab.omitirCreditoAnterior) {
+        console.log('✅ Crédito Anterior omitido, permitiendo avanzar');
+        return true;
+      }
+
+      // Llamar al método validateForm() del componente CreditoAnteriorTabComponent
+      // Este método marcará todos los campos como tocados y validará el formulario
+      console.log('📝 Validando formulario de Crédito Anterior...');
+      const isValid = this.creditoAnteriorTab.validateForm();
+      console.log('📝 Resultado de validación de Crédito Anterior:', isValid);
+
+      if (!isValid) {
+        console.log('❌ Validación de Crédito Anterior fallida');
+        // El componente ya debería mostrar sus propios mensajes de error
+      } else {
+        console.log('✅ Validación de Crédito Anterior exitosa');
+      }
+
+      return isValid;
+    } else {
+      console.log('❌ El componente de Crédito Anterior no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Negocio (Actividad Económica) con lógica de negocio completa
+   */
+  private validateNegocioTab(): boolean {
+    console.log('📝 validateNegocioTab iniciado');
+
+    // Verificar si el componente está inicializado
+    if (this.negocioTab) {
+      console.log('📝 Componente de Negocio inicializado');
+
+      // Llamar al método validateForm() del componente NegocioTabComponent
+      // Este método marcará todos los campos como tocados y validará el formulario
+      console.log('📝 Validando formulario de Negocio (Actividad Económica)...');
+      const isValid = this.negocioTab.validateForm();
+      console.log('📝 Resultado de validación de Negocio:', isValid);
+
+      if (!isValid) {
+        console.log('❌ Validación de Negocio fallida');
+        // El componente ya debería mostrar sus propios mensajes de error
+      } else {
+        console.log('✅ Validación de Negocio exitosa');
+      }
+
+      return isValid;
+    } else {
+      console.log('❌ El componente de Negocio no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Ingreso Adicional con lógica de negocio completa
+   */
+  private validateIngresoAdicionalTab(): boolean {
+    console.log('📝 validateIngresoAdicionalTab iniciado');
+
+    // Verificar si el componente está inicializado
+    if (this.ingresoAdicionalTab) {
+      console.log('📝 Componente de Ingreso Adicional inicializado');
+
+      // Si se ha marcado la opción de omitir, permitir avanzar sin validar el formulario
+      if (this.ingresoAdicionalTab.omitirIngresoAdicional) {
+        console.log('✅ Ingreso Adicional omitido, permitiendo avanzar');
+        return true;
+      }
+
+      // Llamar al método validateForm() del componente IngresoAdicionalTabComponent
+      // Este método marcará todos los campos como tocados y validará el formulario
+      console.log('📝 Validando formulario de Ingreso Adicional...');
+      const isValid = this.ingresoAdicionalTab.validateForm(true);
+      console.log('📝 Resultado de validación de Ingreso Adicional:', isValid);
+
+      if (!isValid) {
+        console.log('❌ Validación de Ingreso Adicional fallida');
+        // El componente ya debería mostrar sus propios mensajes de error
+      } else {
+        console.log('✅ Validación de Ingreso Adicional exitosa');
+      }
+
+      return isValid;
+    } else {
+      console.log('❌ El componente de Ingreso Adicional no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Puntaje Sentinel con lógica de negocio completa
+   */
+  private validatePuntajeSentinelTab(): boolean {
+    console.log('📝 validatePuntajeSentinelTab iniciado');
+
+    // Verificar si el componente está inicializado
+    if (this.puntajeSentinelTab) {
+      console.log('📝 Componente de Puntaje Sentinel inicializado');
+
+      // Llamar al método validateFromParent() del componente PuntajeSentinelTabComponent
+      // Este método marcará todos los campos como tocados y validará el formulario
+      console.log('📝 Validando formulario de Puntaje Sentinel...');
+      const isValid = this.puntajeSentinelTab.validateFromParent();
+      console.log('📝 Resultado de validación de Puntaje Sentinel:', isValid);
+
+      if (!isValid) {
+        console.log('❌ Validación de Puntaje Sentinel fallida');
+        // El componente ya debería mostrar sus propios mensajes de error
+      } else {
+        console.log('✅ Validación de Puntaje Sentinel exitosa');
+      }
+
+      return isValid;
+    } else {
+      console.log('❌ El componente de Puntaje Sentinel no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Gasto Financiero con lógica de negocio completa
+   */
+  private validateGastoFinancieroTab(): boolean {
+    console.log('📝 validateGastoFinancieroTab iniciado');
+
+    // Verificar si el componente está inicializado
+    if (this.gastoFinancieroTab) {
+      console.log('📝 Componente de Gasto Financiero inicializado');
+
+      // Si se ha marcado la opción de omitir, permitir avanzar sin validar el formulario
+      if (this.gastoFinancieroTab.omitirGastoFinanciero) {
+        console.log('✅ Gasto Financiero omitido, permitiendo avanzar');
+        return true;
+      }
+
+      // Llamar al método validateForm() del componente GastoFinancieroTabComponent
+      // Este método marcará todos los campos como tocados y validará el formulario
+      console.log('📝 Validando formulario de Gasto Financiero...');
+      const isValid = this.gastoFinancieroTab.validateForm();
+      console.log('📝 Resultado de validación de Gasto Financiero:', isValid);
+
+      if (!isValid) {
+        console.log('❌ Validación de Gasto Financiero fallida');
+        // El componente ya debería mostrar sus propios mensajes de error
+      } else {
+        console.log('✅ Validación de Gasto Financiero exitosa');
+      }
+
+      return isValid;
+    } else {
+      console.log('❌ El componente de Gasto Financiero no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Valida el tab de Referencia Familiar con lógica de negocio completa
+   */
+  private validateReferenciaFamiliarTab(): boolean {
+    console.log('📝 validateReferenciaFamiliarTab iniciado');
+
+    // Verificar si el componente está inicializado
+    if (this.referenciaFamiliarTab) {
+      console.log('📝 Componente de Referencia Familiar inicializado');
+
+      // Llamar al método validateForm() del componente ReferenciaFamiliarTabComponent
+      // Este método marcará todos los campos como tocados y validará el formulario
+      // Si se ha omitido la información de hijos, el método validateForm() lo manejará internamente
+      console.log('📝 Validando formulario de Referencia Familiar...');
+      const isValid = this.referenciaFamiliarTab.validateForm();
+      console.log('📝 Resultado de validación de Referencia Familiar:', isValid);
+
+      if (!isValid) {
+        console.log('❌ Validación de Referencia Familiar fallida');
+        // El componente ya debería mostrar sus propios mensajes de error
+      } else {
+        console.log('✅ Validación de Referencia Familiar exitosa');
+      }
+
+      return isValid;
+    } else {
+      console.log('❌ El componente de Referencia Familiar no está inicializado');
+      return false;
+    }
+  }
+
+  /**
+   * Maneja el clic en un tab específico con validación
+   * @param targetIndex Índice del tab clickeado
+   * @param event Evento del clic (opcional)
+   */
+  onTabClick(targetIndex: number, event?: Event): void {
+    console.log('🚨🚨🚨 onTabClick EJECUTADO 🚨🚨🚨');
+    console.log(`🖱️ Click en tab ${targetIndex} desde tab actual ${this.activeIndex}`);
+
+    // Prevenir el comportamiento por defecto si es necesario
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Usar la misma lógica de validación que navigateToTab
+    this.navigateToTab(targetIndex);
+  }
+
+  /**
+   * Navega a un tab específico usando la nueva lógica de validación
+   * @param targetIndex Índice del tab al que se quiere navegar
+   */
+  navigateToTab(targetIndex: number): void {
+    console.log('🚨🚨🚨 navigateToTab EJECUTADO 🚨🚨🚨');
+    console.log(`🔄 Navegando desde tab ${this.activeIndex} hacia tab ${targetIndex}`);
+    console.log('🔄 Modo visualización:', this.modoVisualizacion);
+
+    // Si estamos en modo visualización, permitir navegación libre
+    if (this.modoVisualizacion) {
+      console.log('✅ Modo visualización - permitiendo navegación libre');
+      this.activeIndex = targetIndex;
+      this.cargarDatosEnTabSiEsNecesario(targetIndex);
+      return;
+    }
+
+    // Si estamos intentando ir hacia atrás, permitir sin validación
+    if (targetIndex < this.activeIndex) {
+      console.log('⬅️ Navegando hacia atrás, permitiendo sin validación');
+      this.activeIndex = targetIndex;
+      this.cargarDatosEnTabSiEsNecesario(targetIndex);
+      return;
+    }
+
+    // Si estamos intentando ir hacia adelante, validar el tab actual
+    if (targetIndex > this.activeIndex) {
+      console.log('➡️ Navegando hacia adelante, validando tab actual:', this.activeIndex);
+
+      // Validar el tab actual antes de permitir el cambio
+      const isValid = this.validateCurrentTab();
+      console.log('🔍 Resultado de validación en navigateToTab:', isValid);
+
+      if (isValid) {
+        console.log('✅ Validación exitosa, permitiendo navegación');
+        this.activeIndex = targetIndex;
+        this.cargarDatosEnTabSiEsNecesario(targetIndex);
+
+        // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo
+        if (targetIndex === 10) {
+          this.actualizarFichaTrabajo();
+          console.log('📊 Navegando al resumen - datos actualizados');
+        }
+      } else {
+        console.log('❌ Validación fallida, no se permite la navegación');
+        // No cambiar el activeIndex, mantener en el tab actual
+      }
+    } else {
+      // Si es el mismo tab, no hacer nada
+      console.log('🔄 Mismo tab seleccionado, no se requiere acción');
+    }
+  }
+
+  // MÉTODO DEPRECADO - Ya no se utiliza con la nueva validación automática
+  /*
   canGoNext(): boolean {
     switch (this.activeIndex) {
       case 0:
@@ -899,7 +1544,10 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         return true;
     }
   }
+  */
 
+  // MÉTODO DEPRECADO - Ya no se utiliza con la nueva validación automática
+  /*
   canChangeTab(newIndex: number): boolean {
     // Actualizar la ficha de trabajo en cada cambio de pestaña
     this.actualizarFichaTrabajo();
@@ -1217,6 +1865,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     // En otros casos, usar la validación normal
     return this.canGoNext();
   }
+  */
 
   /**
    * Verifica si se ha completado el formulario de aval o cónyuge
@@ -1346,6 +1995,8 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     }
   }
 
+  // MÉTODO DEPRECADO - Ya no se utiliza con la nueva validación automática
+  /*
   nextTab() {
     console.log('Issue:', this.canGoNext());
 
@@ -1659,6 +2310,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       this.messageService.warnMessageToast('Error', 'Complete todos los campos requeridos antes de continuar');
     }
   }
+  */
 
   submit(): void {
     console.log('=== INICIANDO SUBMIT ===');
