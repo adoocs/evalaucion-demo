@@ -34,7 +34,7 @@
       <div class="field md:col-span-1">
         <p-floatlabel>
           <input pInputText id="monto" pKeyFilter="money" formControlName="monto" autocomplete="off" class="w-full"
-            [ngClass]="{'p-invalid': monto.invalid && monto.touched}" (blur)="onMontoChange($event)" />
+            [ngClass]="{'p-invalid': monto.invalid && monto.touched}" (blur)="onMontoChange()" />
           <div *ngIf="monto.value > 1500"
             class="mt-2 p-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
             <i class="pi pi-exclamation-triangle mr-2"></i>

@@ -128,7 +128,6 @@ export class SolicitudCrearComponent implements OnInit {
           // Guardar la solicitud
           this.solicitudService.create({
             ...solicitud,
-            cliente: fichaTrabajo.cliente?.apellidos + ' ' + fichaTrabajo.cliente?.nombres,
             fecha: new Date().toISOString().split('T')[0],
             v_gerencia: 'pendiente' // ✅ Asegurar estado pendiente por defecto
           }).subscribe({

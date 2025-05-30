@@ -81,7 +81,7 @@
 
       <p-tabpanel [value]="7">
         <app-puntaje-sentinel-tab #puntajeSentinelTab
-          [puntajeSentinelInput]="solicitudTab?.puntaje_sentinel?.value"
+          [puntajeSentinelInput]="fichaTrabajoInternal.puntaje_sentinel || 0"
           (puntajeSentinelChange)="handlePuntajeSentinelChange($event)"
           (validationChange)="handlePuntajeSentinelValidationChange($event)">
         </app-puntaje-sentinel-tab>

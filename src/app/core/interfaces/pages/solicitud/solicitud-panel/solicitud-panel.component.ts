@@ -713,11 +713,9 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   handlePuntajeSentinelChange(puntaje: number): void {
     console.log('Puntaje Sentinel cambiado:', puntaje);
 
-    // Actualizar el valor en el formulario de solicitud
-    if (this.solicitudTab && this.solicitudTab.solicitudForm) {
-      this.solicitudTab.solicitudForm.get('puntaje_sentinel')?.setValue(puntaje);
-      console.log('Puntaje Sentinel actualizado en el formulario de solicitud');
-    }
+    // Actualizar el valor en la ficha de trabajo interna
+    this.fichaTrabajoInternal.puntaje_sentinel = puntaje;
+    console.log('Puntaje Sentinel actualizado en la ficha de trabajo:', puntaje);
   }
 
   /**
@@ -843,10 +841,11 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       id: 0,
       n_credito: 0,
       fecha: '',
-      monto: 0,
+      periodo: { id: 0, descripcion: '' },
       plazo: '',
+      monto: 0,
       v_gerencia: 'pendiente', // ✅ Estado por defecto: pendiente
-      puntaje_sentinel: 0,
+      fichaTrabajo: this.createEmptyFichaTrabajo()
     };
   }
 
@@ -1426,7 +1425,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         ingreso_adicional: this.ingresoAdicionalTab?.getFormValues(),
         gasto_financieros: this.gastoFinancieroTab?.gastoFinancieros(),
         referencia_familiar: this.referenciaFamiliarTab?.getFormValues(),
-        puntaje_sentinel: this.solicitud.puntaje_sentinel
+        puntaje_sentinel: this.puntajeSentinelTab?.getFormValues()
       };
 
       console.log('=== FICHA DE TRABAJO ACTUALIZADA ===');
@@ -1898,26 +1897,8 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     // Obtener todos los datos de la ficha de trabajo
     this.fichaTrabajoInternal = this.getAllData();
 
-    // Actualizar la solicitud con los datos de la ficha de trabajo
-    if (this.fichaTrabajoInternal.cliente) {
-      this.solicitud.cliente = this.fichaTrabajoInternal.cliente.apellidos + ' ' + this.fichaTrabajoInternal.cliente.nombres;
-    }
-
-    if (this.fichaTrabajoInternal.aval) {
-      this.solicitud.aval = this.fichaTrabajoInternal.aval.apellidos + ' ' + this.fichaTrabajoInternal.aval.nombres;
-    }
-
-    if (this.fichaTrabajoInternal.conyuge) {
-      this.solicitud.conyugue = this.fichaTrabajoInternal.conyuge.apellidos + ' ' + this.fichaTrabajoInternal.conyuge.nombres;
-    }
-
-    // Asignar otros campos de la solicitud
-    this.solicitud.credito_anterior = this.fichaTrabajoInternal.credito_anterior || undefined;
-    this.solicitud.gasto_financiero = this.fichaTrabajoInternal.gasto_financieros?.[0] || undefined;
-    this.solicitud.referencia_familiar = this.fichaTrabajoInternal.referencia_familiar || undefined;
-    this.solicitud.ingreso_adicional = this.fichaTrabajoInternal.ingreso_adicional || undefined;
-    this.solicitud.negocio = this.fichaTrabajoInternal.detalleEconomico?.negocio || undefined;
-    this.solicitud.ingreso_dependiente = this.fichaTrabajoInternal.detalleEconomico?.ingreso_dependiente || undefined;
+    // Asignar la ficha de trabajo completa a la solicitud
+    this.solicitud.fichaTrabajo = this.fichaTrabajoInternal;
 
     // Asignar fecha actual si no tiene (formato día/mes/año)
     if (!this.solicitud.fecha) {
@@ -1960,26 +1941,8 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     // Obtener todos los datos de la ficha de trabajo
     this.fichaTrabajoInternal = this.getAllData();
 
-    // Actualizar la solicitud con los datos de la ficha de trabajo
-    if (this.fichaTrabajoInternal.cliente) {
-      this.solicitud.cliente = this.fichaTrabajoInternal.cliente.apellidos + ' ' + this.fichaTrabajoInternal.cliente.nombres;
-    }
-
-    if (this.fichaTrabajoInternal.aval) {
-      this.solicitud.aval = this.fichaTrabajoInternal.aval.apellidos + ' ' + this.fichaTrabajoInternal.aval.nombres;
-    }
-
-    if (this.fichaTrabajoInternal.conyuge) {
-      this.solicitud.conyugue = this.fichaTrabajoInternal.conyuge.apellidos + ' ' + this.fichaTrabajoInternal.conyuge.nombres;
-    }
-
-    // Asignar otros campos de la solicitud
-    this.solicitud.credito_anterior = this.fichaTrabajoInternal.credito_anterior || undefined;
-    this.solicitud.gasto_financiero = this.fichaTrabajoInternal.gasto_financieros?.[0] || undefined;
-    this.solicitud.referencia_familiar = this.fichaTrabajoInternal.referencia_familiar || undefined;
-    this.solicitud.ingreso_adicional = this.fichaTrabajoInternal.ingreso_adicional || undefined;
-    this.solicitud.negocio = this.fichaTrabajoInternal.detalleEconomico?.negocio || undefined;
-    this.solicitud.ingreso_dependiente = this.fichaTrabajoInternal.detalleEconomico?.ingreso_dependiente || undefined;
+    // Actualizar la ficha de trabajo completa en la solicitud
+    this.solicitud.fichaTrabajo = this.fichaTrabajoInternal;
 
     // Mantener la fecha existente o asignar fecha actual si no tiene (formato día/mes/año)
     if (!this.solicitud.fecha) {
@@ -2112,15 +2075,15 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     // Usar los datos de la solicitud que ya están actualizados
     console.log('Solicitud para evaluación:', this.solicitud);
 
-    // Verificar si hay datos de negocio válidos
-    const negocio = this.solicitud.negocio;
+    // Verificar si hay datos de negocio válidos desde fichaTrabajo
+    const negocio = this.solicitud.fichaTrabajo?.detalleEconomico?.negocio;
     const tieneNegocio = negocio &&
                         negocio.actividad_economica &&
                         negocio.actividad_economica.id &&
                         negocio.actividad_economica.descripcion;
 
-    // Verificar si hay datos de ingreso dependiente válidos
-    const ingresoDep = this.solicitud.ingreso_dependiente;
+    // Verificar si hay datos de ingreso dependiente válidos desde fichaTrabajo
+    const ingresoDep = this.solicitud.fichaTrabajo?.detalleEconomico?.ingreso_dependiente;
     const tieneIngresoDependiente = ingresoDep &&
                                    ingresoDep.actividad &&
                                    ingresoDep.actividad.trim() !== '' &&
