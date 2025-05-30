@@ -59,7 +59,7 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   @Input() display: boolean = false;
   @Output() closedDialog = new EventEmitter<boolean>();
   @Output() montoChange = new EventEmitter<number>();
-  @Input() solicitud: Solicitud = { id: 0, n_credito: 0, fecha: '', monto: 0, plazo: '', v_gerencia: '', puntaje_sentinel: 0 };
+  @Input() solicitud: Solicitud = { id: 0, n_credito: 0, fecha: '', monto: 0, plazo: '', v_gerencia: 'pendiente', puntaje_sentinel: 0 };
   @Input() title = '';
   @Input() editabled: boolean = false;
 

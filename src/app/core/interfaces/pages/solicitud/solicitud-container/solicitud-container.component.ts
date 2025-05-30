@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -73,12 +73,28 @@ export class SolicitudContainerComponent implements OnInit {
   constructor(
     private solicitudService: LocalSolicitudService,
     private messageService: MessageToastService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
     this.loadSolicitudes();
   }
+
+  /**
+   * Maneja el evento beforeunload para advertir al usuario antes de recargar/cerrar la página
+   * @param event El evento beforeunload
+   */
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification(event: BeforeUnloadEvent): void {
+    // Solo mostrar advertencia si hay datos cargados
+    if (this.solicitudes().length > 0) {
+      event.preventDefault();
+      event.returnValue = '⚠️ Los datos se perderán si recarga la página. ¿Está seguro de que desea continuar?';
+    }
+  }
+
+
 
   loadSolicitudes(): void {
     this.loading = true;
@@ -115,7 +131,6 @@ export class SolicitudContainerComponent implements OnInit {
   }
 
   editSolicitud(solicitud: Solicitud): void {
-    // Navegar al componente de edición en lugar de abrir un diálogo
     this.router.navigate(['/solicitudes/editar', solicitud.id]);
   }
 
@@ -124,7 +139,6 @@ export class SolicitudContainerComponent implements OnInit {
    * @param solicitud La solicitud a mostrar
    */
   viewSolicitud(solicitud: Solicitud): void {
-    // Navegar al componente de visualización en lugar de abrir un diálogo
     this.router.navigate(['/solicitudes/ver', solicitud.id]);
   }
 
@@ -249,6 +263,11 @@ export class SolicitudContainerComponent implements OnInit {
   solicitudMenuAbierto: Solicitud | null = null;
 
   /**
+   * Variable para controlar qué solicitud tiene el menú de acciones abierto
+   */
+  solicitudMenuAcciones: Solicitud | null = null;
+
+  /**
    * Cambia el estado de una solicitud
    * @param solicitud La solicitud a modificar
    * @param nuevoEstado El nuevo estado
@@ -275,24 +294,50 @@ export class SolicitudContainerComponent implements OnInit {
       'Estado actualizado',
       `V° Gerencia de la solicitud ${solicitud.n_credito} cambió de "${estadoAnteriorLabel}" a "${nuevoEstadoLabel}"`
     );
-
-    console.log('Estado cambiado:', {
-      solicitud: solicitud.n_credito,
-      estadoAnterior,
-      nuevoEstado
-    });
   }
 
   /**
-   * Abre el diálogo para seleccionar tipo de evaluación
+   * Abre el diálogo para aplicar evaluación según el tipo de actividad económica
    * @param solicitud La solicitud para la cual aplicar evaluación
    */
   abrirDialogoEvaluacion(solicitud: Solicitud): void {
     this.solicitudSeleccionadaEvaluacion = solicitud;
-    this.tipoEvaluacionSeleccionado = null; // Resetear selección
+
+    // Detectar automáticamente el tipo de evaluación según la actividad económica
+    const tipoEvaluacion = this.detectarTipoEvaluacion(solicitud);
+
+    if (!tipoEvaluacion) {
+      this.messageService.warnMessageToast(
+        'Advertencia',
+        'No se puede determinar el tipo de evaluación. La solicitud debe tener datos de Negocio o Ingreso Dependiente.'
+      );
+      return;
+    }
+
+    this.tipoEvaluacionSeleccionado = tipoEvaluacion;
     this.mostrarDialogoEvaluacion = true;
 
-    console.log('Abriendo diálogo de evaluación para solicitud:', solicitud.n_credito);
+    console.log('Abriendo diálogo de evaluación para solicitud:', solicitud.n_credito, 'Tipo:', tipoEvaluacion);
+  }
+
+  /**
+   * Detecta el tipo de evaluación basado en la actividad económica de la solicitud
+   * @param solicitud La solicitud a evaluar
+   * @returns 'micro' si tiene negocio, 'consumo' si tiene ingreso dependiente, null si no tiene ninguno
+   */
+  private detectarTipoEvaluacion(solicitud: Solicitud): 'micro' | 'consumo' | null {
+    // Si tiene datos de negocio -> Evaluación Micro
+    if (solicitud.negocio) {
+      return 'micro';
+    }
+
+    // Si tiene datos de ingreso dependiente -> Evaluación Consumo
+    if (solicitud.ingreso_dependiente) {
+      return 'consumo';
+    }
+
+    // Si no tiene ninguno de los dos
+    return null;
   }
 
   /**
@@ -326,13 +371,12 @@ export class SolicitudContainerComponent implements OnInit {
     }
 
     const solicitud = this.solicitudSeleccionadaEvaluacion;
-    const tipoEvaluacion = this.tipoEvaluacionSeleccionado;
 
     // Cerrar el diálogo
     this.cerrarDialogoEvaluacion();
 
     // Mostrar mensaje de confirmación
-    const tipoLabel = tipoEvaluacion === 'consumo' ? 'Evaluación Consumo' : 'Evaluación Micro';
+    const tipoLabel = this.getNombreEvaluacion();
     this.messageService.successMessageToast(
       'Evaluación Iniciada',
       `Se ha iniciado la ${tipoLabel} para la solicitud ${solicitud.n_credito}`
@@ -351,5 +395,264 @@ export class SolicitudContainerComponent implements OnInit {
         `La pestaña de ${tipoLabel} estará disponible próximamente`
       );
     }, 1500);
+  }
+
+  /**
+   * Obtiene el título del diálogo de evaluación
+   */
+  getTituloEvaluacion(): string {
+    if (!this.tipoEvaluacionSeleccionado) return 'Aplicar Evaluación';
+    return this.tipoEvaluacionSeleccionado === 'micro' ? 'Aplicar Evaluación Micro' : 'Aplicar Evaluación Consumo';
+  }
+
+  /**
+   * Obtiene la actividad económica de la solicitud seleccionada
+   */
+  getActividadEconomica(): string {
+    if (!this.solicitudSeleccionadaEvaluacion) return '';
+
+    if (this.solicitudSeleccionadaEvaluacion.negocio?.actividad_economica?.descripcion) {
+      return this.solicitudSeleccionadaEvaluacion.negocio.actividad_economica.descripcion;
+    }
+
+    if (this.solicitudSeleccionadaEvaluacion.ingreso_dependiente?.actividad) {
+      return this.solicitudSeleccionadaEvaluacion.ingreso_dependiente.actividad;
+    }
+
+    return 'No especificada';
+  }
+
+  /**
+   * Obtiene el icono correspondiente al tipo de evaluación
+   */
+  getIconoEvaluacion(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? 'pi pi-building' : 'pi pi-shopping-cart';
+  }
+
+  /**
+   * Obtiene el color correspondiente al tipo de evaluación
+   */
+  getColorEvaluacion(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? '#10b981' : '#06b6d4'; // Verde para Micro, Celeste para Consumo
+  }
+
+  /**
+   * Obtiene el nombre del tipo de evaluación
+   */
+  getNombreEvaluacion(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? 'Evaluación Micro' : 'Evaluación Consumo';
+  }
+
+  /**
+   * Obtiene la descripción del tipo de evaluación
+   */
+  getDescripcionEvaluacion(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro'
+      ? 'Para microempresas y negocios'
+      : 'Para créditos de consumo personal';
+  }
+
+  /**
+   * Obtiene las características del tipo de evaluación
+   */
+  getCaracteristicasEvaluacion(): string[] {
+    if (this.tipoEvaluacionSeleccionado === 'micro') {
+      return [
+        'Análisis del flujo de caja del negocio',
+        'Evaluación de la actividad económica',
+        'Capacidad de generación de ingresos',
+        'Análisis de gastos operativos'
+      ];
+    } else {
+      return [
+        'Análisis de capacidad de pago',
+        'Evaluación de ingresos familiares',
+        'Historial crediticio personal',
+        'Evaluación de gastos financieros'
+      ];
+    }
+  }
+
+  /**
+   * Obtiene el color de fondo para el header de la solicitud
+   */
+  getColorFondoHeader(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? '#ecfdf5' : '#cffafe'; // Fondo verde claro para Micro, celeste claro para Consumo
+  }
+
+  /**
+   * Obtiene el color del borde para el header de la solicitud
+   */
+  getColorBordeHeader(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? '#bbf7d0' : '#a5f3fc'; // Borde verde para Micro, celeste para Consumo
+  }
+
+  /**
+   * Obtiene la clase CSS para el tipo de evaluación
+   */
+  getClaseEvaluacion(): string {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? 'evaluacion-micro' : 'evaluacion-consumo';
+  }
+
+  /**
+   * Obtiene la severidad del botón para PrimeNG
+   */
+  getSeveridadBoton(): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    return this.tipoEvaluacionSeleccionado === 'micro' ? 'success' : 'info'; // Verde para Micro, Celeste para Consumo
+  }
+
+  /**
+   * Detecta el tipo de evaluación para una solicitud específica (para usar en la tabla)
+   * @param solicitud La solicitud a evaluar
+   * @returns 'micro' si tiene negocio, 'consumo' si tiene ingreso dependiente, null si no tiene ninguno
+   */
+  getTipoEvaluacionSolicitud(solicitud: Solicitud): 'micro' | 'consumo' | null {
+    if (solicitud.negocio) {
+      return 'micro';
+    }
+    if (solicitud.ingreso_dependiente) {
+      return 'consumo';
+    }
+    return null;
+  }
+
+  /**
+   * Obtiene el color del botón de evaluación para una solicitud específica
+   * @param solicitud La solicitud
+   * @returns El color correspondiente
+   */
+  getColorBotonEvaluacion(solicitud: Solicitud): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    const tipo = this.getTipoEvaluacionSolicitud(solicitud);
+    if (tipo === 'micro') return 'success'; // Verde para Micro
+    if (tipo === 'consumo') return 'info';  // Celeste para Consumo
+    return 'secondary';
+  }
+
+  /**
+   * Obtiene el icono del botón de evaluación para una solicitud específica
+   * @param solicitud La solicitud
+   * @returns El icono correspondiente
+   */
+  getIconoBotonEvaluacion(solicitud: Solicitud): string {
+    const tipo = this.getTipoEvaluacionSolicitud(solicitud);
+    if (tipo === 'micro') return 'pi pi-building';
+    if (tipo === 'consumo') return 'pi pi-shopping-cart';
+    return 'pi pi-chart-line';
+  }
+
+  /**
+   * Obtiene el tooltip del botón de evaluación para una solicitud específica
+   * @param solicitud La solicitud
+   * @returns El texto del tooltip
+   */
+  getTooltipEvaluacion(solicitud: Solicitud): string {
+    const tipo = this.getTipoEvaluacionSolicitud(solicitud);
+    if (tipo === 'micro') return 'Aplicar Evaluación Micro';
+    if (tipo === 'consumo') return 'Aplicar Evaluación Consumo';
+    return 'Sin actividad económica definida';
+  }
+
+  /**
+   * Obtiene la etiqueta del botón de evaluación para una solicitud específica
+   * @param solicitud La solicitud
+   * @returns La etiqueta del botón
+   */
+  getLabelEvaluacion(solicitud: Solicitud): string {
+    const tipo = this.getTipoEvaluacionSolicitud(solicitud);
+    if (tipo === 'micro') return 'MICRO';
+    if (tipo === 'consumo') return 'CONSUMO';
+    return 'EVALUAR';
+  }
+
+  /**
+   * Obtiene el tag de tipo de evaluación para mostrar en la tabla
+   * @param solicitud La solicitud
+   * @returns Objeto con la información del tag
+   */
+  getTagEvaluacion(solicitud: Solicitud): {label: string, severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary', icon: string} {
+    const tipo = this.getTipoEvaluacionSolicitud(solicitud);
+    if (tipo === 'micro') {
+      return {
+        label: 'MICRO',
+        severity: 'success', // Verde para Micro
+        icon: 'pi pi-building'
+      };
+    }
+    if (tipo === 'consumo') {
+      return {
+        label: 'CONSUMO',
+        severity: 'info', // Celeste para Consumo
+        icon: 'pi pi-shopping-cart'
+      };
+    }
+    return {
+      label: 'SIN DEFINIR',
+      severity: 'secondary',
+      icon: 'pi pi-question-circle'
+    };
+  }
+
+  /**
+   * Obtiene el color de la barra indicadora para una solicitud
+   * @param solicitud La solicitud
+   * @returns El color de la barra
+   */
+  getColorBarra(solicitud: Solicitud): string {
+    const tipo = this.getTipoEvaluacionSolicitud(solicitud);
+    if (tipo === 'micro') return '#10b981'; // Verde para Micro
+    if (tipo === 'consumo') return '#06b6d4'; // Celeste para Consumo
+    return '#9ca3af'; // Gris para sin definir
+  }
+
+  /**
+   * Confirma la eliminación de una solicitud
+   * @param solicitud La solicitud a eliminar
+   */
+  confirmarEliminarSolicitud(solicitud: Solicitud): void {
+    this.confirmationService.confirm({
+      message: `¿Está seguro de que desea eliminar la solicitud N° ${solicitud.n_credito}?<br><br>
+                <strong>Cliente:</strong> ${solicitud.cliente}<br>
+                <strong>Monto:</strong> ${solicitud.monto.toLocaleString('es-PE', { style: 'currency', currency: 'PEN' })}<br><br>
+                <span style="color: #dc2626; font-weight: 600;">Esta acción no se puede deshacer.</span>`,
+      header: 'Confirmar Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary p-button-outlined',
+      accept: () => {
+        this.eliminarSolicitud(solicitud);
+      }
+    });
+  }
+
+  /**
+   * Elimina una solicitud de la lista
+   * @param solicitud La solicitud a eliminar
+   */
+  private eliminarSolicitud(solicitud: Solicitud): void {
+    // Obtener la lista actual
+    const solicitudesActuales = this.solicitudes();
+
+    // Filtrar la solicitud a eliminar
+    const solicitudesActualizadas = solicitudesActuales.filter(s => s.id !== solicitud.id);
+
+    // Actualizar la señal
+    this.solicitudes.set(solicitudesActualizadas);
+
+    // Mostrar mensaje de éxito
+    this.messageService.successMessageToast(
+      'Solicitud Eliminada',
+      `La solicitud N° ${solicitud.n_credito} de ${solicitud.cliente} ha sido eliminada exitosamente.`
+    );
+
+    console.log('Solicitud eliminada:', {
+      id: solicitud.id,
+      n_credito: solicitud.n_credito,
+      cliente: solicitud.cliente
+    });
+
+    // TODO: Aquí se implementaría la llamada al servicio para eliminar de la base de datos
+    // Ejemplo: this.solicitudService.delete(solicitud.id).subscribe(...)
   }
 }

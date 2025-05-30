@@ -234,6 +234,18 @@ export const GASTOS_FINANCIEROS: GastoFinanciero[] = [
     tarjeta: 'Visa',
     comentario: 'Préstamo para remodelación',
     periodo: PERIODOS[0]
+  },
+  {
+    id: 2,
+    institucion: 'Banco XYZ',
+    monto_credito: 2000,
+    n_pagadas: 8,
+    n_total: 12,
+    monto_cuota: 180,
+    saldo_credito: 720,
+    tarjeta: 'Mastercard',
+    comentario: 'Préstamo personal',
+    periodo: PERIODOS[1]
   }
 ];
 
@@ -341,6 +353,22 @@ export const INGRESOS_DEPENDIENTES: IngresoDependiente[] = [
     tiempo_valor: 3,
     actividad: 'Empleado público',
     tiempo: TIEMPOS[1] // Usar años en lugar de meses
+  },
+  {
+    id: 2,
+    frecuencia: 'quincenal',
+    importe: 1200,
+    tiempo_valor: 2,
+    actividad: 'Empleado privado - Administrativo',
+    tiempo: TIEMPOS[1] // Años
+  },
+  {
+    id: 3,
+    frecuencia: 'mensual',
+    importe: 3000,
+    tiempo_valor: 5,
+    actividad: 'Docente universitario',
+    tiempo: TIEMPOS[1] // Años
   }
 ];
 
@@ -352,6 +380,20 @@ export const REGISTROS_VENTAS: RegistroVentas[] = [
     ventas_bajas: 3500,
     ventas_altas: 7000,
     frecuencia: 'semanal' // Usar código que coincida con el componente
+  },
+  {
+    id: 2,
+    ventas_normales: 3000,
+    ventas_bajas: 2000,
+    ventas_altas: 4500,
+    frecuencia: 'semanal'
+  },
+  {
+    id: 3,
+    ventas_normales: 8000,
+    ventas_bajas: 6000,
+    ventas_altas: 12000,
+    frecuencia: 'semanal'
   }
 ];
 
@@ -372,8 +414,17 @@ export const NEGOCIOS: Negocio[] = [
     direccion: 'Jr. Los Olivos 123',
     tiempo: TIEMPOS[0],
     actividad_economica: ACTIVIDADES_ECONOMICAS[0], // Bodega / Bazar
-    registro_ventas: REGISTROS_VENTAS[0],
+    registro_ventas: REGISTROS_VENTAS[1],
     gastos_operativos: [GASTOS_OPERATIVOS[1]]
+  },
+  {
+    id: 3,
+    tiempo_valor: 7,
+    direccion: 'Calle Las Flores 456',
+    tiempo: TIEMPOS[1], // Años
+    actividad_economica: ACTIVIDADES_ECONOMICAS[21], // Venta de pan, Panaderías
+    registro_ventas: REGISTROS_VENTAS[2],
+    gastos_operativos: [GASTOS_OPERATIVOS[0], GASTOS_OPERATIVOS[2]]
   }
 ];
 
@@ -409,7 +460,17 @@ export const FAMILIA_MIEMBROS: FamiliaMiembros[] = [
 export const REFERENCIAS_FAMILIARES: ReferenciaFamiliar[] = [
   {
     id: 1,
-    referencia_domicilio: 'calle zzzz',
+    referencia_domicilio: 'Av. Los Pinos 123, San Juan',
+    familia_miembros: FAMILIA_MIEMBROS,
+  },
+  {
+    id: 2,
+    referencia_domicilio: 'Jr. Las Rosas 456, Miraflores',
+    familia_miembros: FAMILIA_MIEMBROS,
+  },
+  {
+    id: 3,
+    referencia_domicilio: 'Calle Los Olivos 789, San Isidro',
     familia_miembros: FAMILIA_MIEMBROS,
   }
 ];
@@ -432,7 +493,8 @@ export const SOLICITUDES: Solicitud[] = [
     credito_anterior: CREDITOS_ANTERIORES[0],
     referencia_familiar: REFERENCIAS_FAMILIARES[0],
     ingreso_adicional: INGRESOS_ADICIONALES[0],
-    negocio: NEGOCIOS[0]
+    negocio: NEGOCIOS[0] // SOLO NEGOCIO - Bodega, venta de carnes o verduras
+    // NO tiene ingreso_dependiente
   },
   {
     id: 2,
@@ -443,7 +505,11 @@ export const SOLICITUDES: Solicitud[] = [
     v_gerencia: 'observado', // Estado observado
     puntaje_sentinel: 820,
     cliente: 'María Elena Gómez Rodríguez',
-    periodo: PERIODOS[1]
+    periodo: PERIODOS[1],
+    gasto_financiero: GASTOS_FINANCIEROS[1],
+    referencia_familiar: REFERENCIAS_FAMILIARES[1],
+    ingreso_dependiente: INGRESOS_DEPENDIENTES[1] // SOLO INGRESO DEPENDIENTE - Empleado privado
+    // NO tiene negocio
   },
   {
     id: 3,
@@ -454,7 +520,12 @@ export const SOLICITUDES: Solicitud[] = [
     v_gerencia: 'denegado', // Estado denegado
     puntaje_sentinel: 450,
     cliente: 'Roberto Martínez Sánchez',
-    periodo: PERIODOS[0]
+    aval: 'Roberto Martínez Sánchez',
+    periodo: PERIODOS[0],
+    credito_anterior: CREDITOS_ANTERIORES[0],
+    referencia_familiar: REFERENCIAS_FAMILIARES[2],
+    negocio: NEGOCIOS[0] // SOLO NEGOCIO - Bodega / Bazar
+    // NO tiene ingreso_dependiente
   },
   {
     id: 4,
@@ -465,7 +536,41 @@ export const SOLICITUDES: Solicitud[] = [
     v_gerencia: 'pendiente', // Estado pendiente
     puntaje_sentinel: 680,
     cliente: 'Ana María Torres Vega',
-    periodo: PERIODOS[1]
+    periodo: PERIODOS[1],
+    referencia_familiar: REFERENCIAS_FAMILIARES[1],
+    ingreso_adicional: INGRESOS_ADICIONALES[0],
+    ingreso_dependiente: INGRESOS_DEPENDIENTES[2] // SOLO INGRESO DEPENDIENTE - Docente universitario
+    // NO tiene negocio
+  },
+  {
+    id: 5,
+    n_credito: 10005,
+    fecha: '2024-01-10',
+    monto: 3000,
+    plazo: '8 meses',
+    v_gerencia: 'aprobado', // Estado aprobado
+    puntaje_sentinel: 720,
+    cliente: 'Carlos Eduardo Ramírez',
+    periodo: PERIODOS[0],
+    referencia_familiar: REFERENCIAS_FAMILIARES[2],
+    ingreso_dependiente: INGRESOS_DEPENDIENTES[0] // SOLO INGRESO DEPENDIENTE - Empleado público
+    // NO tiene negocio
+  },
+  {
+    id: 6,
+    n_credito: 10006,
+    fecha: '2024-01-25',
+    monto: 12000,
+    plazo: '18 meses',
+    v_gerencia: 'pendiente', // Estado pendiente
+    puntaje_sentinel: 690,
+    cliente: 'Luis Fernando García',
+    aval: 'Roberto Martínez Sánchez',
+    periodo: PERIODOS[0],
+    gasto_financiero: GASTOS_FINANCIEROS[0],
+    referencia_familiar: REFERENCIAS_FAMILIARES[0],
+    negocio: NEGOCIOS[2] // SOLO NEGOCIO - Panadería
+    // NO tiene ingreso_dependiente
   }
 ];
 

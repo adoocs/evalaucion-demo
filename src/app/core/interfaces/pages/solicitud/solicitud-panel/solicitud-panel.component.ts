@@ -785,7 +785,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       fecha: '',
       monto: 0,
       plazo: '',
-      v_gerencia: '', // Cambiar de false a string vacío
+      v_gerencia: 'pendiente', // ✅ Estado por defecto: pendiente
       puntaje_sentinel: 0,
     };
   }
@@ -806,7 +806,9 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   }
 
   prevTab(): void {
-    this.activeIndex = Math.max(0, this.activeIndex - 1);
+    const newIndex = Math.max(0, this.activeIndex - 1);
+    this.activeIndex = newIndex;
+    this.scrollToActiveTab(newIndex);
   }
 
   /**
@@ -817,6 +819,9 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     console.log('Pestaña cambiada a:', index);
     this.activeIndex = Number(index);
 
+    // Hacer scroll automático al tab activo
+    this.scrollToActiveTab(Number(index));
+
     // Si estamos en modo edición o visualización, cargar los datos correspondientes al tab
     if ((this.modoEdicion || this.modoVisualizacion) && this.fichaTrabajoInternal) {
       // Usar un timeout para asegurar que el componente esté renderizado
@@ -825,13 +830,55 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       }, 100);
     }
 
-    // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo
+    // Si se selecciona la pestaña de resumen, actualizar la ficha de trabajo SIEMPRE
     if (Number(index) === 10) {
-      if (!this.modoVisualizacion) {
-        this.actualizarFichaTrabajo();
-      }
+      console.log('Navegando al resumen - actualizando ficha de trabajo...');
+      this.actualizarFichaTrabajo();
       console.log('Navegando al resumen - datos actualizados');
     }
+  }
+
+  /**
+   * Hace scroll automático al tab activo para asegurar que sea visible
+   * @param tabIndex El índice del tab al que hacer scroll
+   */
+  scrollToActiveTab(tabIndex: number): void {
+    // Usar setTimeout para asegurar que el DOM esté actualizado
+    setTimeout(() => {
+      try {
+        // Buscar el elemento del tab activo
+        const tabElement = document.querySelector(`p-tab[ng-reflect-value="${tabIndex}"]`) as HTMLElement;
+
+        if (tabElement) {
+          // Hacer scroll suave al elemento
+          tabElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+
+          console.log(`Scroll automático al tab ${tabIndex} completado`);
+        } else {
+          // Método alternativo: buscar por el contenido del tab
+          const allTabs = document.querySelectorAll('p-tab');
+          const targetTab = allTabs[tabIndex] as HTMLElement;
+
+          if (targetTab) {
+            targetTab.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+              inline: 'center'
+            });
+
+            console.log(`Scroll automático al tab ${tabIndex} completado (método alternativo)`);
+          } else {
+            console.log(`No se pudo encontrar el tab ${tabIndex} para hacer scroll`);
+          }
+        }
+      } catch (error) {
+        console.error('Error al hacer scroll al tab activo:', error);
+      }
+    }, 100);
   }
 
   canGoNext(): boolean {
@@ -1328,14 +1375,27 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       // Verificar específicamente el detalle económico
       if (this.fichaTrabajoInternal.detalleEconomico) {
         console.log('✅ Detalle económico presente en ficha actualizada');
+        console.log('Detalle económico completo:', this.fichaTrabajoInternal.detalleEconomico);
+
         if (this.fichaTrabajoInternal.detalleEconomico.negocio) {
           console.log('✅ Datos de negocio presentes');
+          console.log('- Actividad económica:', this.fichaTrabajoInternal.detalleEconomico.negocio.actividad_economica);
+          console.log('- Sector económico:', this.fichaTrabajoInternal.detalleEconomico.negocio.actividad_economica?.sector_economico);
+          console.log('- Registro de ventas:', this.fichaTrabajoInternal.detalleEconomico.negocio.registro_ventas);
+          console.log('- Gastos operativos:', this.fichaTrabajoInternal.detalleEconomico.negocio.gastos_operativos);
         }
+
         if (this.fichaTrabajoInternal.detalleEconomico.ingreso_dependiente) {
           console.log('✅ Datos de ingreso dependiente presentes');
+          console.log('- Actividad:', this.fichaTrabajoInternal.detalleEconomico.ingreso_dependiente.actividad);
+          console.log('- Importe:', this.fichaTrabajoInternal.detalleEconomico.ingreso_dependiente.importe);
         }
       } else {
         console.log('❌ No hay detalle económico en la ficha actualizada');
+        console.log('❌ Verificando si negocioTab está inicializado:', !!this.negocioTab);
+        if (this.negocioTab) {
+          console.log('❌ Verificando getFormValues del negocioTab:', this.negocioTab.getFormValues());
+        }
       }
 
       // No mostrar mensaje de éxito aquí para evitar spam
@@ -1380,6 +1440,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
           // Si todos los campos tienen valor, permitir avanzar
           console.log('Todos los campos requeridos tienen valor, avanzando a la siguiente pestaña');
           this.activeIndex++;
+          this.scrollToActiveTab(this.activeIndex);
           return;
         } else {
           console.log('El formulario de Solicitud no está inicializado');
@@ -1529,6 +1590,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       // Si el formulario está completo y válido, permitir avanzar
       if (isFormComplete && isFormValid) {
         this.activeIndex++;
+        this.scrollToActiveTab(this.activeIndex);
         return;
       }
 
@@ -1592,6 +1654,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       // Si el formulario está completo y válido, permitir avanzar
       if (isFormComplete && isFormValid) {
         this.activeIndex++;
+        this.scrollToActiveTab(this.activeIndex);
         return;
       }
 
@@ -1618,6 +1681,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       // Si no se requiere Cónyuge, permitir avanzar
       if (!this.clienteRequiresConyuge) {
         this.activeIndex++;
+        this.scrollToActiveTab(this.activeIndex);
         return;
       }
 
@@ -1636,24 +1700,29 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         // Si se requiere AVAL por reglas de cliente (no por monto), ir directamente a la pestaña de AVAL (índice 2)
         if (this.clienteRequiresAval) {
           this.activeIndex = 2; // Ir a la pestaña de AVAL
+          this.scrollToActiveTab(this.activeIndex);
           this.messageService.infoMessageToast('Información', 'Se requiere completar la información del AVAL: ' + this.avalRequiredReason);
         }
         // Si se requiere Cónyuge pero no AVAL, ir directamente a la pestaña de Cónyuge (índice 3)
         else if (this.clienteRequiresConyuge) {
           this.activeIndex = 3; // Ir a la pestaña de Cónyuge
+          this.scrollToActiveTab(this.activeIndex);
           this.messageService.infoMessageToast('Información', 'Se requiere completar la información del Cónyuge: ' + this.conyugeRequiredReason);
         } else {
           this.activeIndex++;
+          this.scrollToActiveTab(this.activeIndex);
         }
       }
       // Si estamos en la pestaña de AVAL (índice 2) y se requiere Cónyuge, ir directamente a la pestaña de Cónyuge (índice 3)
       else if (this.activeIndex === 2 && this.clienteRequiresConyuge) {
         this.activeIndex = 3; // Ir a la pestaña de Cónyuge
+        this.scrollToActiveTab(this.activeIndex);
         this.messageService.infoMessageToast('Información', 'Se requiere completar la información del Cónyuge: ' + this.conyugeRequiredReason);
       } else {
         // Actualizar la ficha de trabajo antes de cambiar de pestaña
         this.actualizarFichaTrabajo();
         this.activeIndex++;
+        this.scrollToActiveTab(this.activeIndex);
       }
     } else {
       this.messageService.warnMessageToast('Error', 'Complete todos los campos requeridos antes de continuar');
@@ -1692,6 +1761,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
           // Si es requerido por cliente, mostrar error y no permitir continuar
           errors.push('Se requiere completar la información del AVAL o proporcionar un motivo para omitirlo: ' + this.avalRequiredReason);
           this.activeIndex = 2; // Ir a la pestaña de AVAL
+          this.scrollToActiveTab(this.activeIndex);
         } else if (this.montoRequiresAval) {
           // Si es requerido por monto, mostrar advertencia pero permitir continuar
           warnings.push('El monto de la solicitud es mayor a 1500. Se recomienda incluir AVAL, pero puede continuar sin él.');
@@ -1725,6 +1795,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
         // Solo cambiar a la pestaña de Cónyuge si no hay errores en AVAL
         if (errors.length === 1) {
           this.activeIndex = 3; // Ir a la pestaña de Cónyuge
+          this.scrollToActiveTab(this.activeIndex);
         }
       }
     } else {
@@ -1797,6 +1868,12 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       this.solicitud.n_credito = Math.floor(10000 + Math.random() * 90000);
     }
 
+    // Asegurar estado pendiente por defecto
+    if (!this.solicitud.v_gerencia) {
+      this.solicitud.v_gerencia = 'pendiente';
+      console.log('✅ Estado V° Gerencia establecido como "pendiente" por defecto');
+    }
+
     console.log('Creando solicitud (DEMO):', this.solicitud);
     this.messageService.successMessageToast('Éxito', 'Solicitud creada correctamente (Versión Demo)');
     this.switchMessageHandler('create');
@@ -1829,6 +1906,12 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     // Mantener la fecha existente o asignar fecha actual si no tiene
     if (!this.solicitud.fecha) {
       this.solicitud.fecha = new Date().toISOString().split('T')[0];
+    }
+
+    // Asegurar estado pendiente por defecto si no tiene estado
+    if (!this.solicitud.v_gerencia) {
+      this.solicitud.v_gerencia = 'pendiente';
+      console.log('✅ Estado V° Gerencia establecido como "pendiente" por defecto en getAllData()');
     }
 
     console.log('Editando solicitud (DEMO):', this.solicitud);

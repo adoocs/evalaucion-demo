@@ -78,9 +78,10 @@
 </div>
 
 <!-- Panel de solicitud en modo solo lectura -->
-<div *ngIf="solicitud && !loading">
+<div *ngIf="solicitud && fichaTrabajo && !loading">
   <app-solicitud-panel
     [solicitud]="solicitud"
+    [fichaTrabajo]="fichaTrabajo"
     [modoVisualizacion]="true"
     [iniciarEnResumen]="true"
     (switchMessage)="handleSwitchMessage($event)"

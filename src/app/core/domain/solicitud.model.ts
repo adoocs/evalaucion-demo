@@ -1,6 +1,7 @@
 import { CreditoAnterior } from "./credito-anterior.model"
 import { GastoFinanciero } from "./gasto-financiero.model"
 import { IngresoAdicional } from "./ingreso-adicional.model"
+import { IngresoDependiente } from "./ingreso-dependiente.model"
 import { Negocio } from "./negocio.model"
 import { Periodo } from "./periodo.model"
 import { ReferenciaFamiliar } from "./referencia-familiar.model"
@@ -21,5 +22,6 @@ export interface Solicitud {
     credito_anterior?: CreditoAnterior,
     referencia_familiar?: ReferenciaFamiliar,
     ingreso_adicional?: IngresoAdicional,
-    negocio?: Negocio
+    negocio?: Negocio,
+    ingreso_dependiente?: IngresoDependiente
 }

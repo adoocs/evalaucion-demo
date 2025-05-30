@@ -81,7 +81,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
   omitirHijos: boolean = false;
 
   // Variable para almacenar mensajes de error de validación
-  errorReferenciaDomicilio: string = '';
+  errorDireccion: string = '';
 
   // Output para comunicar el estado de validación al componente padre
   @Output() validationChange = new EventEmitter<boolean>();
@@ -142,14 +142,14 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
   initiateForm() {
     this.referenciaFamiliarForm = this.fb.group({
       id: [this.referenciaFamiliar.id, [Validators.required, Validators.minLength(1)]],
-      referencia_domicilio: [this.referenciaFamiliar.referencia_domicilio, [Validators.required, Validators.minLength(1)]],
-      direccion: [this.referenciaFamiliar.direccion, [Validators.minLength(3)]],
+      referencia_domicilio: [this.referenciaFamiliar.referencia_domicilio, [Validators.minLength(3)]],
+      direccion: [this.referenciaFamiliar.direccion, [Validators.required, Validators.minLength(1)]],
       latitud: [this.referenciaFamiliar.latitud || this.PACASMAYO_LAT],
       longitud: [this.referenciaFamiliar.longitud || this.PACASMAYO_LNG],
     });
 
-    // Suscribirse a los cambios en el campo de referencia_domicilio
-    this.referenciaFamiliarForm.get('referencia_domicilio')?.valueChanges.subscribe(value => {
+    // Suscribirse a los cambios en el campo de direccion (intercambiado)
+    this.referenciaFamiliarForm.get('direccion')?.valueChanges.subscribe(value => {
       if (value && value.length > 3) {
         this.buscarDireccion(value);
       }
@@ -264,7 +264,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
 
   // Método para obtener la URL del mapa con las coordenadas actuales o la dirección
   getMapUrl(): string {
-    const direccion = this.referenciaFamiliarForm.get('referencia_domicilio')?.value;
+    const direccion = this.referenciaFamiliarForm.get('direccion')?.value;
 
     // Si hay una dirección con suficiente longitud, usamos la dirección para la búsqueda
     if (direccion && direccion.length > 3) {
@@ -280,7 +280,7 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
 
   // Método para abrir el mapa en una nueva ventana
   abrirMapaCompleto() {
-    const direccion = this.referenciaFamiliarForm.get('referencia_domicilio')?.value;
+    const direccion = this.referenciaFamiliarForm.get('direccion')?.value;
 
     // Si hay una dirección con suficiente longitud, usamos la dirección para la búsqueda
     if (direccion && direccion.length > 3) {
@@ -312,18 +312,18 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
   }
 
   /**
-   * Valida la referencia de domicilio
+   * Valida la dirección
    * @returns true si la validación es exitosa, false en caso contrario
    */
-  validarReferenciaDomicilio(): boolean {
-    const referenciaDomicilio = this.referenciaFamiliarForm.get('referencia_domicilio')?.value;
+  validarDireccion(): boolean {
+    const direccion = this.referenciaFamiliarForm.get('direccion')?.value;
 
-    if (!referenciaDomicilio || referenciaDomicilio.trim().length < 3) {
-      this.errorReferenciaDomicilio = 'La referencia de domicilio es requerida y debe tener al menos 3 caracteres';
+    if (!direccion || direccion.trim().length < 3) {
+      this.errorDireccion = 'La dirección es requerida y debe tener al menos 3 caracteres';
       return false;
     }
 
-    this.errorReferenciaDomicilio = '';
+    this.errorDireccion = '';
     return true;
   }
 
@@ -370,13 +370,13 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
   validateForm(markAsTouched: boolean = true): boolean {
     let isValid = true;
 
-    // Validar la referencia de domicilio (siempre se valida)
-    if (!this.validarReferenciaDomicilio()) {
+    // Validar la dirección (siempre se valida)
+    if (!this.validarDireccion()) {
       isValid = false;
       if (markAsTouched) {
         this.messageService.warnMessageToast(
-          'Error en Referencia de Domicilio',
-          'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'
+          'Error en Dirección',
+          'La dirección es requerida y debe tener al menos 3 caracteres'
         );
       }
     }
@@ -454,14 +454,14 @@ export class ReferenciaFamiliarTabComponent implements OnChanges {
    * @returns true si el formulario es válido, false en caso contrario
    */
   public validateFromParent(): boolean {
-    // La referencia de domicilio siempre se valida
-    const isReferenciaDomicilioValid = this.validarReferenciaDomicilio();
+    // La dirección siempre se valida
+    const isDireccionValid = this.validarDireccion();
 
-    // Si la referencia de domicilio no es válida, mostrar mensaje y marcar como tocado
-    if (!isReferenciaDomicilioValid) {
+    // Si la dirección no es válida, mostrar mensaje y marcar como tocado
+    if (!isDireccionValid) {
       this.messageService.warnMessageToast(
-        'Error en Referencia de Domicilio',
-        'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'
+        'Error en Dirección',
+        'La dirección es requerida y debe tener al menos 3 caracteres'
       );
       this.referenciaFamiliarForm.markAllAsTouched();
       this.validationChange.emit(false);

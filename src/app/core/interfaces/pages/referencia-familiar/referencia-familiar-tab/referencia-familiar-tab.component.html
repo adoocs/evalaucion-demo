@@ -114,27 +114,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="mb-2">
                 <p-floatlabel variant="on">
-                  <input pInputText id="referencia_domicilio" formControlName="referencia_domicilio" autocomplete="off"
+                  <input pInputText id="direccion" formControlName="direccion" autocomplete="off"
                     required autofocus class="w-full" (keypress)="validarCaracteresDireccion($event)" />
-                  <label for="referencia_domicilio">Referencia</label>
+                  <label for="direccion">Dirección</label>
                 </p-floatlabel>
                 <p-message severity="error" variant="simple" size="small"
-                  *ngIf="referencia_domicilio.touched && referencia_domicilio.invalid"
-                  [text]="'La referencia de domicilio es requerida y debe tener al menos 3 caracteres'">
+                  *ngIf="direccion.touched && direccion.invalid"
+                  [text]="'La dirección es requerida y debe tener al menos 3 caracteres'">
                 </p-message>
               </div>
 
               <div class="mb-2">
                 <p-floatlabel variant="on">
-                  <input pInputText id="direccion" formControlName="direccion" autocomplete="off"
+                  <input pInputText id="referencia_domicilio" formControlName="referencia_domicilio" autocomplete="off"
                     class="w-full" (keypress)="validarCaracteresDireccion($event)" />
-                  <label for="direccion">Dirección</label>
+                  <label for="referencia_domicilio">Referencia</label>
                 </p-floatlabel>
                 <p-message severity="error" variant="simple" size="small"
-                  *ngIf="direccion.touched && direccion.invalid"
-                  [text]="'La dirección debe tener al menos 3 caracteres'">
+                  *ngIf="referencia_domicilio.touched && referencia_domicilio.invalid"
+                  [text]="'La referencia debe tener al menos 3 caracteres'">
                 </p-message>
-              </div>
+              </div>              
             </div>
 
             <div class="mt-4">

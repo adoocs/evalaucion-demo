@@ -7,6 +7,9 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
 import { LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { Solicitud } from '../../../../domain/solicitud.model';
+import { FichaTrabajo } from '../../../../domain/ficha-trabajo.model';
+import { TipoVivienda } from '../../../../domain/tipo-vivienda.model';
+import { DetalleEconomico } from '../../../../domain/detalle-economico.model';
 
 @Component({
   selector: 'app-solicitud-ver',
@@ -23,6 +26,7 @@ import { Solicitud } from '../../../../domain/solicitud.model';
 })
 export class SolicitudVerComponent implements OnInit {
   solicitud: Solicitud | null = null;
+  fichaTrabajo: FichaTrabajo | null = null;
   solicitudId: number | null = null;
   loading: boolean = true;
 
@@ -62,8 +66,21 @@ export class SolicitudVerComponent implements OnInit {
         return;
       }
 
+      // Crear la ficha de trabajo a partir de la solicitud
+      this.fichaTrabajo = this.convertirSolicitudAFichaTrabajo(this.solicitud);
+
       this.loading = false;
-      console.log('Solicitud cargada para visualización:', this.solicitud);
+      console.log('✅ Solicitud cargada para visualización:', this.solicitud);
+      console.log('✅ Ficha de trabajo creada para visualización:', this.fichaTrabajo);
+
+      // Verificar específicamente los datos de actividad económica
+      if (this.fichaTrabajo.detalleEconomico) {
+        console.log('✅ Detalle económico en ficha de trabajo:');
+        console.log('- Negocio:', this.fichaTrabajo.detalleEconomico.negocio);
+        console.log('- Ingreso dependiente:', this.fichaTrabajo.detalleEconomico.ingreso_dependiente);
+      } else {
+        console.log('❌ No hay detalle económico en la ficha de trabajo');
+      }
     }, 500);
   }
 
@@ -148,5 +165,43 @@ export class SolicitudVerComponent implements OnInit {
       default:
         return 'Sin estado';
     }
+  }
+
+  /**
+   * Convierte una solicitud en una ficha de trabajo para visualización
+   * @param solicitud La solicitud a convertir
+   * @returns La ficha de trabajo correspondiente
+   */
+  private convertirSolicitudAFichaTrabajo(solicitud: Solicitud): FichaTrabajo {
+    return {
+      id: solicitud.id,
+      cliente: {
+        id: 0,
+        apellidos: '',
+        nombres: solicitud.cliente || '',
+        dni: '',
+        fecha_born: '',
+        estado_civil: '',
+        edad: 0,
+        genero: '',
+        direccion: '',
+        celular: 0,
+        n_referencial: 0,
+        grado_instruccion: '',
+        email: '',
+        tipo_vivienda: { id: 0, descripcion: '' }
+      },
+      aval: null,
+      conyuge: null,
+      referencia_familiar: solicitud.referencia_familiar || null,
+      credito_anterior: solicitud.credito_anterior || null,
+      gasto_financieros: solicitud.gasto_financiero ? [solicitud.gasto_financiero] : null,
+      ingreso_adicional: solicitud.ingreso_adicional || null,
+      puntaje_sentinel: solicitud.puntaje_sentinel || null,
+      detalleEconomico: {
+        negocio: solicitud.negocio || null,
+        ingreso_dependiente: solicitud.ingreso_dependiente || null
+      }
+    };
   }
 }
