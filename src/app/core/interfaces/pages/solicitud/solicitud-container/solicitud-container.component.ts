@@ -19,6 +19,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
+import { BadgeModule } from 'primeng/badge';
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
 import { LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { Solicitud } from '../../../../domain/solicitud.model';
@@ -44,6 +45,7 @@ import { Solicitud } from '../../../../domain/solicitud.model';
     OverlayPanelModule,
     TooltipModule,
     TagModule,
+    BadgeModule,
     SolicitudPanelComponent
   ],
   providers: [MessageService, MessageToastService, ConfirmationService],

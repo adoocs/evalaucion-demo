@@ -312,194 +312,33 @@
   }
 }
 
-/* Estilos para el menú de acciones */
-:host ::ng-deep .acciones-overlay {
-  .p-overlaypanel-content {
-    padding: 0.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid #e2e8f0;
-    background: white;
-    min-width: 200px;
-  }
+/* Estilos simplificados para el menú de acciones */
+.acciones-menu .accion-opcion {
+  padding: 0.75rem;
+  cursor: pointer;
 }
 
-.acciones-menu {
-  .acciones-header {
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 0.75rem;
-  }
-
-  .acciones-opciones {
-    .accion-opcion {
-      padding: 0.75rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-bottom: 0.25rem;
-
-      &:hover {
-        background: #f8fafc;
-        transform: translateX(4px);
-      }
-
-      &.danger:hover {
-        background: #fef2f2;
-
-        .accion-content {
-          .accion-label {
-            color: #dc2626;
-          }
-        }
-      }
-
-      .accion-content {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-
-        .accion-label {
-          font-weight: 500;
-          color: #374151;
-          transition: color 0.2s ease;
-        }
-
-        i {
-          font-size: 1rem;
-          transition: all 0.2s ease;
-        }
-      }
-    }
-
-    .accion-separador {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 0.5rem 0;
-    }
-  }
+.acciones-menu .accion-opcion:hover {
+  background: #f8fafc;
 }
 
-/* Estilos para el botón de evaluación compacto */
-:host ::ng-deep .evaluacion-btn-compacto {
-  width: 85px !important;
-  height: 2.25rem !important;
+.acciones-menu .accion-separador {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.5rem 0;
+}
+
+/* Estilos mínimos para tags de evaluación */
+:host ::ng-deep .evaluacion-tag {
   font-size: 0.7rem !important;
-  font-weight: 600 !important;
-  border-radius: 1.125rem !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-
-  &:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
-  }
-
-  // Estilo para MICRO (verde)
-  &.p-button-success {
-    background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
-    border: 2px solid #10b981 !important;
-    color: #065f46 !important;
-
-    &:hover {
-      background: linear-gradient(135deg, #d1fae5, #a7f3d0) !important;
-      border-color: #059669 !important;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25) !important;
-    }
-
-    &:active {
-      background: linear-gradient(135deg, #a7f3d0, #6ee7b7) !important;
-    }
-  }
-
-  // Estilo para CONSUMO (celeste)
-  &.p-button-info {
-    background: linear-gradient(135deg, #f0fdfa, #cffafe) !important;
-    border: 2px solid #06b6d4 !important;
-    color: #0c4a6e !important;
-
-    &:hover {
-      background: linear-gradient(135deg, #cffafe, #a5f3fc) !important;
-      border-color: #0891b2 !important;
-      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.25) !important;
-    }
-
-    &:active {
-      background: linear-gradient(135deg, #a5f3fc, #67e8f9) !important;
-    }
-  }
-
-  // Estilo para SIN DEFINIR (gris)
-  &.p-button-secondary {
-    background: linear-gradient(135deg, #f9fafb, #f3f4f6) !important;
-    border: 2px solid #9ca3af !important;
-    color: #374151 !important;
-
-    &:hover {
-      background: linear-gradient(135deg, #f3f4f6, #e5e7eb) !important;
-      border-color: #6b7280 !important;
-      box-shadow: 0 6px 20px rgba(156, 163, 175, 0.25) !important;
-    }
-
-    &:active {
-      background: linear-gradient(135deg, #e5e7eb, #d1d5db) !important;
-    }
-  }
-
-  .p-button-icon {
-    margin-right: 0.5rem !important;
-    font-size: 0.875rem !important;
-  }
-
-  .p-button-label {
-    font-weight: 700 !important;
-    letter-spacing: 0.5px !important;
-  }
+  padding: 0.4rem 0.8rem !important;
+  cursor: pointer;
+  min-width: 80px;
+  text-align: center;
 }
 
-/* Estilos para el botón de acciones con engranaje */
+/* Estilos mínimos para botón de acciones */
 :host ::ng-deep .acciones-btn-grande {
   width: 2.25rem !important;
   height: 2.25rem !important;
-  border: 1.5px solid #e5e7eb !important;
-  background: linear-gradient(135deg, #ffffff, #f9fafb) !important;
-  color: #6b7280 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
-
-  &:hover {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb) !important;
-    border-color: #9ca3af !important;
-    color: #374151 !important;
-    transform: translateY(-1px) scale(1.03) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-
-    .pi-cog {
-      animation: rotate-smooth 0.5s ease-in-out !important;
-      color: #059669 !important;
-    }
-  }
-
-  &:active {
-    transform: translateY(0) scale(0.98) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-  }
-
-  .pi-cog {
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-  }
-}
-
-@keyframes rotate-smooth {
-  0% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(180deg) scale(1.1);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }

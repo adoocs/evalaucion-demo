@@ -141,17 +141,15 @@
                         size="small"
                     />
 
-                    <!-- Botón de Evaluación Compacto -->
-                    <p-button
-                        [label]="getLabelEvaluacion(solicitud)"
-                        [icon]="getIconoBotonEvaluacion(solicitud)"
+                    <!-- Tag de Evaluación con PrimeNG -->
+                    <p-tag
+                        [value]="getLabelEvaluacion(solicitud)"
                         [severity]="getColorBotonEvaluacion(solicitud)"
-                        [outlined]="true"
+                        [icon]="getIconoBotonEvaluacion(solicitud)"
                         (click)="abrirDialogoEvaluacion(solicitud)"
                         [pTooltip]="getTooltipEvaluacion(solicitud)"
                         tooltipPosition="top"
-                        size="small"
-                        class="evaluacion-btn-compacto"
+                        class="evaluacion-tag cursor-pointer"
                     />
 
                     <!-- Menú de Acciones Mejorado -->
