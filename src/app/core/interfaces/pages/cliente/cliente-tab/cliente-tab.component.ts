@@ -26,6 +26,7 @@ import { LocalTipoViviendaService, LocalClienteService } from '../../../../servi
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LocalLoadPersonService } from '../../../../../shared/utils/local-load-person.service';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
+import { dniFormatValidator } from '../../../../validators/dni-unique.validator';
 
 @Component({
   selector: 'app-cliente-tab',
@@ -68,6 +69,7 @@ export class ClienteTabComponent implements OnInit {
   @Output() dniValid = new EventEmitter<string>();
   @Output() requiresAvalChange = new EventEmitter<{ required: boolean, reason: string }>();
   @Output() clienteChange = new EventEmitter<Cliente>();
+  @Input() validateUniqueDni?: (dni: string, type: 'cliente' | 'aval' | 'conyuge') => any;
 
   selectedClientes!: Cliente[] | null;
   clienteForm!: FormGroup;
@@ -213,7 +215,7 @@ export class ClienteTabComponent implements OnInit {
       id: [null, []],
       apellidos: [null, [Validators.required, Validators.minLength(1)]],
       nombres: [null, [Validators.required]],
-      dni: ['', [Validators.required]],
+      dni: ['', [Validators.required, dniFormatValidator, this.dniUniqueValidatorFn.bind(this)]],
       fecha_born: [this.max18Date, [Validators.required, this.minAgeValidator(18)]],
       estado_civil: [null, [Validators.required]],
       edad: [{ value: null, disabled: true }, [Validators.required]],
@@ -370,6 +372,35 @@ export class ClienteTabComponent implements OnInit {
     return this.clienteForm.controls['tipo_vivienda'];
   }
 
+  /**
+   * Validador personalizado para DNI único
+   * @param control Control del formulario
+   * @returns ValidationErrors | null
+   */
+  dniUniqueValidatorFn(control: AbstractControl): ValidationErrors | null {
+    const dni = control.value;
+
+    if (!dni || dni.length !== 8) {
+      return null; // No validar DNI incompletos
+    }
+
+    // Solo validar si tenemos la función de validación del padre
+    if (this.validateUniqueDni) {
+      const validation = this.validateUniqueDni(dni, 'cliente');
+
+      if (!validation.isValid) {
+        return {
+          dniDuplicated: {
+            message: validation.message,
+            usedIn: validation.usedIn
+          }
+        };
+      }
+    }
+
+    return null;
+  }
+
   minAgeValidator(minAge: number) {
     return (control: AbstractControl): ValidationErrors | null => {
       const dateValue = control.value;
@@ -426,6 +457,8 @@ export class ClienteTabComponent implements OnInit {
   getForm() {
     return this.clienteForm;
   }
+
+
 
   calculateAge(birthDate: Date) {
     const today = new Date();

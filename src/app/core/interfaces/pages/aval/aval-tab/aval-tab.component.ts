@@ -25,6 +25,8 @@ import { Aval } from '../../../../domain/aval.model';
 import { LocalAvalService, LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
+import { dniFormatValidator } from '../../../../validators/dni-unique.validator';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 
 @Component({
@@ -71,6 +73,7 @@ export class AvalTabComponent implements OnInit {
   @Input() isRecommended: boolean = false;
   @Input() recommendedReason: string = '';
   @Input() conyugeCompletado: boolean = false;
+  @Input() validateUniqueDni?: (dni: string, type: 'cliente' | 'aval' | 'conyuge') => any;
   selectedAvals!: Aval[] | null;
   tipoViviendasList = computed(() => this.tipoViviendaService.data());
   avalForm!: FormGroup;
@@ -279,7 +282,7 @@ export class AvalTabComponent implements OnInit {
       id: [0], // No es requerido, se generará automáticamente
       apellidos: ['', [Validators.required, Validators.minLength(1)]],
       nombres: ['', [Validators.required]],
-      dni: ['', [Validators.required]],
+      dni: ['', [Validators.required, dniFormatValidator, this.dniUniqueValidatorFn.bind(this)]],
       direccion: ['', [Validators.required]],
       celular: ['', [Validators.required]],
       n_referencial: ['', [Validators.minLength(9), Validators.maxLength(9)]],
@@ -429,6 +432,35 @@ export class AvalTabComponent implements OnInit {
 
   get tipo_vivienda() {
     return this.avalForm.controls['tipo_vivienda'];
+  }
+
+  /**
+   * Validador personalizado para DNI único en aval
+   * @param control Control del formulario
+   * @returns ValidationErrors | null
+   */
+  dniUniqueValidatorFn(control: AbstractControl): ValidationErrors | null {
+    const dni = control.value;
+
+    if (!dni || dni.length !== 8) {
+      return null; // No validar DNI incompletos
+    }
+
+    // Solo validar si tenemos la función de validación del padre
+    if (this.validateUniqueDni) {
+      const validation = this.validateUniqueDni(dni, 'aval');
+
+      if (!validation.isValid) {
+        return {
+          dniDuplicated: {
+            message: validation.message,
+            usedIn: validation.usedIn
+          }
+        };
+      }
+    }
+
+    return null;
   }
 
   showClearIcon = false;

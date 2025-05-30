@@ -37,23 +37,32 @@
       </p-tabpanel>
 
       <p-tabpanel [value]="1">
-        <app-cliente-tab #clienteTab (requiresAvalChange)="handleAvalRequirementChange($event)"
-          (clienteChange)="handleClienteChange($event)">
+        <app-cliente-tab #clienteTab
+          (requiresAvalChange)="handleAvalRequirementChange($event)"
+          (clienteChange)="handleClienteChange($event)"
+          [validateUniqueDni]="validateUniqueDni.bind(this)">
         </app-cliente-tab>
       </p-tabpanel>
 
       <p-tabpanel [value]="2">
-        <app-aval-tab #avalTab [isRequired]="clienteRequiresAval" [requiredReason]="avalRequiredReason"
-          [isRecommended]="montoRequiresAval" [recommendedReason]="montoAvalReason"
+        <app-aval-tab #avalTab
+          [isRequired]="clienteRequiresAval"
+          [requiredReason]="avalRequiredReason"
+          [isRecommended]="montoRequiresAval"
+          [recommendedReason]="montoAvalReason"
           [conyugeCompletado]="conyugeCompletado"
+          [validateUniqueDni]="validateUniqueDni.bind(this)"
           (avalCompletado)="verificarAvalOConyugeCompletado()">
         </app-aval-tab>
       </p-tabpanel>
 
       <p-tabpanel [value]="3">
-        <app-conyuge-tab #conyugeTab [isRequired]="clienteRequiresConyuge"
-          [requiredReason]="conyugeRequiredReason" [montoSolicitud]="montoSolicitud"
+        <app-conyuge-tab #conyugeTab
+          [isRequired]="clienteRequiresConyuge"
+          [requiredReason]="conyugeRequiredReason"
+          [montoSolicitud]="montoSolicitud"
           [avalCompletado]="avalCompletado"
+          [validateUniqueDni]="validateUniqueDni.bind(this)"
           (conyugeCompletado)="verificarAvalOConyugeCompletado()">
         </app-conyuge-tab>
       </p-tabpanel>

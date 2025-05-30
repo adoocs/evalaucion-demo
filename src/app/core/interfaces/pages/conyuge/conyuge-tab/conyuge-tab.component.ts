@@ -26,6 +26,8 @@ import { Conyuge } from '../../../../domain/conyuge.model';
 import { LocalConyugeService, LocalTipoViviendaService } from '../../../../services/local-data-container.service';
 import { debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { LoadPersonService } from '../../../../../shared/utils/load-person.service';
+import { dniFormatValidator } from '../../../../validators/dni-unique.validator';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 
 @Component({
@@ -71,6 +73,7 @@ export class ConyugeTabComponent implements OnChanges {
   @Input() requiredReason: string = '';
   @Input() montoSolicitud: number = 0;
   @Input() avalCompletado: boolean = false;
+  @Input() validateUniqueDni?: (dni: string, type: 'cliente' | 'aval' | 'conyuge') => any;
 
   get showWarning(): boolean {
     return this.isRequired && !this.isFormComplete();
@@ -135,7 +138,7 @@ export class ConyugeTabComponent implements OnChanges {
       id: [0], // No es requerido, se generará automáticamente
       apellidos: ['', [Validators.required, Validators.minLength(1)]],
       nombres: ['', [Validators.required]],
-      dni: ['', [Validators.required]],
+      dni: ['', [Validators.required, dniFormatValidator, this.dniUniqueValidatorFn.bind(this)]],
       fecha_born: [null],
       celular: ['', [Validators.required]],
       actividad: ['', [Validators.required]],
@@ -247,6 +250,35 @@ export class ConyugeTabComponent implements OnChanges {
 
   get actividad() {
     return this.conyugeForm.controls['actividad'];
+  }
+
+  /**
+   * Validador personalizado para DNI único en cónyuge
+   * @param control Control del formulario
+   * @returns ValidationErrors | null
+   */
+  dniUniqueValidatorFn(control: AbstractControl): ValidationErrors | null {
+    const dni = control.value;
+
+    if (!dni || dni.length !== 8) {
+      return null; // No validar DNI incompletos
+    }
+
+    // Solo validar si tenemos la función de validación del padre
+    if (this.validateUniqueDni) {
+      const validation = this.validateUniqueDni(dni, 'conyuge');
+
+      if (!validation.isValid) {
+        return {
+          dniDuplicated: {
+            message: validation.message,
+            usedIn: validation.usedIn
+          }
+        };
+      }
+    }
+
+    return null;
   }
 
   showClearIcon = false;

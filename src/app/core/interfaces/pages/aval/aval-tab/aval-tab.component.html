@@ -59,9 +59,18 @@
                             <i class="pi pi-times"></i>
                         </button>
                     </p-floatlabel>
+                    <!-- Mensajes de error para DNI del aval -->
                     <p-message severity="error" variant="simple" size="small"
-                        *ngIf="dni.touched && dni.invalid && !avalForm.get('omitido')?.value"
-                        [text]="'DNI es requerido.'">
+                        *ngIf="dni.touched && dni.errors?.['required'] && !avalForm.get('omitido')?.value"
+                        text="DNI es requerido.">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="dni.touched && dni.errors?.['dniFormat'] && !avalForm.get('omitido')?.value"
+                        [text]="dni.errors?.['dniFormat']?.message">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="dni.touched && dni.errors?.['dniDuplicated'] && !avalForm.get('omitido')?.value"
+                        [text]="dni.errors?.['dniDuplicated']?.message">
                     </p-message>
                 </div>
 

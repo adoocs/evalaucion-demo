@@ -20,8 +20,18 @@
                             <i class="pi pi-times"></i>
                         </button>
                     </p-floatlabel>
-                    <p-message severity="error" variant="simple" size="small" *ngIf="dni.touched && dni.invalid"
-                        [text]="'DNI es requerido.'">
+                    <!-- Mensajes de error para DNI -->
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="dni.touched && dni.errors?.['required']"
+                        text="DNI es requerido.">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="dni.touched && dni.errors?.['dniFormat']"
+                        [text]="dni.errors?.['dniFormat']?.message">
+                    </p-message>
+                    <p-message severity="error" variant="simple" size="small"
+                        *ngIf="dni.touched && dni.errors?.['dniDuplicated']"
+                        [text]="dni.errors?.['dniDuplicated']?.message">
                     </p-message>
                 </div>
 

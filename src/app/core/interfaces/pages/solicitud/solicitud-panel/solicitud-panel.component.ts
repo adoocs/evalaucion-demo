@@ -17,6 +17,8 @@ import { SolicitudTabComponent } from '../solicitud-tab/solicitud-tab.component'
 import { FichaTrabajo } from '../../../../domain/ficha-trabajo.model';
 import { Solicitud } from '../../../../domain/solicitud.model';
 import { Cliente } from '../../../../domain/cliente.model';
+import { Aval } from '../../../../domain/aval.model';
+import { Conyuge } from '../../../../domain/conyuge.model';
 import { LocalTipoViviendaService, LocalClienteService } from '../../../../services/local-data-container.service';
 import { PuntajeSentinelTabComponent } from "../../puntaje-sentinel/puntaje-sentinel-tab/puntaje-sentinel-tab.component";
 import { ResumenTabComponent } from "../../resumen/resumen-tab/resumen-tab.component";
@@ -25,6 +27,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { LocalFichaService } from '../../../../services/local-ficha.service';
 import { LocalValidationService } from '../../../../services/local-validation.service';
+import { DniValidationService } from '../../../../services/dni-validation.service';
 import { TaskToastService, Task } from '../../../../../shared/utils/task-toast.service';
 import { LocalLoadPersonService } from '../../../../../shared/utils/local-load-person.service';
 
@@ -131,6 +134,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   constructor(
     private messageService: MessageToastService,
     private validationService: LocalValidationService,
+    private dniValidationService: DniValidationService,
     private tipoViviendaService: LocalTipoViviendaService,
     private taskToastService: TaskToastService,
     private fichaTrabajoService: LocalFichaService,
@@ -384,6 +388,35 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error(`Error al cargar datos en tab ${tabIndex}:`, error);
     }
+  }
+
+  /**
+   * Obtiene los datos actuales de cliente, aval y cónyuge para validación de DNI
+   * @returns Objeto con los datos actuales
+   */
+  getCurrentPersonData(): { cliente: Cliente | null, aval: Aval | null, conyuge: Conyuge | null } {
+    return {
+      cliente: this.clienteTab?.getFormValues() || null,
+      aval: this.avalTab?.getFormValues() || null,
+      conyuge: this.conyugeTab?.getFormValues() || null
+    };
+  }
+
+  /**
+   * Valida que un DNI no esté duplicado entre cliente, aval y cónyuge
+   * @param dni El DNI a validar
+   * @param currentType El tipo actual donde se está ingresando el DNI
+   * @returns Resultado de la validación
+   */
+  validateUniqueDni(dni: string, currentType: 'cliente' | 'aval' | 'conyuge') {
+    const currentData = this.getCurrentPersonData();
+    return this.dniValidationService.validateUniqueDni(
+      dni,
+      currentData.cliente,
+      currentData.aval,
+      currentData.conyuge,
+      currentType
+    );
   }
 
   /**
