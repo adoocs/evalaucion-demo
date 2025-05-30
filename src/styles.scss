@@ -11,3 +11,35 @@
 .field {
   margin-bottom: 1.5rem;
 }
+
+/* ✅ ELIMINAR TODAS LAS TRANSICIONES MOLESTAS */
+/* Desactivar transiciones globalmente para evitar palpitaciones */
+* {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Permitir solo transiciones esenciales para funcionalidad */
+.p-dialog, .p-overlay, .p-dropdown-panel, .p-menu {
+  transition: opacity 0.1s ease !important;
+}
+
+/* Sin efectos de hover molestos */
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: #f8f9fa !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Sin efectos en botones */
+.p-button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Sin efectos en cards */
+.p-card:hover, .shadow-1:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}

@@ -4,7 +4,7 @@
       <div class="field md:col-span-1">
         <p-floatlabel>
           <p-datepicker formControlName="fecha" inputId="fecha" showIcon iconDisplay="input" [showButtonBar]="true"
-            dateFormat="yy-mm-dd" styleClass="w-full" [ngClass]="{'p-invalid': fecha.invalid && fecha.touched}" />
+            dateFormat="dd/mm/yy" styleClass="w-full" [ngClass]="{'p-invalid': fecha.invalid && fecha.touched}" />
           <label for="fecha">Fecha de pago</label>
         </p-floatlabel>
         <p-message severity="error" variant="simple" size="small" *ngIf="fecha.touched && fecha.invalid"

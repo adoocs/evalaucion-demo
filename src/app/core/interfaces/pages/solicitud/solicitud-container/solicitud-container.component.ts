@@ -125,7 +125,12 @@ export class SolicitudContainerComponent implements OnInit {
     setTimeout(() => {
       this.solicitudes.set(this.solicitudService.data());
       this.loading = false;
-    }, 500);
+
+      this.messageService.successMessageToast(
+        'Lista Actualizada',
+        'La lista de solicitudes ha sido actualizada correctamente.'
+      );
+    }, 1000);
   }
 
   openNew(): void {
@@ -657,4 +662,30 @@ export class SolicitudContainerComponent implements OnInit {
     // TODO: Aquí se implementaría la llamada al servicio para eliminar de la base de datos
     // Ejemplo: this.solicitudService.delete(solicitud.id).subscribe(...)
   }
+
+  /**
+   * Obtiene el número de solicitudes pendientes
+   * @returns Número de solicitudes pendientes
+   */
+  getSolicitudesPendientes(): number {
+    return this.solicitudes().filter(s => s.v_gerencia === 'pendiente').length;
+  }
+
+  /**
+   * Obtiene el número de solicitudes aprobadas
+   * @returns Número de solicitudes aprobadas
+   */
+  getSolicitudesAprobadas(): number {
+    return this.solicitudes().filter(s => s.v_gerencia === 'aprobado').length;
+  }
+
+  /**
+   * Obtiene el número de solicitudes observadas o denegadas
+   * @returns Número de solicitudes observadas o denegadas
+   */
+  getSolicitudesObservadasDenegadas(): number {
+    return this.solicitudes().filter(s => s.v_gerencia === 'observado' || s.v_gerencia === 'denegado').length;
+  }
+
+
 }

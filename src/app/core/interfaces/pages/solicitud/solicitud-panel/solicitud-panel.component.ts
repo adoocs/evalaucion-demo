@@ -19,7 +19,7 @@ import { Solicitud } from '../../../../domain/solicitud.model';
 import { Cliente } from '../../../../domain/cliente.model';
 import { Aval } from '../../../../domain/aval.model';
 import { Conyuge } from '../../../../domain/conyuge.model';
-import { LocalTipoViviendaService, LocalClienteService } from '../../../../services/local-data-container.service';
+import { LocalTipoViviendaService, LocalClienteService, LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { PuntajeSentinelTabComponent } from "../../puntaje-sentinel/puntaje-sentinel-tab/puntaje-sentinel-tab.component";
 import { ResumenTabComponent } from "../../resumen/resumen-tab/resumen-tab.component";
 import { MessageService } from 'primeng/api';
@@ -139,7 +139,8 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     private taskToastService: TaskToastService,
     private fichaTrabajoService: LocalFichaService,
     private clienteService: LocalClienteService,
-    private loadPersonService: LocalLoadPersonService
+    private loadPersonService: LocalLoadPersonService,
+    private solicitudService: LocalSolicitudService
   ) { }
 
   ngOnInit(): void {
@@ -182,10 +183,10 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos de la ficha de trabajo en los formularios para modo edición
+   * Carga los datos de la ficha de trabajo en los formularios para modo edición y visualización
    */
   private cargarDatosEnFormularios(): void {
-    if (!this.modoEdicion || !this.fichaTrabajoInternal) {
+    if ((!this.modoEdicion && !this.modoVisualizacion) || !this.fichaTrabajoInternal) {
       return;
     }
 
@@ -241,31 +242,41 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
           break;
 
         case 2: // Aval
-          if (this.avalTab && this.fichaTrabajoInternal.aval) {
+          if (this.avalTab) {
             setTimeout(() => {
-              this.avalTab.updateFormValues(this.fichaTrabajoInternal.aval!);
+              if (this.fichaTrabajoInternal.aval) {
+                this.avalTab.updateFormValues(this.fichaTrabajoInternal.aval!);
 
-              // Si el aval está omitido, aplicar la lógica de deshabilitación
-              if (this.fichaTrabajoInternal.aval!.omitido) {
-                this.aplicarEstadoOmisionAval();
+                // Si el aval está omitido, aplicar la lógica de deshabilitación
+                if (this.fichaTrabajoInternal.aval!.omitido) {
+                  console.log('🚫 Aval está omitido, aplicando estado de omisión');
+                  this.aplicarEstadoOmisionAval();
+                }
+
+                console.log('✅ Datos de aval cargados:', this.fichaTrabajoInternal.aval);
+              } else {
+                console.log('⚠️ No hay datos de aval disponibles');
               }
-
-              console.log('Datos de aval cargados:', this.fichaTrabajoInternal.aval);
             }, 100);
           }
           break;
 
         case 3: // Cónyuge
-          if (this.conyugeTab && this.fichaTrabajoInternal.conyuge) {
+          if (this.conyugeTab) {
             setTimeout(() => {
-              this.conyugeTab.updateFormValues(this.fichaTrabajoInternal.conyuge!);
+              if (this.fichaTrabajoInternal.conyuge) {
+                this.conyugeTab.updateFormValues(this.fichaTrabajoInternal.conyuge!);
 
-              // Si el cónyuge está omitido, aplicar la lógica de deshabilitación
-              if (this.fichaTrabajoInternal.conyuge!.omitido) {
-                this.aplicarEstadoOmisionConyuge();
+                // Si el cónyuge está omitido, aplicar la lógica de deshabilitación
+                if (this.fichaTrabajoInternal.conyuge!.omitido) {
+                  console.log('🚫 Cónyuge está omitido, aplicando estado de omisión');
+                  this.aplicarEstadoOmisionConyuge();
+                }
+
+                console.log('✅ Datos de cónyuge cargados:', this.fichaTrabajoInternal.conyuge);
+              } else {
+                console.log('⚠️ No hay datos de cónyuge disponibles');
               }
-
-              console.log('Datos de cónyuge cargados:', this.fichaTrabajoInternal.conyuge);
             }, 100);
           }
           break;
@@ -275,12 +286,20 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               if (this.fichaTrabajoInternal.credito_anterior) {
                 this.creditoAnteriorTab.updateFormValues(this.fichaTrabajoInternal.credito_anterior!);
-                console.log('Datos de crédito anterior cargados:', this.fichaTrabajoInternal.credito_anterior);
+
+                // Para crédito anterior, verificar si tiene la propiedad omitido
+                if (this.fichaTrabajoInternal.credito_anterior && 'omitido' in this.fichaTrabajoInternal.credito_anterior && (this.fichaTrabajoInternal.credito_anterior as any).omitido) {
+                  console.log('🚫 Crédito anterior está omitido');
+                  this.creditoAnteriorTab.omitirCreditoAnterior = true;
+                  this.creditoAnteriorTab.confirmarOmision();
+                } else {
+                  console.log('✅ Datos de crédito anterior cargados:', this.fichaTrabajoInternal.credito_anterior);
+                }
               } else {
-                // Si no hay crédito anterior, verificar si está omitido
+                // Si no hay crédito anterior, marcarlo como omitido
+                console.log('⚠️ No hay datos de crédito anterior, marcando como omitido');
                 this.creditoAnteriorTab.omitirCreditoAnterior = true;
                 this.creditoAnteriorTab.confirmarOmision();
-                console.log('Crédito anterior omitido');
               }
             }, 100);
           }
@@ -313,10 +332,16 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               if (this.fichaTrabajoInternal.ingreso_adicional) {
                 this.ingresoAdicionalTab.updateFormValues(this.fichaTrabajoInternal.ingreso_adicional!);
-                console.log('Datos de ingreso adicional cargados:', this.fichaTrabajoInternal.ingreso_adicional);
+                console.log('✅ Datos de ingreso adicional cargados:', this.fichaTrabajoInternal.ingreso_adicional);
+
+                // Para ingreso adicional, no verificamos omisión en el modelo
+                // La omisión se maneja a través de las variables del componente
+                // Si hay datos, significa que no está omitido
+                this.ingresoAdicionalTab.omitirIngresoAdicional = false;
+                this.ingresoAdicionalTab.omitirAportesTerceros = false;
               } else {
                 // Si no hay ingreso adicional, marcarlo como omitido
-                console.log('Aplicando omisión para ingreso adicional');
+                console.log('⚠️ No hay datos de ingreso adicional, marcando como omitido');
                 this.ingresoAdicionalTab.omitirIngresoAdicional = true;
                 this.ingresoAdicionalTab.omitirAportesTerceros = true;
 
@@ -324,11 +349,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
                 this.ingresoAdicionalTab.confirmarOmision();
                 this.ingresoAdicionalTab.confirmarOmisionAportesTerceros();
 
-                // Deshabilitar los formularios
-                this.ingresoAdicionalTab.ingresoAdicionalForm.disable();
-                // El formulario de aportes terceros se deshabilita automáticamente con la omisión
-
-                console.log('Ingreso adicional omitido y formularios deshabilitados');
+                console.log('✅ Ingreso adicional omitido');
               }
             }, 200); // Aumentar el timeout para asegurar que el componente esté completamente inicializado
           }
@@ -714,6 +735,12 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
    * Actualiza la lista de tareas pendientes basado en las validaciones actuales
    */
   actualizarTareasPendientes(): void {
+    // No mostrar tareas pendientes en modo visualización
+    if (this.modoVisualizacion) {
+      console.log('Modo visualización: no se muestran tareas pendientes');
+      return;
+    }
+
     // Verificar si los componentes están inicializados
     if (!this.avalTab || !this.conyugeTab) {
       console.log('Los componentes no están inicializados todavía, no se pueden actualizar las tareas');
@@ -1890,10 +1917,12 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     this.solicitud.referencia_familiar = this.fichaTrabajoInternal.referencia_familiar || undefined;
     this.solicitud.ingreso_adicional = this.fichaTrabajoInternal.ingreso_adicional || undefined;
     this.solicitud.negocio = this.fichaTrabajoInternal.detalleEconomico?.negocio || undefined;
+    this.solicitud.ingreso_dependiente = this.fichaTrabajoInternal.detalleEconomico?.ingreso_dependiente || undefined;
 
-    // Asignar fecha actual si no tiene
+    // Asignar fecha actual si no tiene (formato día/mes/año)
     if (!this.solicitud.fecha) {
-      this.solicitud.fecha = new Date().toISOString().split('T')[0];
+      const hoy = new Date();
+      this.solicitud.fecha = `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
     }
 
     // Generar número de crédito si no tiene
@@ -1907,9 +1936,24 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       console.log('✅ Estado V° Gerencia establecido como "pendiente" por defecto');
     }
 
-    console.log('Creando solicitud (DEMO):', this.solicitud);
-    this.messageService.successMessageToast('Éxito', 'Solicitud creada correctamente (Versión Demo)');
-    this.switchMessageHandler('create');
+    // Determinar tipo de evaluación automáticamente
+    const tipoEvaluacion = this.determinarTipoEvaluacion();
+    console.log('✅ Tipo de evaluación determinado:', tipoEvaluacion);
+
+    console.log('Creando solicitud:', this.solicitud);
+
+    // GUARDAR LA SOLICITUD EN EL SERVICIO LOCAL
+    this.solicitudService.create(this.solicitud).subscribe({
+      next: (solicitudGuardada) => {
+        console.log('✅ Solicitud guardada exitosamente:', solicitudGuardada);
+        this.messageService.successMessageToast('Éxito', `Solicitud creada correctamente - ${tipoEvaluacion}`);
+        this.switchMessageHandler('create');
+      },
+      error: (error) => {
+        console.error('❌ Error al guardar solicitud:', error);
+        this.messageService.errorMessageToast('Error', 'No se pudo guardar la solicitud');
+      }
+    });
   }
 
   editSolicitud(): void {
@@ -1935,10 +1979,12 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
     this.solicitud.referencia_familiar = this.fichaTrabajoInternal.referencia_familiar || undefined;
     this.solicitud.ingreso_adicional = this.fichaTrabajoInternal.ingreso_adicional || undefined;
     this.solicitud.negocio = this.fichaTrabajoInternal.detalleEconomico?.negocio || undefined;
+    this.solicitud.ingreso_dependiente = this.fichaTrabajoInternal.detalleEconomico?.ingreso_dependiente || undefined;
 
-    // Mantener la fecha existente o asignar fecha actual si no tiene
+    // Mantener la fecha existente o asignar fecha actual si no tiene (formato día/mes/año)
     if (!this.solicitud.fecha) {
-      this.solicitud.fecha = new Date().toISOString().split('T')[0];
+      const hoy = new Date();
+      this.solicitud.fecha = `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
     }
 
     // Asegurar estado pendiente por defecto si no tiene estado
@@ -1947,11 +1993,25 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       console.log('✅ Estado V° Gerencia establecido como "pendiente" por defecto en getAllData()');
     }
 
-    console.log('Editando solicitud (DEMO):', this.solicitud);
-    console.log('Ficha de trabajo actualizada (DEMO):', this.fichaTrabajoInternal);
+    // Determinar tipo de evaluación automáticamente
+    const tipoEvaluacion = this.determinarTipoEvaluacion();
+    console.log('✅ Tipo de evaluación determinado:', tipoEvaluacion);
 
-    this.messageService.successMessageToast('Éxito', 'Solicitud actualizada correctamente (Versión Demo)');
-    this.switchMessageHandler('edit');
+    console.log('Editando solicitud:', this.solicitud);
+    console.log('Ficha de trabajo actualizada:', this.fichaTrabajoInternal);
+
+    // ACTUALIZAR LA SOLICITUD EN EL SERVICIO LOCAL
+    this.solicitudService.update(this.solicitud.id, this.solicitud).subscribe({
+      next: (solicitudActualizada) => {
+        console.log('✅ Solicitud actualizada exitosamente:', solicitudActualizada);
+        this.messageService.successMessageToast('Éxito', `Solicitud actualizada correctamente - ${tipoEvaluacion}`);
+        this.switchMessageHandler('edit');
+      },
+      error: (error) => {
+        console.error('❌ Error al actualizar solicitud:', error);
+        this.messageService.errorMessageToast('Error', 'No se pudo actualizar la solicitud');
+      }
+    });
   }
 
   switchMessageHandler(message: string): void {
@@ -1984,10 +2044,14 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
    */
   private aplicarEstadoOmisionAval(): void {
     if (!this.avalTab || !this.avalTab.avalForm) {
+      console.log('⚠️ No se puede aplicar omisión de aval - formulario no disponible');
       return;
     }
 
-    console.log('Aplicando estado de omisión para Aval');
+    console.log('🚫 Aplicando estado de omisión para Aval');
+
+    // Marcar como omitido en el formulario
+    this.avalTab.avalForm.patchValue({ omitido: true });
 
     // Deshabilitar los campos requeridos
     const requiredFields = [
@@ -2004,7 +2068,7 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       }
     });
 
-    console.log('Estado de omisión aplicado para Aval');
+    console.log('✅ Estado de omisión aplicado para Aval');
   }
 
   /**
@@ -2012,10 +2076,14 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
    */
   private aplicarEstadoOmisionConyuge(): void {
     if (!this.conyugeTab || !this.conyugeTab.conyugeForm) {
+      console.log('⚠️ No se puede aplicar omisión de cónyuge - formulario no disponible');
       return;
     }
 
-    console.log('Aplicando estado de omisión para Cónyuge');
+    console.log('🚫 Aplicando estado de omisión para Cónyuge');
+
+    // Marcar como omitido en el formulario
+    this.conyugeTab.conyugeForm.patchValue({ omitido: true });
 
     // Deshabilitar los campos requeridos
     const requiredFields = [
@@ -2031,6 +2099,53 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
       }
     });
 
-    console.log('Estado de omisión aplicado para Cónyuge');
+    console.log('✅ Estado de omisión aplicado para Cónyuge');
+  }
+
+  /**
+   * Determina automáticamente el tipo de evaluación basado en los datos ingresados
+   * @returns El tipo de evaluación determinado
+   */
+  determinarTipoEvaluacion(): string {
+    console.log('=== DETERMINANDO TIPO DE EVALUACIÓN ===');
+
+    // Usar los datos de la solicitud que ya están actualizados
+    console.log('Solicitud para evaluación:', this.solicitud);
+
+    // Verificar si hay datos de negocio válidos
+    const negocio = this.solicitud.negocio;
+    const tieneNegocio = negocio &&
+                        negocio.actividad_economica &&
+                        negocio.actividad_economica.id &&
+                        negocio.actividad_economica.descripcion;
+
+    // Verificar si hay datos de ingreso dependiente válidos
+    const ingresoDep = this.solicitud.ingreso_dependiente;
+    const tieneIngresoDependiente = ingresoDep &&
+                                   ingresoDep.actividad &&
+                                   ingresoDep.actividad.trim() !== '' &&
+                                   ingresoDep.importe &&
+                                   ingresoDep.importe > 0;
+
+    console.log('=== ANÁLISIS DETALLADO ===');
+    console.log('Datos de negocio en solicitud:', negocio);
+    console.log('¿Tiene negocio válido?:', tieneNegocio);
+    console.log('Datos de ingreso dependiente en solicitud:', ingresoDep);
+    console.log('¿Tiene ingreso dependiente válido?:', tieneIngresoDependiente);
+
+    if (tieneNegocio && !tieneIngresoDependiente) {
+      console.log('✅ EVALUACIÓN MICRO - Solo tiene datos de negocio');
+      return 'Evaluación Micro';
+    } else if (tieneIngresoDependiente && !tieneNegocio) {
+      console.log('✅ EVALUACIÓN CONSUMO - Solo tiene datos de ingreso dependiente');
+      return 'Evaluación Consumo';
+    } else if (tieneNegocio && tieneIngresoDependiente) {
+      console.log('⚠️ AMBOS TIPOS DE DATOS - Priorizando Evaluación Micro');
+      return 'Evaluación Micro (Prioridad)';
+    } else {
+      console.log('❌ SIN DATOS SUFICIENTES - Evaluación pendiente');
+      console.log('Motivo: No se encontraron datos válidos de negocio ni ingreso dependiente');
+      return 'Evaluación Pendiente';
+    }
   }
 }

@@ -276,8 +276,9 @@ export class SolicitudEditarComponent implements OnInit {
 
     switch (message) {
       case 'edit':
-        // Actualizar la solicitud y la ficha de trabajo
-        this.actualizarSolicitud();
+        // La solicitud ya fue actualizada en el panel, navegar inmediatamente
+        console.log('Solicitud actualizada exitosamente, navegando a la lista');
+        this.router.navigate(['/solicitudes']);
         break;
       case 'error':
         this.messageService.errorMessageToast('Error', 'No se pudo completar la acción');

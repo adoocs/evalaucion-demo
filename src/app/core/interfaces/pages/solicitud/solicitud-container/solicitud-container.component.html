@@ -1,63 +1,217 @@
 <!-- Toast para mensajes -->
 <p-toast />
 
-<p-toolbar styleClass="mb-6">
-    <ng-template pTemplate="start">
-        <h5 class="m-0 mr-4">Lista de Solicitudes</h5>
-        <p-button label="Nueva Solicitud" icon="pi pi-plus" severity="secondary" class="mr-2" (click)="openNew()" />
-    </ng-template>
+<!-- Header mejorado con estadísticas -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="col-span-1 md:col-span-4">
+        <p-toolbar styleClass="mb-4">
+            <ng-template pTemplate="start">
+                <div class="flex items-center gap-4">
+                    <h4 class="m-0 text-primary font-bold">
+                        <i class="pi pi-list mr-2"></i>
+                        Gestión de Solicitudes
+                    </h4>
+                    <p-button
+                        label="Nueva Solicitud"
+                        icon="pi pi-plus"
+                        severity="success"
+                        class="mr-2"
+                        (click)="openNew()"
+                        pTooltip="Crear nueva solicitud"
+                    />
+                </div>
+            </ng-template>
 
-    <ng-template pTemplate="end">
-        <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
-    </ng-template>
-</p-toolbar>
+            <ng-template pTemplate="end">
+                <div class="flex gap-2">
+                    <p-button
+                        icon="pi pi-refresh"
+                        severity="secondary"
+                        [outlined]="true"
+                        (click)="refreshSolicitudes()"
+                        pTooltip="Actualizar lista"
+                    />
+                    <p-button
+                        label="Exportar"
+                        icon="pi pi-upload"
+                        severity="secondary"
+                        [outlined]="true"
+                        pTooltip="Exportar datos"
+                    />
+                </div>
+            </ng-template>
+        </p-toolbar>
+    </div>
 
-<!-- Tabla de solicitudes -->
-<p-table
-    #dt
-    [value]="solicitudes()"
-    [rows]="10"
-    [paginator]="true"
-    [globalFilterFields]="['id', 'n_credito', 'cliente', 'fecha', 'monto', 'plazo', 'v_gerencia']"
-    [tableStyle]="{ 'min-width': '75rem' }"
-    [rowHover]="true"
-    dataKey="id"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} solicitudes"
-    [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[10, 20, 30]"
-    [loading]="loading"
->
-    <ng-template pTemplate="caption">
-        <div class="flex items-center justify-between">
-            <h5 class="m-0">Solicitudes Registradas</h5>
-            <p-iconfield>
-                <p-inputicon styleClass="pi pi-search" />
-                <input pInputText type="text" placeholder="Buscar..." />
-            </p-iconfield>
+    <!-- Tarjetas de estadísticas -->
+    <div class="bg-white p-4 border-round shadow-1">
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-600 text-sm font-medium">Total Solicitudes</div>
+                <div class="text-900 text-2xl font-bold">{{ solicitudes().length }}</div>
+            </div>
+            <div class="bg-blue-100 text-blue-600 p-3 border-round">
+                <i class="pi pi-file text-xl"></i>
+            </div>
         </div>
-    </ng-template>
-    <ng-template pTemplate="header">
-        <tr>
-            <th pSortableColumn="n_credito">N° Crédito <p-sortIcon field="n_credito"></p-sortIcon></th>
-            <th pSortableColumn="cliente">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
-            <th pSortableColumn="fecha">Fecha <p-sortIcon field="fecha"></p-sortIcon></th>
-            <th pSortableColumn="monto">Monto <p-sortIcon field="monto"></p-sortIcon></th>
-            <th pSortableColumn="plazo">Plazo <p-sortIcon field="plazo"></p-sortIcon></th>
-            <th pSortableColumn="v_gerencia">V° Gerencia <p-sortIcon field="v_gerencia"></p-sortIcon></th>
-            <th>Acciones</th>
-        </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-solicitud>
-        <tr class="solicitud-row" [style.border-left]="'4px solid ' + getColorBarra(solicitud)">
-            <td>{{solicitud.n_credito}}</td>
-            <td>{{solicitud.cliente}}</td>
-            <td>{{solicitud.fecha}}</td>
-            <td>{{solicitud.monto | currency:'S/ '}}</td>
-            <td>{{solicitud.plazo}}</td>
-            <td>
-                <div class="v-gerencia-container">
-                    <!-- Tag principal del estado -->
-                    <div class="estado-tag-wrapper">
+    </div>
+
+    <div class="bg-white p-4 border-round shadow-1">
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-600 text-sm font-medium">Pendientes</div>
+                <div class="text-900 text-2xl font-bold">
+                    {{ getSolicitudesPendientes() }}
+                </div>
+            </div>
+            <div class="bg-orange-100 text-orange-600 p-3 border-round">
+                <i class="pi pi-clock text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 border-round shadow-1">
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-600 text-sm font-medium">Aprobadas</div>
+                <div class="text-900 text-2xl font-bold">
+                    {{ getSolicitudesAprobadas() }}
+                </div>
+            </div>
+            <div class="bg-green-100 text-green-600 p-3 border-round">
+                <i class="pi pi-check-circle text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 border-round shadow-1">
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-600 text-sm font-medium">Observadas/Denegadas</div>
+                <div class="text-900 text-2xl font-bold">
+                    {{ getSolicitudesObservadasDenegadas() }}
+                </div>
+            </div>
+            <div class="bg-red-100 text-red-600 p-3 border-round">
+                <i class="pi pi-exclamation-triangle text-xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de solicitudes mejorada -->
+<div class="bg-white border-round shadow-1 p-4">
+    <p-table
+        #dt
+        [value]="solicitudes()"
+        [rows]="10"
+        [paginator]="true"
+        [globalFilterFields]="['id', 'n_credito', 'cliente', 'fecha', 'monto', 'plazo', 'v_gerencia']"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [rowHover]="true"
+        dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} solicitudes"
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 20, 30]"
+        [loading]="loading"
+        styleClass="p-datatable-striped p-datatable-gridlines"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <h5 class="m-0 text-900 font-bold">
+                        <i class="pi pi-table text-primary mr-2"></i>
+                        Solicitudes Registradas
+                    </h5>
+                    <p-tag
+                        [value]="'Total: ' + solicitudes().length"
+                        severity="info"
+                        [rounded]="true"
+                    />
+                </div>
+                <div class="flex gap-3">
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input
+                            pInputText
+                            type="text"
+                            placeholder="Buscar solicitudes..."
+                            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            class="w-20rem"
+                        />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="n_credito" class="text-center">
+                    N° Crédito
+                    <p-sortIcon field="n_credito"></p-sortIcon>
+                </th>
+                <th pSortableColumn="cliente">
+                    Cliente
+                    <p-sortIcon field="cliente"></p-sortIcon>
+                </th>
+                <th pSortableColumn="fecha" class="text-center">
+                    Fecha
+                    <p-sortIcon field="fecha"></p-sortIcon>
+                </th>
+                <th pSortableColumn="monto" class="text-center">
+                    Monto
+                    <p-sortIcon field="monto"></p-sortIcon>
+                </th>
+                <th pSortableColumn="plazo" class="text-center">
+                    Plazo
+                    <p-sortIcon field="plazo"></p-sortIcon>
+                </th>
+                <th class="text-center">
+                    Tipo
+                </th>
+                <th pSortableColumn="v_gerencia" class="text-center">
+                    V° Gerencia
+                    <p-sortIcon field="v_gerencia"></p-sortIcon>
+                </th>
+                <th class="text-center">
+                    Acciones
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-solicitud>
+            <tr class="solicitud-row" [style.border-left]="'4px solid ' + getColorBarra(solicitud)">
+                <td class="text-center">
+                    <p-tag
+                        [value]="solicitud.n_credito.toString()"
+                        severity="secondary"
+                        [rounded]="true"
+                    />
+                </td>
+                <td>
+                    <div class="font-semibold text-900">{{ solicitud.cliente }}</div>
+                </td>
+                <td class="text-center">
+                    <span class="font-medium">{{ solicitud.fecha }}</span>
+                </td>
+                <td class="text-center">
+                    <span class="font-bold text-900">
+                        {{ solicitud.monto | currency:'S/ ' }}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <span class="font-medium">{{ solicitud.plazo }}</span>
+                </td>
+                <td class="text-center">
+                    <!-- Tag de tipo de evaluación -->
+                    <p-tag
+                        [value]="getTagEvaluacion(solicitud).label"
+                        [severity]="getTagEvaluacion(solicitud).severity"
+                        [icon]="getTagEvaluacion(solicitud).icon"
+                        [rounded]="true"
+                    />
+                </td>
+                <td class="text-center">
+                    <div class="v-gerencia-container flex items-center justify-center gap-3">
+                        <!-- Tag principal del estado -->
                         <p-tag
                             *ngIf="solicitud.v_gerencia"
                             [value]="getEstadoLabel(solicitud.v_gerencia)"
@@ -76,152 +230,182 @@
                             [rounded]="true"
                             class="estado-tag"
                         />
-                    </div>
 
-                    <!-- Botón para cambiar estado -->
-                    <p-button
-                        #estadoButton
-                        icon="pi pi-pencil"
-                        [rounded]="true"
-                        [text]="true"
-                        size="small"
-                        severity="secondary"
-                        class="estado-edit-btn"
-                        (click)="estadoPanel.toggle($event, estadoButton.el.nativeElement); solicitudMenuAbierto = solicitud"
-                        pTooltip="Cambiar estado"
-                        tooltipPosition="top"
-                    />
+                        <!-- Botón para cambiar estado -->
+                        <p-button
+                            #estadoButton
+                            icon="pi pi-pencil"
+                            [rounded]="true"
+                            [outlined]="true"
+                            size="small"
+                            severity="secondary"
+                            class="estado-edit-btn"
+                            (click)="estadoPanel.toggle($event, estadoButton.el.nativeElement); solicitudMenuAbierto = solicitud"
+                            pTooltip="Cambiar estado"
+                            tooltipPosition="top"
+                        />
 
                     <!-- Menu overlay para cambiar estado -->
                     <p-overlayPanel
                         #estadoPanel
-                        [style]="{'width': '250px'}"
+                        [style]="{'width': '280px'}"
                         styleClass="estado-overlay"
                     >
-                        <div class="estado-menu">
-                            <div class="estado-menu-header">
-                                <div class="flex align-items-center gap-2 mb-2">
-                                    <i class="pi pi-cog text-primary"></i>
-                                    <h6 class="m-0 font-semibold text-900">Cambiar V° Gerencia</h6>
-                                </div>
-                                <p class="m-0 text-sm text-600" *ngIf="solicitudMenuAbierto">
-                                    <i class="pi pi-file mr-1"></i>
+                        <div class="p-3">
+                            <div class="mb-3">
+                                <h6 class="m-0 font-bold text-900 mb-2">Cambiar V° Gerencia</h6>
+                                <small class="text-600" *ngIf="solicitudMenuAbierto">
                                     Solicitud N° {{ solicitudMenuAbierto.n_credito }}
-                                </p>
+                                </small>
                             </div>
-                            <div class="estado-opciones">
-                                <div
-                                    *ngFor="let estado of estadosVBGerencia"
-                                    class="estado-opcion"
-                                    [ngClass]="{'selected': solicitudMenuAbierto?.v_gerencia === estado.value}"
-                                    (click)="cambiarEstado(solicitudMenuAbierto!, estado.value, estadoPanel)"
-                                >
-                                    <div class="estado-opcion-content">
-                                        <i [class]="getEstadoIcon(estado.value)" [style.color]="getEstadoColor(estado.value)"></i>
-                                        <span class="estado-label">{{ estado.label }}</span>
-                                        <i *ngIf="solicitudMenuAbierto?.v_gerencia === estado.value" class="pi pi-check ml-auto text-primary estado-check"></i>
-                                    </div>
-                                </div>
+
+                            <div class="flex flex-col gap-2">
+                                <!-- Opción Aprobado -->
+                                <p-button
+                                    label="Aprobado"
+                                    icon="pi pi-check-circle"
+                                    severity="success"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
+                                    (click)="cambiarEstado(solicitudMenuAbierto!, 'aprobado', estadoPanel)"
+                                />
+
+                                <!-- Opción Observado -->
+                                <p-button
+                                    label="Observado"
+                                    icon="pi pi-exclamation-triangle"
+                                    severity="warn"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
+                                    (click)="cambiarEstado(solicitudMenuAbierto!, 'observado', estadoPanel)"
+                                />
+
+                                <!-- Opción Denegado -->
+                                <p-button
+                                    label="Denegado"
+                                    icon="pi pi-times-circle"
+                                    severity="danger"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
+                                    (click)="cambiarEstado(solicitudMenuAbierto!, 'denegado', estadoPanel)"
+                                />
+
+                                <!-- Opción Pendiente -->
+                                <p-button
+                                    label="Pendiente"
+                                    icon="pi pi-clock"
+                                    severity="secondary"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
+                                    (click)="cambiarEstado(solicitudMenuAbierto!, 'pendiente', estadoPanel)"
+                                />
                             </div>
                         </div>
                     </p-overlayPanel>
                 </div>
             </td>
-            <td>
-                <div class="flex gap-2 align-items-center">
-                    <!-- Botón Ver -->
-                    <p-button
-                        icon="pi pi-eye"
-                        severity="help"
-                        [rounded]="true"
-                        [outlined]="true"
-                        (click)="viewSolicitud(solicitud)"
-                        pTooltip="Ver solicitud"
-                        tooltipPosition="top"
-                        size="small"
-                    />
+                <td class="text-center">
+                    <div class="flex gap-2 align-items-center justify-center">
+                        <!-- Botón Ver -->
+                        <p-button
+                            icon="pi pi-eye"
+                            severity="help"
+                            [rounded]="true"
+                            [outlined]="true"
+                            (click)="viewSolicitud(solicitud)"
+                            pTooltip="Ver solicitud"
+                            tooltipPosition="top"
+                            size="small"
+                        />
 
-                    <!-- Tag de Evaluación con PrimeNG -->
-                    <p-tag
-                        [value]="getLabelEvaluacion(solicitud)"
-                        [severity]="getColorBotonEvaluacion(solicitud)"
-                        [icon]="getIconoBotonEvaluacion(solicitud)"
-                        (click)="abrirDialogoEvaluacion(solicitud)"
-                        [pTooltip]="getTooltipEvaluacion(solicitud)"
-                        tooltipPosition="top"
-                        class="evaluacion-tag cursor-pointer"
-                    />
+                        <!-- Botón de Evaluación mejorado -->
+                        <p-button
+                            [icon]="getIconoBotonEvaluacion(solicitud)"
+                            [severity]="getColorBotonEvaluacion(solicitud)"
+                            [rounded]="true"
+                            [outlined]="true"
+                            (click)="abrirDialogoEvaluacion(solicitud)"
+                            [pTooltip]="getTooltipEvaluacion(solicitud)"
+                            tooltipPosition="top"
+                            size="small"
+                        />
 
-                    <!-- Menú de Acciones Mejorado -->
-                    <p-button
-                        #accionesButton
-                        icon="pi pi-cog"
-                        severity="secondary"
-                        [rounded]="true"
-                        [outlined]="true"
-                        (click)="accionesPanel.toggle($event, accionesButton.el.nativeElement); solicitudMenuAcciones = solicitud"
-                        pTooltip="Acciones"
-                        tooltipPosition="top"
-                        class="acciones-btn-grande"
-                    />
+                        <!-- Menú de Acciones Mejorado -->
+                        <p-button
+                            #accionesButton
+                            icon="pi pi-ellipsis-v"
+                            severity="secondary"
+                            [rounded]="true"
+                            [outlined]="true"
+                            (click)="accionesPanel.toggle($event, accionesButton.el.nativeElement); solicitudMenuAcciones = solicitud"
+                            pTooltip="Más acciones"
+                            tooltipPosition="top"
+                            size="small"
+                        />
 
                     <!-- Panel de Acciones -->
                     <p-overlayPanel
                         #accionesPanel
-                        [style]="{'width': '200px'}"
+                        [style]="{'width': '220px'}"
                         styleClass="acciones-overlay"
                     >
-                        <div class="acciones-menu">
-                            <div class="acciones-header">
-                                <div class="flex align-items-center gap-2 mb-2">
-                                    <i class="pi pi-cog text-primary"></i>
-                                    <h6 class="m-0 font-semibold text-900">Acciones</h6>
-                                </div>
-                                <p class="m-0 text-sm text-600" *ngIf="solicitudMenuAcciones">
-                                    <i class="pi pi-file mr-1"></i>
+                        <div class="p-3">
+                            <div class="mb-3">
+                                <h6 class="m-0 font-bold text-900 mb-2">Acciones</h6>
+                                <small class="text-600" *ngIf="solicitudMenuAcciones">
                                     Solicitud N° {{ solicitudMenuAcciones.n_credito }}
-                                </p>
+                                </small>
                             </div>
-                            <div class="acciones-opciones">
-                                <!-- Opción Editar -->
-                                <div
-                                    class="accion-opcion"
-                                    (click)="editSolicitud(solicitudMenuAcciones!); accionesPanel.hide()"
-                                >
-                                    <div class="accion-content">
-                                        <i class="pi pi-pencil text-blue-500"></i>
-                                        <span class="accion-label">Editar</span>
-                                        <i class="pi pi-angle-right ml-auto text-400"></i>
-                                    </div>
-                                </div>
 
-                                <!-- Separador -->
-                                <div class="accion-separador"></div>
+                            <div class="flex flex-col gap-2">
+                                <!-- Opción Editar -->
+                                <p-button
+                                    label="Editar"
+                                    icon="pi pi-pencil"
+                                    severity="info"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
+                                    (click)="editSolicitud(solicitudMenuAcciones!); accionesPanel.hide()"
+                                />
 
                                 <!-- Opción Eliminar -->
-                                <div
-                                    class="accion-opcion danger"
+                                <p-button
+                                    label="Eliminar"
+                                    icon="pi pi-trash"
+                                    severity="danger"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
                                     (click)="confirmarEliminarSolicitud(solicitudMenuAcciones!); accionesPanel.hide()"
-                                >
-                                    <div class="accion-content">
-                                        <i class="pi pi-trash text-red-500"></i>
-                                        <span class="accion-label">Eliminar</span>
-                                        <i class="pi pi-angle-right ml-auto text-400"></i>
-                                    </div>
-                                </div>
+                                />
                             </div>
                         </div>
                     </p-overlayPanel>
-                </div>
-            </td>
-        </tr>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-        <tr>
-            <td colspan="7" class="text-center p-4">No se encontraron solicitudes.</td>
-        </tr>
-    </ng-template>
-</p-table>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="8" class="text-center p-8">
+                    <div class="flex flex-col items-center gap-4">
+                        <i class="pi pi-inbox text-6xl text-400"></i>
+                        <div>
+                            <h5 class="text-900 font-bold mb-2">No se encontraron solicitudes</h5>
+                            <p class="text-600 m-0">No hay solicitudes registradas que coincidan con los criterios de búsqueda.</p>
+                        </div>
+                        <p-button
+                            label="Nueva Solicitud"
+                            icon="pi pi-plus"
+                            severity="success"
+                            (click)="openNew()"
+                        />
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
 
 <!-- Diálogo para nueva solicitud -->
 <p-dialog

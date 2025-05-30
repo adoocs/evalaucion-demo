@@ -480,7 +480,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 1,
     n_credito: 10001,
-    fecha: '2023-10-15',
+    fecha: '15/10/2023', // Formato día/mes/año
     monto: 10000,
     plazo: '12 meses',
     v_gerencia: 'aprobado', // Estado aprobado
@@ -499,7 +499,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 2,
     n_credito: 10002,
-    fecha: '2023-11-20',
+    fecha: '20/11/2023', // Formato día/mes/año
     monto: 5000,
     plazo: '6 meses',
     v_gerencia: 'observado', // Estado observado
@@ -514,7 +514,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 3,
     n_credito: 10003,
-    fecha: '2023-12-05',
+    fecha: '05/12/2023', // Formato día/mes/año
     monto: 15000,
     plazo: '24 meses',
     v_gerencia: 'denegado', // Estado denegado
@@ -530,7 +530,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 4,
     n_credito: 10004,
-    fecha: '2023-12-15',
+    fecha: '15/12/2023', // Formato día/mes/año
     monto: 7500,
     plazo: '18 meses',
     v_gerencia: 'pendiente', // Estado pendiente
@@ -545,7 +545,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 5,
     n_credito: 10005,
-    fecha: '2024-01-10',
+    fecha: '10/01/2024', // Formato día/mes/año
     monto: 3000,
     plazo: '8 meses',
     v_gerencia: 'aprobado', // Estado aprobado
@@ -559,7 +559,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 6,
     n_credito: 10006,
-    fecha: '2024-01-25',
+    fecha: '25/01/2024', // Formato día/mes/año
     monto: 12000,
     plazo: '18 meses',
     v_gerencia: 'pendiente', // Estado pendiente

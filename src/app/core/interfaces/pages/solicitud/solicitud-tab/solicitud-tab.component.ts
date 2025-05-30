@@ -80,10 +80,12 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   ngOnInit(): void {
     this.periodoService.loadInitialData();
 
-    // Establecer la fecha actual en el formulario
-    const fechaActual = new Date();
+    // Establecer la fecha actual en formato día/mes/año
+    const hoy = new Date();
+    const fechaFormateada = `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
+
     this.solicitudForm.patchValue({
-      fecha: fechaActual
+      fecha: fechaFormateada
     });
   }
 
@@ -120,10 +122,23 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
         console.log('Periodo encontrado:', periodoCompleto);
       }
 
+      // Manejar la fecha correctamente
+      let fechaParaFormulario = this.solicitud.fecha;
+      if (this.solicitud.fecha && typeof this.solicitud.fecha === 'string') {
+        // Si la fecha está en formato día/mes/año, mantenerla así
+        if (this.solicitud.fecha.includes('/')) {
+          fechaParaFormulario = this.solicitud.fecha;
+        } else {
+          // Si está en formato ISO, convertir a día/mes/año
+          const fecha = new Date(this.solicitud.fecha + 'T00:00:00');
+          fechaParaFormulario = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+        }
+      }
+
       this.solicitudForm.patchValue({
         id: this.solicitud.id,
         n_credito: this.solicitud.n_credito,
-        fecha: this.solicitud.fecha ? new Date(this.solicitud.fecha + 'T00:00:00') : null,
+        fecha: fechaParaFormulario,
         monto: this.solicitud.monto,
         plazo: this.solicitud.plazo,
         v_gerencia: this.solicitud.v_gerencia,
@@ -175,9 +190,22 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
     }
 
     if (this.solicitudForm.valid) {
+      const formValues = this.solicitudForm.value;
+
+      // Convertir fecha a formato día/mes/año si es un objeto Date
+      let fechaFormateada = formValues.fecha;
+      if (formValues.fecha instanceof Date) {
+        const fecha = formValues.fecha;
+        fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+      }
+
       this.solicitud = {
-        ...this.solicitudForm.value
+        ...formValues,
+        fecha: fechaFormateada
       };
+
+      console.log('Solicitud con fecha formateada:', this.solicitud);
+
       if (this.editabled) {
         this.editSolicitud();
       } else {

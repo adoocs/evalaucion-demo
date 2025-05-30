@@ -173,29 +173,27 @@ export class SolicitudVerComponent implements OnInit {
    * @returns La ficha de trabajo correspondiente
    */
   private convertirSolicitudAFichaTrabajo(solicitud: Solicitud): FichaTrabajo {
-    return {
+    console.log('🔄 Convirtiendo solicitud a ficha de trabajo:', solicitud);
+
+    // Buscar datos completos en los servicios mock
+    const clienteCompleto = this.buscarClientePorNombre(solicitud.cliente || '');
+    const avalCompleto = this.buscarAvalPorNombre(solicitud.aval || '');
+    const conyugeCompleto = this.buscarConyugePorNombre(solicitud.conyugue || '');
+
+    console.log('✅ Datos encontrados:');
+    console.log('- Cliente:', clienteCompleto);
+    console.log('- Aval:', avalCompleto);
+    console.log('- Cónyuge:', conyugeCompleto);
+
+    // Crear la ficha de trabajo completa
+    const fichaTrabajo: FichaTrabajo = {
       id: solicitud.id,
-      cliente: {
-        id: 0,
-        apellidos: '',
-        nombres: solicitud.cliente || '',
-        dni: '',
-        fecha_born: '',
-        estado_civil: '',
-        edad: 0,
-        genero: '',
-        direccion: '',
-        celular: 0,
-        n_referencial: 0,
-        grado_instruccion: '',
-        email: '',
-        tipo_vivienda: { id: 0, descripcion: '' }
-      },
-      aval: null,
-      conyuge: null,
+      cliente: clienteCompleto,
+      aval: avalCompleto,
+      conyuge: conyugeCompleto,
       referencia_familiar: solicitud.referencia_familiar || null,
       credito_anterior: solicitud.credito_anterior || null,
-      gasto_financieros: solicitud.gasto_financiero ? [solicitud.gasto_financiero] : null,
+      gasto_financieros: solicitud.gasto_financiero ? [solicitud.gasto_financiero] : [],
       ingreso_adicional: solicitud.ingreso_adicional || null,
       puntaje_sentinel: solicitud.puntaje_sentinel || null,
       detalleEconomico: {
@@ -203,5 +201,276 @@ export class SolicitudVerComponent implements OnInit {
         ingreso_dependiente: solicitud.ingreso_dependiente || null
       }
     };
+
+    console.log('✅ Ficha de trabajo completa creada:', fichaTrabajo);
+    return fichaTrabajo;
+  }
+
+  /**
+   * Busca un cliente por nombre en los datos mock
+   */
+  private buscarClientePorNombre(nombreCompleto: string): any {
+    if (!nombreCompleto) return null;
+
+    console.log('🔍 Buscando cliente para:', nombreCompleto);
+
+    // Datos mock completos que coinciden con las solicitudes
+    const CLIENTES = [
+      {
+        id: 1,
+        apellidos: 'Pérez López',
+        nombres: 'Juan Carlos',
+        dni: '12345678',
+        fecha_born: '15/05/1985',
+        estado_civil: 'casado',
+        edad: 38,
+        genero: 'M',
+        direccion: 'Av. Principal 123, Lima',
+        celular: 987654321,
+        n_referencial: 123456,
+        grado_instruccion: 'universitaria',
+        email: 'juan.perez@example.com',
+        tipo_vivienda: { id: 1, descripcion: 'Casa propia' }
+      },
+      {
+        id: 2,
+        apellidos: 'Gómez Rodríguez',
+        nombres: 'María Elena',
+        dni: '87654321',
+        fecha_born: '20/10/1990',
+        estado_civil: 'soltero',
+        edad: 33,
+        genero: 'F',
+        direccion: 'Jr. Secundaria 456, Lima',
+        celular: 912345678,
+        n_referencial: 654321,
+        grado_instruccion: 'tecnica',
+        email: 'maria.gomez@example.com',
+        tipo_vivienda: { id: 2, descripcion: 'Casa alquilada' }
+      },
+      {
+        id: 3,
+        apellidos: 'Martínez Sánchez',
+        nombres: 'Roberto',
+        dni: '23456789',
+        fecha_born: '12/03/1980',
+        estado_civil: 'casado',
+        edad: 43,
+        genero: 'M',
+        direccion: 'Calle Los Pinos 789, Lima',
+        celular: 945678123,
+        n_referencial: 789123,
+        grado_instruccion: 'secundaria',
+        email: 'roberto.martinez@example.com',
+        tipo_vivienda: { id: 1, descripcion: 'Casa propia' }
+      },
+      {
+        id: 4,
+        apellidos: 'Torres Vega',
+        nombres: 'Ana María',
+        dni: '34567890',
+        fecha_born: '08/07/1988',
+        estado_civil: 'casado',
+        edad: 35,
+        genero: 'F',
+        direccion: 'Av. Los Olivos 321, Lima',
+        celular: 956781234,
+        n_referencial: 321654,
+        grado_instruccion: 'universitaria',
+        email: 'ana.torres@example.com',
+        tipo_vivienda: { id: 2, descripcion: 'Casa alquilada' }
+      },
+      {
+        id: 5,
+        apellidos: 'Ramírez',
+        nombres: 'Carlos Eduardo',
+        dni: '45678901',
+        fecha_born: '25/11/1987',
+        estado_civil: 'soltero',
+        edad: 36,
+        genero: 'M',
+        direccion: 'Jr. Los Cedros 654, Lima',
+        celular: 923456789,
+        n_referencial: 987654,
+        grado_instruccion: 'tecnica',
+        email: 'carlos.ramirez@example.com',
+        tipo_vivienda: { id: 1, descripcion: 'Casa propia' }
+      },
+      {
+        id: 6,
+        apellidos: 'García',
+        nombres: 'Luis Fernando',
+        dni: '56789012',
+        fecha_born: '18/09/1982',
+        estado_civil: 'casado',
+        edad: 41,
+        genero: 'M',
+        direccion: 'Av. Las Palmeras 987, Lima',
+        celular: 934567890,
+        n_referencial: 876543,
+        grado_instruccion: 'universitaria',
+        email: 'luis.garcia@example.com',
+        tipo_vivienda: { id: 2, descripcion: 'Casa alquilada' }
+      }
+    ];
+
+    // Búsqueda más inteligente
+    let cliente = CLIENTES.find(c =>
+      `${c.nombres} ${c.apellidos}` === nombreCompleto ||
+      `${c.apellidos} ${c.nombres}` === nombreCompleto
+    );
+
+    // Si no encuentra coincidencia exacta, buscar por partes
+    if (!cliente) {
+      cliente = CLIENTES.find(c =>
+        nombreCompleto.includes(c.nombres) && nombreCompleto.includes(c.apellidos.split(' ')[0])
+      );
+    }
+
+    // Si aún no encuentra, buscar solo por apellido principal
+    if (!cliente) {
+      cliente = CLIENTES.find(c =>
+        nombreCompleto.includes(c.apellidos.split(' ')[0])
+      );
+    }
+
+    console.log('✅ Cliente encontrado:', cliente, 'para nombre:', nombreCompleto);
+    return cliente || null;
+  }
+
+  /**
+   * Busca un aval por nombre en los datos mock
+   */
+  private buscarAvalPorNombre(nombreCompleto: string): any {
+    if (!nombreCompleto) return null;
+
+    console.log('🔍 Buscando aval para:', nombreCompleto);
+
+    const AVALES = [
+      {
+        id: 1,
+        apellidos: 'Martínez Sánchez',
+        nombres: 'Roberto',
+        dni: '23456789',
+        direccion: 'Calle Los Pinos 789, Lima',
+        celular: '945678123',
+        n_referencial: 789123,
+        actividad: 'Comerciante',
+        parentesco: 'Hermano',
+        tipo_vivienda: { id: 1, descripcion: 'Casa propia' },
+        omitido: false
+      },
+      {
+        id: 2,
+        apellidos: 'Herrera Díaz',
+        nombres: 'Luis Fernando',
+        dni: '45678901',
+        direccion: 'Jr. Las Flores 456, Lima',
+        celular: '987123456',
+        n_referencial: 456789,
+        actividad: 'Empleado',
+        parentesco: 'Amigo',
+        tipo_vivienda: { id: 2, descripcion: 'Casa alquilada' },
+        omitido: false
+      },
+      {
+        id: 3,
+        apellidos: 'López Torres',
+        nombres: 'Carmen Rosa',
+        dni: '67890123',
+        direccion: 'Av. Central 321, Lima',
+        celular: '956789012',
+        n_referencial: 654987,
+        actividad: 'Profesora',
+        parentesco: 'Hermana',
+        tipo_vivienda: { id: 1, descripcion: 'Casa propia' },
+        omitido: false
+      }
+    ];
+
+    // Búsqueda más inteligente
+    let aval = AVALES.find(a =>
+      `${a.nombres} ${a.apellidos}` === nombreCompleto ||
+      `${a.apellidos} ${a.nombres}` === nombreCompleto
+    );
+
+    // Si no encuentra coincidencia exacta, buscar por partes
+    if (!aval) {
+      aval = AVALES.find(a =>
+        nombreCompleto.includes(a.nombres) && nombreCompleto.includes(a.apellidos.split(' ')[0])
+      );
+    }
+
+    // Si aún no encuentra, buscar solo por apellido principal
+    if (!aval) {
+      aval = AVALES.find(a =>
+        nombreCompleto.includes(a.apellidos.split(' ')[0])
+      );
+    }
+
+    console.log('✅ Aval encontrado:', aval, 'para nombre:', nombreCompleto);
+    return aval || null;
+  }
+
+  /**
+   * Busca un cónyuge por nombre en los datos mock
+   */
+  private buscarConyugePorNombre(nombreCompleto: string): any {
+    if (!nombreCompleto) return null;
+
+    console.log('🔍 Buscando cónyuge para:', nombreCompleto);
+
+    const CONYUGES = [
+      {
+        id: 1,
+        apellidos: 'Torres Vega',
+        nombres: 'Ana María',
+        dni: '34567890',
+        celular: '956781234',
+        actividad: 'Docente',
+        omitido: false
+      },
+      {
+        id: 2,
+        apellidos: 'Paredes Cruz',
+        nombres: 'Mónica Isabel',
+        dni: '56789012',
+        celular: '912345678',
+        actividad: 'Enfermera',
+        omitido: false
+      },
+      {
+        id: 3,
+        apellidos: 'Vega Morales',
+        nombres: 'Patricia Elena',
+        dni: '78901234',
+        celular: '967890123',
+        actividad: 'Contadora',
+        omitido: false
+      }
+    ];
+
+    // Búsqueda más inteligente
+    let conyuge = CONYUGES.find(c =>
+      `${c.nombres} ${c.apellidos}` === nombreCompleto ||
+      `${c.apellidos} ${c.nombres}` === nombreCompleto
+    );
+
+    // Si no encuentra coincidencia exacta, buscar por partes
+    if (!conyuge) {
+      conyuge = CONYUGES.find(c =>
+        nombreCompleto.includes(c.nombres) && nombreCompleto.includes(c.apellidos.split(' ')[0])
+      );
+    }
+
+    // Si aún no encuentra, buscar solo por apellido principal
+    if (!conyuge) {
+      conyuge = CONYUGES.find(c =>
+        nombreCompleto.includes(c.apellidos.split(' ')[0])
+      );
+    }
+
+    console.log('✅ Cónyuge encontrado:', conyuge, 'para nombre:', nombreCompleto);
+    return conyuge || null;
   }
 }

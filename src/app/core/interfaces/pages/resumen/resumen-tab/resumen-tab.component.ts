@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
@@ -35,7 +35,7 @@ import { MessageToastService } from '../../../../../shared/utils/message-toast.s
   templateUrl: './resumen-tab.component.html',
   styleUrl: './resumen-tab.component.scss'
 })
-export class ResumenTabComponent implements OnInit {
+export class ResumenTabComponent implements OnInit, OnChanges {
   @Input() fichaTrabajo: any;
   @Input() solicitud: any;
 
@@ -52,10 +52,18 @@ export class ResumenTabComponent implements OnInit {
    * Este método se llama cada vez que cambian las propiedades de entrada
    * Nos permite actualizar la vista cuando cambian los datos
    */
-  ngOnChanges(): void {
-    console.log('Datos actualizados en ResumenTabComponent:');
-    console.log('Solicitud:', this.solicitud);
-    console.log('FichaTrabajo:', this.fichaTrabajo);
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('📊 Datos actualizados en ResumenTabComponent:');
+    console.log('Cambios detectados:', changes);
+    console.log('Solicitud actual:', this.solicitud);
+    console.log('FichaTrabajo actual:', this.fichaTrabajo);
+
+    // Forzar detección de cambios si es necesario
+    if (this.solicitud || this.fichaTrabajo) {
+      console.log('✅ Datos disponibles para mostrar en resumen');
+    } else {
+      console.log('⚠️ No hay datos disponibles para el resumen');
+    }
   }
 
 
@@ -81,12 +89,24 @@ export class ResumenTabComponent implements OnInit {
    */
   formatoFecha(fecha: string): string {
     if (!fecha) return 'No disponible';
-    const date = new Date(fecha);
-    return new Intl.DateTimeFormat('es-PE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(date);
+
+    // Si la fecha ya está en formato día/mes/año, devolverla tal como está
+    if (fecha.includes('/')) {
+      return fecha;
+    }
+
+    // Si está en formato ISO, convertirla
+    try {
+      const date = new Date(fecha);
+      return new Intl.DateTimeFormat('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date);
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return fecha; // Devolver la fecha original si hay error
+    }
   }
 
   /**

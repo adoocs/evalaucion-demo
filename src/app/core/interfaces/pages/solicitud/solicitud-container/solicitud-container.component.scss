@@ -14,4 +14,31 @@
   .p-button {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
+
+  /* Tabla sin colores */
+  .p-datatable .p-datatable-thead > tr > th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    border: 1px solid #dee2e6;
+  }
+
+  .p-datatable .p-datatable-tbody > tr:hover {
+    background: #f8f9fa !important;
+  }
+
+  /* Mejoras para los overlays */
+  .estado-overlay, .acciones-overlay {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  /* Sin efectos molestos en estadísticas */
+  .shadow-1 {
+    /* Sin transiciones */
+  }
+
+  .shadow-1:hover {
+    /* Sin efectos de hover */
+  }
 }

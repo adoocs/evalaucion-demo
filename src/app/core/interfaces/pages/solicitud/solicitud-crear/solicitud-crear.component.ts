@@ -87,8 +87,9 @@ export class SolicitudCrearComponent implements OnInit {
 
     switch (message) {
       case 'create':
-        // Guardar la solicitud y la ficha de trabajo
-        this.guardarSolicitud();
+        // La solicitud ya fue guardada en el panel, navegar inmediatamente
+        console.log('Solicitud creada exitosamente, navegando a la lista');
+        this.router.navigate(['/solicitudes']);
         break;
       case 'edit':
         this.messageService.successMessageToast('Éxito', 'Solicitud actualizada correctamente');
