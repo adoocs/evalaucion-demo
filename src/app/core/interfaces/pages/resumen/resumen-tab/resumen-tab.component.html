@@ -231,11 +231,14 @@
         <ng-template pTemplate="icons">
           <i class="pi pi-dollar text-primary mr-2"></i>
         </ng-template>
-        <div *ngIf="fichaTrabajo.ingreso_adicional.omitido" class="p-message p-message-info p-2 mb-2">
+        <div *ngIf="isIngresoAdicionalOmitido(fichaTrabajo.ingreso_adicional)" class="p-message p-message-info p-2 mb-2">
           <i class="pi pi-info-circle p-message-icon"></i>
           <span class="p-message-text">Ingreso adicional omitido</span>
+          <div *ngIf="getMotivoDeseleccion(fichaTrabajo.ingreso_adicional)" class="mt-1 text-sm">
+            <strong>Motivo:</strong> {{ getMotivoDeseleccion(fichaTrabajo.ingreso_adicional) }}
+          </div>
         </div>
-        <div *ngIf="!fichaTrabajo.ingreso_adicional.omitido">
+        <div *ngIf="!isIngresoAdicionalOmitido(fichaTrabajo.ingreso_adicional)">
           <!-- Contenido de datos organizado en columnas -->
           <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
             <!-- Columna 1 -->

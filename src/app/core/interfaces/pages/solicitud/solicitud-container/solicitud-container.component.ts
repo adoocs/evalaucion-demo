@@ -20,9 +20,11 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { BadgeModule } from 'primeng/badge';
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
 import { LocalSolicitudService } from '../../../../services/local-data-container.service';
 import { Solicitud } from '../../../../domain/solicitud.model';
+import { PrintService } from '../../../../services/print.service';
 
 @Component({
   selector: 'app-solicitud-list',
@@ -46,6 +48,7 @@ import { Solicitud } from '../../../../domain/solicitud.model';
     TooltipModule,
     TagModule,
     BadgeModule,
+    RadioButtonModule,
     SolicitudPanelComponent
   ],
   providers: [MessageService, MessageToastService, ConfirmationService],
@@ -72,11 +75,18 @@ export class SolicitudContainerComponent implements OnInit {
   solicitudSeleccionadaEvaluacion: Solicitud | null = null;
   tipoEvaluacionSeleccionado: string | null = null;
 
+  // Propiedades para el diálogo de impresión
+  mostrarDialogoImpresion: boolean = false;
+  solicitudSeleccionadaImpresion: Solicitud | null = null;
+  tipoImpresionSeleccionado: string = '';
+  formatoDescargaSeleccionado: string = 'pdf';
+
   constructor(
     private solicitudService: LocalSolicitudService,
     private messageService: MessageToastService,
     private router: Router,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private printService: PrintService
   ) {}
 
   ngOnInit(): void {
@@ -687,5 +697,150 @@ export class SolicitudContainerComponent implements OnInit {
     return this.solicitudes().filter(s => s.v_gerencia === 'observado' || s.v_gerencia === 'denegado').length;
   }
 
+  // ==================== MÉTODOS DE IMPRESIÓN ====================
+
+  /**
+   * Abre el diálogo de impresión para una solicitud
+   * @param solicitud La solicitud a imprimir
+   */
+  abrirDialogoImpresion(solicitud: Solicitud): void {
+    this.solicitudSeleccionadaImpresion = solicitud;
+    this.tipoImpresionSeleccionado = '';
+    this.formatoDescargaSeleccionado = 'pdf';
+    this.mostrarDialogoImpresion = true;
+
+    console.log('Abriendo diálogo de impresión para solicitud:', solicitud.n_credito);
+  }
+
+  /**
+   * Cierra el diálogo de impresión
+   */
+  cerrarDialogoImpresion(): void {
+    this.mostrarDialogoImpresion = false;
+    this.solicitudSeleccionadaImpresion = null;
+    this.tipoImpresionSeleccionado = '';
+    this.formatoDescargaSeleccionado = 'pdf';
+
+    console.log('Diálogo de impresión cerrado');
+  }
+
+  /**
+   * Selecciona el tipo de impresión
+   * @param tipo El tipo de impresión seleccionado
+   */
+  seleccionarTipoImpresion(tipo: string): void {
+    this.tipoImpresionSeleccionado = tipo;
+    console.log('Tipo de impresión seleccionado:', tipo);
+  }
+
+  /**
+   * Procesa la impresión según las opciones seleccionadas
+   */
+  procesarImpresion(): void {
+    if (!this.solicitudSeleccionadaImpresion || !this.tipoImpresionSeleccionado) {
+      this.messageService.warnMessageToast('Advertencia', 'Debe seleccionar un tipo de impresión');
+      return;
+    }
+
+    const solicitud = this.solicitudSeleccionadaImpresion;
+
+    try {
+      if (this.formatoDescargaSeleccionado === 'pdf') {
+        this.generarPDF(solicitud, this.tipoImpresionSeleccionado);
+      } else {
+        this.abrirEnNuevaVentana(solicitud, this.tipoImpresionSeleccionado);
+      }
+
+      // Cerrar el diálogo
+      this.cerrarDialogoImpresion();
+
+      // Mostrar mensaje de éxito
+      const tipoLabel = this.getTipoImpresionLabel(this.tipoImpresionSeleccionado);
+      const formatoLabel = this.formatoDescargaSeleccionado === 'pdf' ? 'PDF descargado' : 'Abierto en nueva ventana';
+
+      this.messageService.successMessageToast(
+        'Impresión Procesada',
+        `${tipoLabel} - ${formatoLabel} exitosamente`
+      );
+
+    } catch (error) {
+      console.error('Error al procesar impresión:', error);
+      this.messageService.errorMessageToast(
+        'Error de Impresión',
+        'No se pudo procesar la impresión. Inténtelo nuevamente.'
+      );
+    }
+  }
+
+  /**
+   * Genera un PDF según el tipo seleccionado
+   * @param solicitud La solicitud a imprimir
+   * @param tipo El tipo de impresión
+   */
+  private generarPDF(solicitud: Solicitud, tipo: string): void {
+    switch (tipo) {
+      case 'solicitud':
+        this.printService.generarPDFSolicitud(solicitud);
+        break;
+      case 'evaluacion':
+        this.printService.generarPDFEvaluacion(solicitud);
+        break;
+      case 'completo':
+        this.printService.generarPDFCompleto(solicitud);
+        break;
+      default:
+        throw new Error('Tipo de impresión no válido');
+    }
+  }
+
+  /**
+   * Abre el documento en una nueva ventana
+   * @param solicitud La solicitud a imprimir
+   * @param tipo El tipo de impresión
+   */
+  private abrirEnNuevaVentana(solicitud: Solicitud, tipo: string): void {
+    let htmlContent: string;
+
+    switch (tipo) {
+      case 'solicitud':
+        htmlContent = this.printService.generarHTMLSolicitud(solicitud);
+        break;
+      case 'evaluacion':
+        htmlContent = this.printService.generarHTMLEvaluacion(solicitud);
+        break;
+      case 'completo':
+        htmlContent = this.printService.generarHTMLCompleto(solicitud);
+        break;
+      default:
+        throw new Error('Tipo de impresión no válido');
+    }
+
+    // Abrir en nueva ventana
+    const nuevaVentana = window.open('', '_blank');
+    if (nuevaVentana) {
+      nuevaVentana.document.write(htmlContent);
+      nuevaVentana.document.close();
+    } else {
+      throw new Error('No se pudo abrir la nueva ventana. Verifique que no esté bloqueada por el navegador.');
+    }
+  }
+
+  /**
+   * Obtiene la etiqueta del tipo de impresión
+   * @param tipo El tipo de impresión
+   * @returns La etiqueta correspondiente
+   */
+  private getTipoImpresionLabel(tipo: string): string {
+    switch (tipo) {
+      case 'solicitud':
+        return 'Solo Solicitud';
+      case 'evaluacion':
+        return 'Solo Evaluación';
+      case 'completo':
+        return 'Documento Completo';
+      default:
+        return 'Documento';
+    }
+  }
 
 }

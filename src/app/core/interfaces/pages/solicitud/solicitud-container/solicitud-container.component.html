@@ -358,6 +358,16 @@
                             </div>
 
                             <div class="flex flex-col gap-2">
+                                <!-- Opción Imprimir -->
+                                <p-button
+                                    label="Imprimir"
+                                    icon="pi pi-print"
+                                    severity="secondary"
+                                    [outlined]="true"
+                                    class="w-full justify-start"
+                                    (click)="abrirDialogoImpresion(solicitudMenuAcciones!); accionesPanel.hide()"
+                                />
+
                                 <!-- Opción Editar -->
                                 <p-button
                                     label="Editar"
@@ -509,3 +519,149 @@
 </p-dialog>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
+
+<!-- Diálogo de Impresión -->
+<p-dialog
+    header="Opciones de Impresión"
+    [(visible)]="mostrarDialogoImpresion"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    (onHide)="cerrarDialogoImpresion()"
+>
+    <div class="impresion-dialog" *ngIf="solicitudSeleccionadaImpresion">
+        <!-- Header con información de la solicitud -->
+        <div class="solicitud-info mb-4">
+            <div class="solicitud-header p-3 border-round bg-blue-50 border-2 border-blue-200">
+                <h5 class="m-0 mb-2 font-bold text-blue-700">
+                    <i class="pi pi-file mr-2"></i>
+                    Solicitud N° {{ solicitudSeleccionadaImpresion.n_credito }}
+                </h5>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <span class="text-600">Cliente:</span>
+                        <div class="font-semibold text-900">{{ solicitudSeleccionadaImpresion.cliente }}</div>
+                    </div>
+                    <div>
+                        <span class="text-600">Monto:</span>
+                        <div class="font-semibold text-900">{{ solicitudSeleccionadaImpresion.monto | currency:'S/ ' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opciones de impresión -->
+        <div class="opciones-impresion mb-4">
+            <h6 class="text-900 mb-3 font-semibold">Seleccione qué desea imprimir:</h6>
+
+            <div class="flex flex-col gap-3">
+                <!-- Opción Solo Solicitud -->
+                <div class="opcion-impresion p-3 border-round border-2 cursor-pointer hover:bg-gray-50"
+                     [class.border-blue-500]="tipoImpresionSeleccionado === 'solicitud'"
+                     [class.bg-blue-50]="tipoImpresionSeleccionado === 'solicitud'"
+                     [class.border-gray-200]="tipoImpresionSeleccionado !== 'solicitud'"
+                     (click)="seleccionarTipoImpresion('solicitud')">
+                    <div class="flex items-center gap-3">
+                        <p-radiobutton
+                            name="tipoImpresion"
+                            value="solicitud"
+                            [(ngModel)]="tipoImpresionSeleccionado"
+                        />
+                        <div>
+                            <div class="font-semibold text-900">Solo Solicitud</div>
+                            <div class="text-sm text-600">Información básica de la solicitud de crédito</div>
+                        </div>
+                        <i class="pi pi-file-edit text-blue-500 ml-auto text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Opción Solo Evaluación -->
+                <div class="opcion-impresion p-3 border-round border-2 cursor-pointer hover:bg-gray-50"
+                     [class.border-green-500]="tipoImpresionSeleccionado === 'evaluacion'"
+                     [class.bg-green-50]="tipoImpresionSeleccionado === 'evaluacion'"
+                     [class.border-gray-200]="tipoImpresionSeleccionado !== 'evaluacion'"
+                     (click)="seleccionarTipoImpresion('evaluacion')">
+                    <div class="flex items-center gap-3">
+                        <p-radiobutton
+                            name="tipoImpresion"
+                            value="evaluacion"
+                            [(ngModel)]="tipoImpresionSeleccionado"
+                        />
+                        <div>
+                            <div class="font-semibold text-900">Solo Evaluación</div>
+                            <div class="text-sm text-600">Ficha de trabajo y análisis crediticio</div>
+                        </div>
+                        <i class="pi pi-chart-line text-green-500 ml-auto text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Opción Documento Completo -->
+                <div class="opcion-impresion p-3 border-round border-2 cursor-pointer hover:bg-gray-50"
+                     [class.border-purple-500]="tipoImpresionSeleccionado === 'completo'"
+                     [class.bg-purple-50]="tipoImpresionSeleccionado === 'completo'"
+                     [class.border-gray-200]="tipoImpresionSeleccionado !== 'completo'"
+                     (click)="seleccionarTipoImpresion('completo')">
+                    <div class="flex items-center gap-3">
+                        <p-radiobutton
+                            name="tipoImpresion"
+                            value="completo"
+                            [(ngModel)]="tipoImpresionSeleccionado"
+                        />
+                        <div>
+                            <div class="font-semibold text-900">Documento Completo</div>
+                            <div class="text-sm text-600">Solicitud + Evaluación en un solo documento</div>
+                        </div>
+                        <i class="pi pi-file-pdf text-purple-500 ml-auto text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opciones de descarga -->
+        <div class="opciones-descarga mb-4">
+            <h6 class="text-900 mb-3 font-semibold">Formato de descarga:</h6>
+
+            <div class="flex gap-3">
+                <div class="flex items-center gap-2">
+                    <p-radiobutton
+                        name="formatoDescarga"
+                        value="pdf"
+                        [(ngModel)]="formatoDescargaSeleccionado"
+                    />
+                    <label class="font-medium">PDF</label>
+                    <i class="pi pi-file-pdf text-red-500"></i>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <p-radiobutton
+                        name="formatoDescarga"
+                        value="html"
+                        [(ngModel)]="formatoDescargaSeleccionado"
+                    />
+                    <label class="font-medium">Abrir en nueva ventana</label>
+                    <i class="pi pi-external-link text-blue-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex justify-end gap-3 pt-3 border-t border-gray-200">
+            <p-button
+                label="Cancelar"
+                severity="secondary"
+                [outlined]="true"
+                (click)="cerrarDialogoImpresion()"
+            />
+            <p-button
+                [label]="formatoDescargaSeleccionado === 'pdf' ? 'Descargar PDF' : 'Abrir en Nueva Ventana'"
+                [icon]="formatoDescargaSeleccionado === 'pdf' ? 'pi pi-download' : 'pi pi-external-link'"
+                severity="primary"
+                iconPos="left"
+                [disabled]="!tipoImpresionSeleccionado"
+                (click)="procesarImpresion()"
+            />
+        </div>
+    </div>
+</p-dialog>

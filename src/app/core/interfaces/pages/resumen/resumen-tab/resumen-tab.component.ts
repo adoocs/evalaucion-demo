@@ -204,4 +204,22 @@ export class ResumenTabComponent implements OnInit, OnChanges {
 
     return familiaMiembros.filter(miembro => miembro.n_hijos >= 1);
   }
+
+  /**
+   * Verifica si el ingreso adicional está omitido
+   * @param ingresoAdicional Objeto de ingreso adicional
+   * @returns true si está omitido, false en caso contrario
+   */
+  isIngresoAdicionalOmitido(ingresoAdicional: any): boolean {
+    return ingresoAdicional && (ingresoAdicional as any).omitido === true;
+  }
+
+  /**
+   * Obtiene el motivo de deselección del ingreso adicional
+   * @param ingresoAdicional Objeto de ingreso adicional
+   * @returns Motivo de deselección o cadena vacía
+   */
+  getMotivoDeseleccion(ingresoAdicional: any): string {
+    return ingresoAdicional && (ingresoAdicional as any).motivoDeseleccion || '';
+  }
 }

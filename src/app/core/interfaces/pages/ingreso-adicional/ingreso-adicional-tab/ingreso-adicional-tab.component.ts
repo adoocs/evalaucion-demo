@@ -282,7 +282,28 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
     }
   }
 
-  updateFormValues(ingresoAdicional: Partial<IngresoAdicional> = {}): void {
+  updateFormValues(ingresoAdicional: Partial<IngresoAdicional & { omitido?: boolean, motivoDeseleccion?: string }> = {}): void {
+    // Si el ingreso adicional está omitido, aplicar el estado de omisión
+    if ((ingresoAdicional as any)?.omitido) {
+      console.log('🚫 Ingreso adicional está omitido, aplicando estado de omisión');
+      this.omitirIngresoAdicional = true;
+      this.omitirAportesTerceros = true;
+
+      // Cargar el motivo de deselección si existe
+      if ((ingresoAdicional as any)?.motivoDeseleccion) {
+        this.motivoDeseleccionGuardado = (ingresoAdicional as any).motivoDeseleccion;
+        this.mostrarMotivo = true;
+      }
+
+      // Aplicar la omisión
+      this.confirmarOmision();
+      this.confirmarOmisionAportesTerceros();
+
+      console.log('✅ Estado de omisión aplicado para ingreso adicional');
+      return;
+    }
+
+    // Si no está omitido, cargar los datos normalmente
     this.ingresoAdicionalForm.patchValue({
       id: ingresoAdicional.id || null,
       frecuencia: ingresoAdicional.frecuencia || null,
@@ -296,6 +317,16 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
       aportante: ingresoAdicional.aportante || null,
       importe_tercero: ingresoAdicional.importe_tercero || null
     });
+
+    // Cargar el motivo de deselección si existe
+    if ((ingresoAdicional as any)?.motivoDeseleccion) {
+      this.motivoDeseleccionGuardado = (ingresoAdicional as any).motivoDeseleccion;
+      this.mostrarMotivo = true;
+    }
+
+    // Asegurar que no esté marcado como omitido
+    this.omitirIngresoAdicional = false;
+    this.omitirAportesTerceros = false;
   }
 
   initiateForm(): void {
@@ -376,8 +407,27 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
       .subscribe(() => updateValidators());
   }
 
-  getFormValues(): IngresoAdicional {
+  getFormValues(): IngresoAdicional & { omitido?: boolean, motivoDeseleccion?: string } {
     const formValue = this.ingresoAdicionalForm.value;
+
+    // Si ambos paneles están omitidos, devolver objeto con información de omisión
+    if (this.omitirIngresoAdicional && this.omitirAportesTerceros) {
+      return {
+        id: 0,
+        frecuencia: '',
+        importe_act: 0,
+        sustentable: false,
+        detalle: '',
+        firma_aval: false,
+        firma_conyuge: false,
+        actividad: '',
+        motivo: '',
+        aportante: { id: 0, descripcion: '' },
+        importe_tercero: 0,
+        omitido: true,
+        motivoDeseleccion: this.motivoDeseleccionGuardado || ''
+      };
+    }
 
     return {
       id: formValue.id || 0,
@@ -389,8 +439,10 @@ export class IngresoAdicionalTabComponent implements OnInit, OnChanges, OnDestro
       firma_conyuge: formValue.firma_conyuge || false,
       actividad: formValue.actividad || '',
       motivo: formValue.motivo || '',
-      aportante: formValue.aportante || { descripcion: '' },
-      importe_tercero: formValue.importe_tercero || 0
+      aportante: formValue.aportante || { id: 0, descripcion: '' },
+      importe_tercero: formValue.importe_tercero || 0,
+      omitido: false,
+      motivoDeseleccion: this.motivoDeseleccionGuardado || ''
     };
   }
 

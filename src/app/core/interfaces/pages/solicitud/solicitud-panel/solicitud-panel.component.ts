@@ -331,14 +331,9 @@ export class SolicitudPanelComponent implements OnInit, OnDestroy {
           if (this.ingresoAdicionalTab) {
             setTimeout(() => {
               if (this.fichaTrabajoInternal.ingreso_adicional) {
+                // Cargar los datos incluyendo el estado de omisión y motivo de deselección
                 this.ingresoAdicionalTab.updateFormValues(this.fichaTrabajoInternal.ingreso_adicional!);
                 console.log('✅ Datos de ingreso adicional cargados:', this.fichaTrabajoInternal.ingreso_adicional);
-
-                // Para ingreso adicional, no verificamos omisión en el modelo
-                // La omisión se maneja a través de las variables del componente
-                // Si hay datos, significa que no está omitido
-                this.ingresoAdicionalTab.omitirIngresoAdicional = false;
-                this.ingresoAdicionalTab.omitirAportesTerceros = false;
               } else {
                 // Si no hay ingreso adicional, marcarlo como omitido
                 console.log('⚠️ No hay datos de ingreso adicional, marcando como omitido');
