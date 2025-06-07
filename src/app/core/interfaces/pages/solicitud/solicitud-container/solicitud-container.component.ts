@@ -344,12 +344,12 @@ export class SolicitudContainerComponent implements OnInit {
    */
   private detectarTipoEvaluacion(solicitud: Solicitud): 'micro' | 'consumo' | null {
     // Si tiene datos de negocio -> Evaluación Micro
-    if (solicitud.negocio) {
+    if (solicitud.fichaTrabajo?.detalleEconomico?.negocio) {
       return 'micro';
     }
 
     // Si tiene datos de ingreso dependiente -> Evaluación Consumo
-    if (solicitud.ingreso_dependiente) {
+    if (solicitud.fichaTrabajo?.detalleEconomico?.ingreso_dependiente) {
       return 'consumo';
     }
 
@@ -428,12 +428,14 @@ export class SolicitudContainerComponent implements OnInit {
   getActividadEconomica(): string {
     if (!this.solicitudSeleccionadaEvaluacion) return '';
 
-    if (this.solicitudSeleccionadaEvaluacion.negocio?.actividad_economica?.descripcion) {
-      return this.solicitudSeleccionadaEvaluacion.negocio.actividad_economica.descripcion;
+    const negocio = this.solicitudSeleccionadaEvaluacion.fichaTrabajo?.detalleEconomico?.negocio;
+    if (negocio?.actividad_economica?.descripcion) {
+      return negocio.actividad_economica.descripcion;
     }
 
-    if (this.solicitudSeleccionadaEvaluacion.ingreso_dependiente?.actividad) {
-      return this.solicitudSeleccionadaEvaluacion.ingreso_dependiente.actividad;
+    const ingresoDep = this.solicitudSeleccionadaEvaluacion.fichaTrabajo?.detalleEconomico?.ingreso_dependiente;
+    if (ingresoDep?.actividad) {
+      return ingresoDep.actividad;
     }
 
     return 'No especificada';
@@ -524,10 +526,10 @@ export class SolicitudContainerComponent implements OnInit {
    * @returns 'micro' si tiene negocio, 'consumo' si tiene ingreso dependiente, null si no tiene ninguno
    */
   getTipoEvaluacionSolicitud(solicitud: Solicitud): 'micro' | 'consumo' | null {
-    if (solicitud.negocio) {
+    if (solicitud.fichaTrabajo?.detalleEconomico?.negocio) {
       return 'micro';
     }
-    if (solicitud.ingreso_dependiente) {
+    if (solicitud.fichaTrabajo?.detalleEconomico?.ingreso_dependiente) {
       return 'consumo';
     }
     return null;
@@ -628,7 +630,7 @@ export class SolicitudContainerComponent implements OnInit {
   confirmarEliminarSolicitud(solicitud: Solicitud): void {
     this.confirmationService.confirm({
       message: `¿Está seguro de que desea eliminar la solicitud N° ${solicitud.n_credito}?<br><br>
-                <strong>Cliente:</strong> ${solicitud.cliente}<br>
+                <strong>Cliente:</strong> ${this.getNombreCliente(solicitud)}<br>
                 <strong>Monto:</strong> ${solicitud.monto.toLocaleString('es-PE', { style: 'currency', currency: 'PEN' })}<br><br>
                 <span style="color: #dc2626; font-weight: 600;">Esta acción no se puede deshacer.</span>`,
       header: 'Confirmar Eliminación',
@@ -660,13 +662,13 @@ export class SolicitudContainerComponent implements OnInit {
     // Mostrar mensaje de éxito
     this.messageService.successMessageToast(
       'Solicitud Eliminada',
-      `La solicitud N° ${solicitud.n_credito} de ${solicitud.cliente} ha sido eliminada exitosamente.`
+      `La solicitud N° ${solicitud.n_credito} de ${this.getNombreCliente(solicitud)} ha sido eliminada exitosamente.`
     );
 
     console.log('Solicitud eliminada:', {
       id: solicitud.id,
       n_credito: solicitud.n_credito,
-      cliente: solicitud.cliente
+      cliente: this.getNombreCliente(solicitud)
     });
 
     // TODO: Aquí se implementaría la llamada al servicio para eliminar de la base de datos

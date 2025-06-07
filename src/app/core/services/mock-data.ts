@@ -37,9 +37,10 @@ export const TASAS: Tasa[] = [
 
 // Datos de ejemplo para Periodo
 export const PERIODOS: Periodo[] = [
-  { id: 1, descripcion: 'Mensual' },
-  { id: 2, descripcion: 'Quincenal' },
-  { id: 3, descripcion: 'Semanal' }
+  { id: 1, descripcion: 'Diario' },
+  { id: 2, descripcion: 'Semanal' },
+  { id: 3, descripcion: 'Quincenal' },
+  { id: 4, descripcion: 'Mensual' },
 ];
 
 // Datos de ejemplo para Tiempo
@@ -148,15 +149,15 @@ export const CLIENTES: Cliente[] = [
     nombres: 'Juan Carlos',
     dni: '12345678',
     fecha_born: '1985-05-15',
-    estado_civil: 'casado', // Usar código que coincida con el componente
+    estado_civil: 'casado',
     edad: 38,
     genero: 'M',
     direccion: 'Av. Principal 123',
     celular: 987654321,
     n_referencial: 123456,
-    grado_instruccion: 'universitaria', // Usar código que coincida con el componente
+    grado_instruccion: 'universitaria',
     email: 'juan@example.com',
-    tipo_vivienda: TIPO_VIVIENDAS[0]
+    tipo_vivienda: TIPO_VIVIENDAS[0],
   },
   {
     id: 2,
@@ -164,16 +165,80 @@ export const CLIENTES: Cliente[] = [
     nombres: 'María Elena',
     dni: '87654321',
     fecha_born: '1990-10-20',
-    estado_civil: 'soltero', // Usar código que coincida con el componente
+    estado_civil: 'soltero',
     edad: 33,
     genero: 'F',
     direccion: 'Jr. Secundaria 456',
     celular: 912345678,
     n_referencial: 654321,
-    grado_instruccion: 'tecnica', // Usar código que coincida con el componente
+    grado_instruccion: 'tecnica',
     email: 'maria@example.com',
-    tipo_vivienda: TIPO_VIVIENDAS[1]
-  }
+    tipo_vivienda: TIPO_VIVIENDAS[1],
+  },
+  {
+    id: 3,
+    apellidos: 'Ramírez Soto',
+    nombres: 'Luis Alberto',
+    dni: '11223344',
+    fecha_born: '1978-07-02',
+    estado_civil: 'viudo',
+    edad: 46,
+    genero: 'M',
+    direccion: 'Calle Lima 789',
+    celular: 999888777,
+    n_referencial: 112233,
+    grado_instruccion: 'secundaria',
+    email: 'luis@example.com',
+    tipo_vivienda: TIPO_VIVIENDAS[2],
+  },
+  {
+    id: 4,
+    apellidos: 'Torres Ruiz',
+    nombres: 'Ana Lucía',
+    dni: '55667788',
+    fecha_born: '1995-12-05',
+    estado_civil: 'conviviente',
+    edad: 29,
+    genero: 'F',
+    direccion: 'Av. Arequipa 1234',
+    celular: 987321654,
+    n_referencial: 445566,
+    grado_instruccion: 'universitaria',
+    email: 'ana@example.com',
+    tipo_vivienda: TIPO_VIVIENDAS[1],
+  },
+  {
+    id: 5,
+    apellidos: 'Mendoza Quispe',
+    nombres: 'Carlos Daniel',
+    dni: '33445566',
+    fecha_born: '1982-03-22',
+    estado_civil: 'casado',
+    edad: 43,
+    genero: 'M',
+    direccion: 'Psje. El Sol 234',
+    celular: 911223344,
+    n_referencial: 778899,
+    grado_instruccion: 'primaria',
+    email: 'carlos@example.com',
+    tipo_vivienda: TIPO_VIVIENDAS[0],
+  },
+  {
+    id: 6,
+    apellidos: 'Salas Fernández',
+    nombres: 'Patricia Mercedes',
+    dni: '99887766',
+    fecha_born: '1988-08-18',
+    estado_civil: 'divorciado',
+    edad: 36,
+    genero: 'F',
+    direccion: 'Jr. La Paz 678',
+    celular: 923456789,
+    n_referencial: 334455,
+    grado_instruccion: 'tecnica',
+    email: 'patricia@example.com',
+    tipo_vivienda: TIPO_VIVIENDAS[2],
+  },
 ];
 
 // Datos de ejemplo para Aval
@@ -481,97 +546,146 @@ export const SOLICITUDES: Solicitud[] = [
     id: 1,
     n_credito: 10001,
     fecha: '15/10/2023', // Formato día/mes/año
-    monto: 10000,
-    plazo: '12 meses',
-    v_gerencia: 'aprobado', // Estado aprobado
-    puntaje_sentinel: 750,
-    cliente: 'Juan Carlos Pérez López',
-    aval: 'Roberto Martínez Sánchez',
-    conyugue: 'Ana María Torres Vega',
     periodo: PERIODOS[0],
-    gasto_financiero: GASTOS_FINANCIEROS[0],
-    credito_anterior: CREDITOS_ANTERIORES[0],
-    referencia_familiar: REFERENCIAS_FAMILIARES[0],
-    ingreso_adicional: INGRESOS_ADICIONALES[0],
-    negocio: NEGOCIOS[0] // SOLO NEGOCIO - Bodega, venta de carnes o verduras
-    // NO tiene ingreso_dependiente
+    plazo: '12 meses',
+    monto: 10000,
+    v_gerencia: 'aprobado', // Estado aprobado
+    fichaTrabajo: {
+      id: 1,
+      cliente: CLIENTES[0],
+      aval: AVALES[0],
+      conyuge: CONYUGES[0],
+      referencia_familiar: REFERENCIAS_FAMILIARES[0],
+      credito_anterior: CREDITOS_ANTERIORES[0],
+      gasto_financieros: [GASTOS_FINANCIEROS[0]],
+      ingreso_adicional: INGRESOS_ADICIONALES[0],
+      puntaje_sentinel: 750,
+      detalleEconomico: {
+        negocio: NEGOCIOS[0],
+        ingreso_dependiente: null,
+      },
+    },
   },
   {
     id: 2,
     n_credito: 10002,
     fecha: '20/11/2023', // Formato día/mes/año
+    periodo: PERIODOS[1],
     monto: 5000,
     plazo: '6 meses',
     v_gerencia: 'observado', // Estado observado
-    puntaje_sentinel: 820,
-    cliente: 'María Elena Gómez Rodríguez',
-    periodo: PERIODOS[1],
-    gasto_financiero: GASTOS_FINANCIEROS[1],
-    referencia_familiar: REFERENCIAS_FAMILIARES[1],
-    ingreso_dependiente: INGRESOS_DEPENDIENTES[1] // SOLO INGRESO DEPENDIENTE - Empleado privado
-    // NO tiene negocio
+    fichaTrabajo: {
+      id: 2,
+      cliente: CLIENTES[1], // María Elena Gómez Rodríguez
+      aval: null, // No tiene aval
+      conyuge: null, // Soltera, no tiene cónyuge
+      referencia_familiar: REFERENCIAS_FAMILIARES[1],
+      credito_anterior: null, // No tiene crédito anterior
+      gasto_financieros: [GASTOS_FINANCIEROS[1]],
+      ingreso_adicional: null, // No tiene ingreso adicional
+      puntaje_sentinel: 820,
+      detalleEconomico: {
+        negocio: null, // NO tiene negocio
+        ingreso_dependiente: INGRESOS_DEPENDIENTES[1], // SOLO INGRESO DEPENDIENTE - Empleado privado
+      },
+    },
   },
   {
     id: 3,
     n_credito: 10003,
     fecha: '05/12/2023', // Formato día/mes/año
+    periodo: PERIODOS[2],
     monto: 15000,
     plazo: '24 meses',
     v_gerencia: 'denegado', // Estado denegado
-    puntaje_sentinel: 450,
-    cliente: 'Roberto Martínez Sánchez',
-    aval: 'Roberto Martínez Sánchez',
-    periodo: PERIODOS[0],
-    credito_anterior: CREDITOS_ANTERIORES[0],
-    referencia_familiar: REFERENCIAS_FAMILIARES[2],
-    negocio: NEGOCIOS[0] // SOLO NEGOCIO - Bodega / Bazar
-    // NO tiene ingreso_dependiente
+    fichaTrabajo: {
+      id: 3,
+      cliente: CLIENTES[0], // Reutilizamos un cliente existente
+      aval: AVALES[0], // Roberto Martínez Sánchez como aval
+      conyuge: CONYUGES[0], // Tiene cónyuge
+      referencia_familiar: REFERENCIAS_FAMILIARES[2],
+      credito_anterior: CREDITOS_ANTERIORES[0],
+      gasto_financieros: [], // No tiene gastos financieros
+      ingreso_adicional: null, // No tiene ingreso adicional
+      puntaje_sentinel: 450,
+      detalleEconomico: {
+        negocio: NEGOCIOS[0], // SOLO NEGOCIO - Bodega / Bazar
+        ingreso_dependiente: null, // NO tiene ingreso_dependiente
+      },
+    },
   },
   {
     id: 4,
     n_credito: 10004,
     fecha: '15/12/2023', // Formato día/mes/año
+    periodo: PERIODOS[2],
     monto: 7500,
     plazo: '18 meses',
     v_gerencia: 'pendiente', // Estado pendiente
-    puntaje_sentinel: 680,
-    cliente: 'Ana María Torres Vega',
-    periodo: PERIODOS[1],
-    referencia_familiar: REFERENCIAS_FAMILIARES[1],
-    ingreso_adicional: INGRESOS_ADICIONALES[0],
-    ingreso_dependiente: INGRESOS_DEPENDIENTES[2] // SOLO INGRESO DEPENDIENTE - Docente universitario
-    // NO tiene negocio
+    fichaTrabajo: {
+      id: 4,
+      cliente: CLIENTES[2], // Ana María Torres Vega
+      aval: null, // No tiene aval
+      conyuge: null, // No tiene cónyuge
+      referencia_familiar: REFERENCIAS_FAMILIARES[1],
+      credito_anterior: null, // No tiene crédito anterior
+      gasto_financieros: [], // No tiene gastos financieros
+      ingreso_adicional: INGRESOS_ADICIONALES[0],
+      puntaje_sentinel: 680,
+      detalleEconomico: {
+        negocio: null, // NO tiene negocio
+        ingreso_dependiente: INGRESOS_DEPENDIENTES[2], // SOLO INGRESO DEPENDIENTE - Docente universitario
+      },
+    },
   },
   {
     id: 5,
     n_credito: 10005,
     fecha: '10/01/2024', // Formato día/mes/año
+    periodo: PERIODOS[2],
     monto: 3000,
     plazo: '8 meses',
     v_gerencia: 'aprobado', // Estado aprobado
-    puntaje_sentinel: 720,
-    cliente: 'Carlos Eduardo Ramírez',
-    periodo: PERIODOS[0],
-    referencia_familiar: REFERENCIAS_FAMILIARES[2],
-    ingreso_dependiente: INGRESOS_DEPENDIENTES[0] // SOLO INGRESO DEPENDIENTE - Empleado público
-    // NO tiene negocio
+    fichaTrabajo: {
+      id: 5,
+      cliente: CLIENTES[3], // Carlos Eduardo Ramírez
+      aval: null, // No tiene aval
+      conyuge: null, // No tiene cónyuge
+      referencia_familiar: REFERENCIAS_FAMILIARES[2],
+      credito_anterior: null, // No tiene crédito anterior
+      gasto_financieros: [], // No tiene gastos financieros
+      ingreso_adicional: null, // No tiene ingreso adicional
+      puntaje_sentinel: 720,
+      detalleEconomico: {
+        negocio: null, // NO tiene negocio
+        ingreso_dependiente: INGRESOS_DEPENDIENTES[0], // SOLO INGRESO DEPENDIENTE - Empleado público
+      },
+    },
   },
   {
     id: 6,
     n_credito: 10006,
     fecha: '25/01/2024', // Formato día/mes/año
+    periodo: PERIODOS[2],
     monto: 12000,
     plazo: '18 meses',
     v_gerencia: 'pendiente', // Estado pendiente
-    puntaje_sentinel: 690,
-    cliente: 'Luis Fernando García',
-    aval: 'Roberto Martínez Sánchez',
-    periodo: PERIODOS[0],
-    gasto_financiero: GASTOS_FINANCIEROS[0],
-    referencia_familiar: REFERENCIAS_FAMILIARES[0],
-    negocio: NEGOCIOS[2] // SOLO NEGOCIO - Panadería
-    // NO tiene ingreso_dependiente
-  }
+    fichaTrabajo: {
+      id: 6,
+      cliente: CLIENTES[4], // Luis Fernando García
+      aval: AVALES[1], // Roberto Martínez Sánchez como aval
+      conyuge: CONYUGES[1], // Tiene cónyuge
+      referencia_familiar: REFERENCIAS_FAMILIARES[0],
+      credito_anterior: null, // No tiene crédito anterior
+      gasto_financieros: [GASTOS_FINANCIEROS[0]],
+      ingreso_adicional: null, // No tiene ingreso adicional
+      puntaje_sentinel: 690,
+      detalleEconomico: {
+        negocio: NEGOCIOS[2], // SOLO NEGOCIO - Panadería
+        ingreso_dependiente: null, // NO tiene ingreso_dependiente
+      },
+    },
+  },
 ];
 
 // Datos de ejemplo para Usuario

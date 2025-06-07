@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, computed, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Message } from 'primeng/message';
 import { ButtonModule } from 'primeng/button';
@@ -59,7 +59,30 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   @Input() display: boolean = false;
   @Output() closedDialog = new EventEmitter<boolean>();
   @Output() montoChange = new EventEmitter<number>();
-  @Input() solicitud: Solicitud = { id: 0, n_credito: 0, fecha: '', monto: 0, plazo: '', v_gerencia: 'pendiente', puntaje_sentinel: 0 };
+  @Input() solicitud: Solicitud = {
+    id: 0,
+    n_credito: 0,
+    fecha: '',
+    periodo: { id: 0, descripcion: '' },
+    plazo: '',
+    monto: 0,
+    v_gerencia: 'pendiente',
+    fichaTrabajo: {
+      id: 0,
+      cliente: null,
+      aval: null,
+      conyuge: null,
+      referencia_familiar: null,
+      credito_anterior: null,
+      gasto_financieros: [],
+      ingreso_adicional: null,
+      puntaje_sentinel: null,
+      detalleEconomico: {
+        negocio: null,
+        ingreso_dependiente: null
+      }
+    }
+  };
   @Input() title = '';
   @Input() editabled: boolean = false;
 
@@ -135,6 +158,7 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
         }
       }
 
+      // Solo actualizar los campos que pertenecen al modelo Solicitud
       this.solicitudForm.patchValue({
         id: this.solicitud.id,
         n_credito: this.solicitud.n_credito,
@@ -142,16 +166,7 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
         monto: this.solicitud.monto,
         plazo: this.solicitud.plazo,
         v_gerencia: this.solicitud.v_gerencia,
-        puntaje_sentinel: this.solicitud.puntaje_sentinel,
-        cliente: this.solicitud.cliente,
-        aval: this.solicitud.aval,
-        conyugue: this.solicitud.conyugue,
-        periodo: periodoCompleto, // Usar el objeto completo del periodo
-        gasto_financiero: this.solicitud.gasto_financiero?.id,
-        credito_anterior: this.solicitud.credito_anterior?.id,
-        referencia_familiar: this.solicitud.referencia_familiar?.id,
-        ingreso_adicional: this.solicitud.ingreso_adicional?.id,
-        negocio: this.solicitud.negocio?.id,
+        periodo: periodoCompleto // Usar el objeto completo del periodo
       });
 
       console.log('✅ Formulario de solicitud actualizado');
@@ -161,23 +176,15 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
   }
 
   initiateForm() {
+    // Solo incluir los campos que pertenecen al modelo Solicitud
     this.solicitudForm = this.fb.group({
-      id: [[this.solicitud.id], [Validators.required, Validators.minLength(1)]],
-      n_credito: [[this.solicitud.n_credito], [Validators.required, Validators.minLength(1)]],
-      fecha: [[this.solicitud.fecha], [Validators.required]],
-      monto: [[this.solicitud.monto], [Validators.required]],
-      plazo: [[this.solicitud.plazo], [Validators.required]],
-      v_gerencia: [[this.solicitud.v_gerencia], [Validators.required]],
-      cliente: [[this.solicitud.cliente], [Validators.required]],
-      aval: [[this.solicitud.aval], [Validators.required]],
-      conyugue: [[this.solicitud.conyugue], [Validators.required]],
-      periodo: [[this.solicitud.periodo?.descripcion], [Validators.required]],
-      gasto_financiero: [[this.solicitud.gasto_financiero?.id], [Validators.required]],
-      credito_anterior: [[this.solicitud.credito_anterior?.id], [Validators.required]],
-      referencia_familiar: [[this.solicitud.referencia_familiar?.id], [Validators.required]],
-      ingreso_adicional: [[this.solicitud.ingreso_adicional?.id], [Validators.required]],
-      negocio: [[this.solicitud.negocio?.id], [Validators.required]],
-      puntaje_sentinel: [this.solicitud.puntaje_sentinel, [Validators.required]],
+      id: [this.solicitud.id, [Validators.required, Validators.minLength(1)]],
+      n_credito: [this.solicitud.n_credito, [Validators.required, Validators.minLength(1)]],
+      fecha: [this.solicitud.fecha, [Validators.required]],
+      monto: [this.solicitud.monto, [Validators.required, Validators.min(1)]],
+      plazo: [this.solicitud.plazo, [Validators.required]],
+      v_gerencia: [this.solicitud.v_gerencia, [Validators.required]],
+      periodo: [this.solicitud.periodo, [Validators.required]]
     });
     this.solicitudForm.reset();
   }
@@ -281,51 +288,14 @@ export class SolicitudTabComponent implements   OnInit, OnChanges {
     return this.solicitudForm.controls['v_gerencia'];
   }
 
-  get puntaje_sentinel() {
-    return this.solicitudForm.controls['puntaje_sentinel'];
-  }
-
-  get cliente() {
-    return this.solicitudForm.controls['cliente'];
-  }
-
-  get aval() {
-    return this.solicitudForm.controls['aval'];
-  }
-
-  get conyugue() {
-    return this.solicitudForm.controls['conyugue'];
-  }
-
   get periodo() {
     return this.solicitudForm.controls['periodo'];
   }
 
-  get gasto_financiero() {
-    return this.solicitudForm.controls['gasto_financiero'];
-  }
-
-  get credito_anterior() {
-    return this.solicitudForm.controls['credito_anterior'];
-  }
-
-  get referencia_familiar() {
-    return this.solicitudForm.controls['referencia_familiar'];
-  }
-
-  get ingreso_adicional() {
-    return this.solicitudForm.controls['ingreso_adicional'];
-  }
-
-  get negocio() {
-    return this.solicitudForm.controls['negocio'];
-  }
-
   /**
    * Maneja el evento cuando cambia el monto de la solicitud
-   * @param event El evento de cambio
    */
-  onMontoChange(event: any): void {
+  onMontoChange(): void {
     const montoValue = this.monto.value;
     if (montoValue && !isNaN(montoValue)) {
       // Emitir el evento con el monto como número

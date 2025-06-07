@@ -18,7 +18,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageToastService } from '../../../../../shared/utils/message-toast.service';
 import { SolicitudPanelComponent } from '../solicitud-panel/solicitud-panel.component';
 import { LocalSolicitudService } from '../../../../services/local-data-container.service';
-import { LocalFichaService } from '../../../../services/local-ficha.service';
+
 import { Solicitud } from '../../../../domain/solicitud.model';
 import { FichaTrabajo } from '../../../../domain/ficha-trabajo.model';
 
@@ -112,7 +112,6 @@ export class SolicitudEditarComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private solicitudService: LocalSolicitudService,
-    private fichaService: LocalFichaService,
     private messageService: MessageToastService
   ) {}
 
@@ -132,140 +131,46 @@ export class SolicitudEditarComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    // Cargar la solicitud
-    this.solicitudService.getById(this.solicitudId).subscribe({
-      next: (solicitud) => {
-        this.solicitud = solicitud;
+    // Cargar datos iniciales del servicio
+    this.solicitudService.loadInitialData();
 
-        // Extraer el DNI del cliente para cargar la ficha
-        if (solicitud.cliente) {
-          // Buscar el DNI en los datos mock basándose en el nombre del cliente
-          this.cargarFichaPorCliente(solicitud.cliente);
-        } else {
-          this.error = 'No se encontró información del cliente en la solicitud';
-          this.loading = false;
-        }
-      },
-      error: (error) => {
-        console.error('Error al cargar la solicitud:', error);
+    // Buscar la solicitud por ID
+    setTimeout(() => {
+      const solicitudes = this.solicitudService.data();
+      this.solicitud = solicitudes.find(s => s.id === this.solicitudId) || null;
+
+      if (!this.solicitud) {
         this.error = 'No se pudo cargar la solicitud. Verifique que el ID sea correcto.';
         this.loading = false;
+        return;
       }
-    });
-  }
 
-  private cargarFichaPorCliente(nombreCliente: string): void {
-    console.log('Cargando ficha para cliente:', nombreCliente);
+      // Usar directamente la ficha de trabajo de la solicitud
+      this.fichaTrabajo = this.solicitud.fichaTrabajo || null;
 
-    // En un sistema real, tendríamos una relación directa entre solicitud y ficha
-    // Para la demo, vamos a buscar por nombre del cliente directamente
-
-    // Primero intentar buscar por nombre directamente
-    this.fichaService.obtenerFichaPorNombre(nombreCliente).subscribe({
-      next: (ficha) => {
-        console.log('Ficha cargada exitosamente por nombre:', ficha);
-        this.fichaTrabajo = ficha;
+      if (!this.fichaTrabajo) {
+        this.error = 'No se encontró información de la ficha de trabajo en la solicitud';
         this.loading = false;
-
-        this.messageService.infoMessageToast(
-          'Datos cargados',
-          `Se han cargado los datos de la solicitud y la ficha de trabajo para ${nombreCliente}.`
-        );
-      },
-      error: (error) => {
-        console.log('No se encontró ficha por nombre, intentando por DNI:', error);
-
-        // Si no se encuentra por nombre, intentar por DNI
-        const dni = this.obtenerDniPorNombre(nombreCliente);
-
-        if (dni) {
-          this.fichaService.obtenerFichaPorDni(dni).subscribe({
-            next: (ficha) => {
-              console.log('Ficha cargada exitosamente por DNI:', ficha);
-              this.fichaTrabajo = ficha;
-              this.loading = false;
-
-              this.messageService.infoMessageToast(
-                'Datos cargados',
-                `Se han cargado los datos de la solicitud y la ficha de trabajo para ${nombreCliente}.`
-              );
-            },
-            error: (errorDni) => {
-              console.error('Error al cargar la ficha de trabajo por DNI:', errorDni);
-
-              // Si no se encuentra la ficha, crear una ficha básica con los datos del cliente
-              this.crearFichaBasica(nombreCliente, dni);
-            }
-          });
-        } else {
-          console.error('No se encontró DNI para el cliente:', nombreCliente);
-          this.error = `No se encontraron datos para el cliente "${nombreCliente}". Verifique que el cliente exista en el sistema.`;
-          this.loading = false;
-        }
+        return;
       }
-    });
+
+      this.loading = false;
+      console.log('✅ Solicitud y ficha de trabajo cargadas para edición:', this.solicitud);
+
+      const nombreCliente = this.fichaTrabajo.cliente ?
+        `${this.fichaTrabajo.cliente.nombres} ${this.fichaTrabajo.cliente.apellidos}` :
+        'Cliente';
+
+      this.messageService.infoMessageToast(
+        'Datos cargados',
+        `Se han cargado los datos de la solicitud y la ficha de trabajo para ${nombreCliente}.`
+      );
+    }, 500);
   }
 
-  private obtenerDniPorNombre(nombreCliente: string): string | null {
-    // Mapeo de nombres a DNIs para la demo
-    const clientesDni: { [key: string]: string } = {
-      'Juan Carlos Pérez López': '12345678',
-      'María Elena Gómez Rodríguez': '87654321',
-      'Pérez López Juan Carlos': '12345678', // Variación del nombre
-      'Gómez Rodríguez María Elena': '87654321' // Variación del nombre
-    };
-
-    // Buscar coincidencia exacta primero
-    let dni = clientesDni[nombreCliente];
-
-    // Si no encuentra coincidencia exacta, buscar por partes del nombre
-    if (!dni) {
-      const nombreLimpio = nombreCliente.toLowerCase().trim();
-
-      // Buscar por coincidencias parciales
-      // Verificar si contiene las palabras principales
-      if (nombreLimpio.includes('juan carlos') && nombreLimpio.includes('pérez')) {
-        dni = '12345678';
-      } else if (nombreLimpio.includes('maría elena') && nombreLimpio.includes('gómez')) {
-        dni = '87654321';
-      }
-    }
-
-    console.log(`Mapeo de nombre "${nombreCliente}" a DNI: ${dni}`);
-    return dni;
-  }
-
-  private crearFichaBasica(nombreCliente: string, dni: string): void {
-    console.log('Creando ficha básica para cliente sin ficha existente');
-
-    // Crear una ficha básica con datos mínimos
-    this.fichaTrabajo = {
-      id: -1,
-      cliente: {
-        id: 0,
-        apellidos: nombreCliente.split(' ').slice(-2).join(' ') || 'Apellidos',
-        nombres: nombreCliente.split(' ').slice(0, -2).join(' ') || 'Nombres',
-        dni: dni,
-        genero: 'M',
-        tipo_vivienda: { id: 1, descripcion: 'Propia' }
-      },
-      aval: null,
-      conyuge: null,
-      referencia_familiar: null,
-      credito_anterior: null,
-      gasto_financieros: null,
-      ingreso_adicional: null,
-      puntaje_sentinel: this.solicitud?.puntaje_sentinel || null,
-      detalleEconomico: null
-    };
-
-    this.loading = false;
-
-    this.messageService.infoMessageToast(
-      'Ficha creada',
-      `Se ha creado una ficha básica para ${nombreCliente}. Complete los datos faltantes.`
-    );
-  }
+  // MÉTODOS OBSOLETOS ELIMINADOS
+  // Ya no necesitamos cargar fichas por separado porque ahora están integradas en la solicitud
+  // Los métodos cargarFichaPorCliente, obtenerDniPorNombre y crearFichaBasica han sido eliminados
 
   /**
    * Maneja los mensajes emitidos por el componente SolicitudPanel
@@ -288,59 +193,9 @@ export class SolicitudEditarComponent implements OnInit {
     }
   }
 
-  /**
-   * Actualiza la solicitud y la ficha de trabajo
-   */
-  private actualizarSolicitud(): void {
-    if (!this.solicitudPanel) {
-      this.messageService.errorMessageToast('Error', 'No se pudo acceder al formulario de solicitud');
-      return;
-    }
-
-    try {
-      // Obtener los datos actualizados de la solicitud y la ficha de trabajo
-      const fichaActualizada = this.solicitudPanel.getAllData();
-      const solicitudActualizada = this.solicitudPanel.solicitud;
-
-      console.log('Ficha de trabajo a actualizar:', fichaActualizada);
-      console.log('Solicitud a actualizar:', solicitudActualizada);
-
-      // Actualizar la ficha de trabajo
-      this.fichaService.updateFichaTrabajo(fichaActualizada).subscribe({
-        next: (response) => {
-          console.log('Ficha de trabajo actualizada:', response);
-
-          // Actualizar la solicitud
-          this.solicitudService.update(solicitudActualizada.id, {
-            ...solicitudActualizada,
-            cliente: fichaActualizada.cliente?.apellidos + ' ' + fichaActualizada.cliente?.nombres,
-            fecha: solicitudActualizada.fecha || new Date().toISOString().split('T')[0]
-          }).subscribe({
-            next: (solicitudGuardada) => {
-              console.log('Solicitud actualizada:', solicitudGuardada);
-              this.messageService.successMessageToast('Éxito', 'Solicitud actualizada correctamente');
-
-              // Navegar a la lista de solicitudes
-              setTimeout(() => {
-                this.router.navigate(['/solicitudes']);
-              }, 1500);
-            },
-            error: (error) => {
-              console.error('Error al actualizar la solicitud:', error);
-              this.messageService.errorMessageToast('Error', 'No se pudo actualizar la solicitud');
-            }
-          });
-        },
-        error: (error) => {
-          console.error('Error al actualizar la ficha de trabajo:', error);
-          this.messageService.errorMessageToast('Error', 'No se pudo actualizar la ficha de trabajo');
-        }
-      });
-    } catch (error) {
-      console.error('Error al procesar los datos:', error);
-      this.messageService.errorMessageToast('Error', 'Error al procesar los datos del formulario');
-    }
-  }
+  // MÉTODO OBSOLETO ELIMINADO
+  // La actualización ahora se maneja directamente en el componente SolicitudPanel
+  // que tiene acceso directo a la estructura correcta del modelo Solicitud
 
   volver(): void {
     this.router.navigate(['/solicitudes']);
